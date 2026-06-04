@@ -4,24 +4,21 @@ from django.urls import reverse
 
 
 CATEGORY_CHOICES = [
-    ('electronics', 'Electronics'),
     ('laptops', 'Laptops'),
     ('cameras', 'Cameras'),
-    ('drones', 'Drones'),
     ('gaming', 'Gaming'),
+    ('drones', 'Drones'),
     ('bikes', 'Bikes'),
     ('cars', 'Cars'),
     ('furniture', 'Furniture'),
-    ('books', 'Books'),
-    ('sports', 'Sports'),
     ('tools', 'Tools'),
+    ('books', 'Books'),
+    ('musical_instruments', 'Music'),
     ('projectors', 'Projectors'),
-    ('musical_instruments', 'Musical Instruments'),
     ('other', 'Other'),
 ]
 
 CATEGORY_ICONS = {
-    'electronics': 'bi-cpu',
     'laptops': 'bi-laptop',
     'cameras': 'bi-camera',
     'drones': 'bi-controller',
@@ -30,7 +27,6 @@ CATEGORY_ICONS = {
     'cars': 'bi-car-front',
     'furniture': 'bi-house',
     'books': 'bi-book',
-    'sports': 'bi-trophy',
     'tools': 'bi-tools',
     'projectors': 'bi-projector',
     'musical_instruments': 'bi-music-note-beamed',

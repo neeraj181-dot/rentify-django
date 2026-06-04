@@ -10,6 +10,7 @@ urlpatterns = [
     path('api/health/', health_check, name='health_check_slash'),
     path('', include('listings.urls')),
     path('accounts/', include('accounts.urls')),
+    path('oauth/', include('social_django.urls', namespace='social')),
     path('bookings/', include('bookings.urls')),
     path('messaging/', include('messaging.urls')),
     path('reviews/', include('reviews.urls')),

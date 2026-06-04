@@ -70,7 +70,6 @@ def earn_view(request):
 def search_view(request):
     # Build category list for template — no filter tricks needed
     CATEGORY_DATA = [
-        ('electronics',        'Electronics',        'bi-cpu-fill'),
         ('laptops',            'Laptops',            'bi-laptop-fill'),
         ('cameras',            'Cameras',            'bi-camera-fill'),
         ('gaming',             'Gaming',             'bi-joystick'),
@@ -78,7 +77,6 @@ def search_view(request):
         ('bikes',              'Bikes',              'bi-bicycle'),
         ('cars',               'Cars',               'bi-car-front-fill'),
         ('furniture',          'Furniture',          'bi-house-fill'),
-        ('sports',             'Sports',             'bi-trophy-fill'),
         ('tools',              'Tools',              'bi-tools'),
         ('books',              'Books',              'bi-book-fill'),
         ('musical_instruments','Music',              'bi-music-note-beamed'),

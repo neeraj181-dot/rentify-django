@@ -287,7 +287,7 @@ html.auth-ready .rfy-nav-authed-only {
 }
 .hub-card-img-wrap {
   position: relative;
-  aspect-ratio: 16 / 10;
+  height: 220px;
   overflow: hidden;
   background: #0a0e1a;
 }

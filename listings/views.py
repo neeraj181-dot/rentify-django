@@ -1,6 +1,7 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.urls import reverse
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.cache import never_cache
 from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.db.models import Q, Avg, Case, When, IntegerField, Value
@@ -257,8 +258,9 @@ def _listing_form_context():
 
 
 def _redirect_after_listing_save(product):
-    """POST/Redirect/GET — land on product page, not the upload form."""
-    return HttpResponseRedirect(reverse('product_detail', kwargs={'pk': product.pk}), status=303)
+    """POST/Redirect/GET — redirect to My Listings, not the form. Prevents Back-button resubmit."""
+    from django.urls import reverse
+    return HttpResponseRedirect(reverse('my_listings'), status=303)
 
 
 @login_required
@@ -271,6 +273,7 @@ def listing_form_meta(request):
     })
 
 
+@never_cache
 @login_required
 def create_listing_view(request):
     if request.method == 'POST':
@@ -279,12 +282,10 @@ def create_listing_view(request):
             product = form.save(commit=False)
             product.owner = request.user
             product.auto_calculate_prices()
-            # Fraud detection: flag suspiciously low prices
             if product.price_per_day < 10:
                 product.is_flagged = True
                 product.flag_reason = 'Suspiciously low price - under review'
             product.save()
-            # Collect uploaded images from individually-named fields (image_0..image_4)
             saved = 0
             for i in range(5):
                 img = request.FILES.get(f'image_{i}')
@@ -298,16 +299,23 @@ def create_listing_view(request):
                     saved += 1
             messages.success(
                 request,
-                'Your listing has been published! You can manage it anytime from My Listings.',
+                '✓ Listing created successfully! You can manage it from My Listings.',
             )
-            return _redirect_after_listing_save(product)
+            # PRG: 303 redirect → my_listings so Back never replays the POST
+            return HttpResponseRedirect(reverse('my_listings'), status=303)
     else:
         form = ProductForm()
     context = {'form': form}
     context.update(_listing_form_context())
-    return render(request, 'listings/create_listing.html', context)
+    resp = render(request, 'listings/create_listing.html', context)
+    # Prevent browser from caching the blank form page
+    resp['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    resp['Pragma']  = 'no-cache'
+    resp['Expires'] = '0'
+    return resp
 
 
+@never_cache
 @login_required
 def edit_listing_view(request, pk):
     product = get_object_or_404(Product, pk=pk, owner=request.user)
@@ -317,7 +325,6 @@ def edit_listing_view(request, pk):
             product = form.save(commit=False)
             product.auto_calculate_prices()
             product.save()
-            # Add new images from individually-named fields
             existing_count = product.images.count()
             slots_left = max(0, 5 - existing_count)
             added = 0
@@ -338,13 +345,18 @@ def edit_listing_view(request, pk):
                 if first_img:
                     first_img.is_primary = True
                     first_img.save(update_fields=['is_primary'])
-            messages.success(request, 'Listing updated successfully!')
-            return _redirect_after_listing_save(product)
+            messages.success(request, '✓ Listing updated successfully!')
+            # PRG: 303 redirect → my_listings
+            return HttpResponseRedirect(reverse('my_listings'), status=303)
     else:
         form = ProductForm(instance=product)
     context = {'form': form, 'product': product}
     context.update(_listing_form_context())
-    return render(request, 'listings/edit_listing.html', context)
+    resp = render(request, 'listings/edit_listing.html', context)
+    resp['Cache-Control'] = 'no-store, no-cache, must-revalidate, max-age=0'
+    resp['Pragma']  = 'no-cache'
+    resp['Expires'] = '0'
+    return resp
 
 
 @login_required

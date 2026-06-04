@@ -315,91 +315,124 @@
 {% block extra_js %}
 <script>
 (function () {
-  const chatEl  = document.getElementById('chat-messages');
-  const convId  = document.getElementById('conv-id')?.value;
-  const form    = document.getElementById('msg-form');
-  const input   = document.getElementById('msg-input');
+  const chatEl = document.getElementById('chat-messages');
+  const convId = document.getElementById('conv-id')?.value;
+  const form   = document.getElementById('msg-form');
+  const input  = document.getElementById('msg-input');
 
-  /* scroll to bottom */
-  function scrollBottom() { if (chatEl) chatEl.scrollTop = chatEl.scrollHeight; }
-  scrollBottom();
-
-  /* auto-grow textarea */
-  input?.addEventListener('input', () => {
-    input.style.height = 'auto';
-    input.style.height = Math.min(input.scrollHeight, 140) + 'px';
-  });
-
-  /* submit via AJAX */
-  window.submitMsg = async function () {
-    const content = input?.value.trim();
-    if (!content) return;
-    const btn = document.querySelector('.send-btn');
-    btn.disabled = true;
-
-    try {
-      const fd = new FormData(form);
-      const r  = await fetch(form.action || window.location.href, {
-        method: 'POST',
-        headers: { 'X-Requested-With': 'XMLHttpRequest' },
-        credentials: 'same-origin',
-        body: fd,
-      });
-      if (r.ok) {
-        const d = await r.json();
-        if (d.id) {
-          appendBubble(d, true);
-          input.value = '';
-          input.style.height = 'auto';
-          scrollBottom();
-        }
-      }
-    } catch (e) {
-      /* fallback: normal POST */
-      form.submit();
-    } finally { btn.disabled = false; }
-  };
-
-  function appendBubble(msg, isMine) {
-    /* remove start placeholder if present */
-    document.querySelector('.chat-start')?.remove();
-
-    const row = document.createElement('div');
-    row.className = `msg-row ${isMine ? 'mine' : 'theirs'}`;
-    row.dataset.id = msg.id;
-    row.innerHTML = `
-      <div class="bubble ${isMine ? 'mine' : 'theirs'}">
-        ${esc(msg.content)}
-        <span class="bubble-time">${msg.time}</span>
-      </div>`;
-    chatEl.appendChild(row);
-  }
-
-  function esc(s) {
-    return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')
-            .replace(/\n/g,'<br>');
-  }
-
-  /* poll for new messages */
+  /* ── Track the highest message ID we've rendered ── */
   let lastId = 0;
   chatEl?.querySelectorAll('.msg-row[data-id]').forEach(r => {
     lastId = Math.max(lastId, parseInt(r.dataset.id || 0));
   });
 
+  /* ── Scroll to bottom ── */
+  function scrollBottom() { if (chatEl) chatEl.scrollTop = chatEl.scrollHeight; }
+  scrollBottom();
+
+  /* ── Auto-grow textarea ── */
+  input?.addEventListener('input', () => {
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 140) + 'px';
+  });
+
+  /* ── Append a bubble (deduplication by data-id) ── */
+  function appendBubble(msg, isMine) {
+    /* skip if this id is already in the DOM */
+    if (chatEl.querySelector(`.msg-row[data-id="${msg.id}"]`)) return;
+
+    /* remove first-visit placeholder */
+    document.querySelector('.chat-start')?.remove();
+
+    const row = document.createElement('div');
+    row.className = `msg-row ${isMine ? 'mine' : 'theirs'}`;
+    row.dataset.id = msg.id;
+
+    const avatar = isMine
+      ? ''
+      : `<img src="${escAttr(msg.avatar || '')}" class="row-av"
+             onerror="this.src='https://placehold.co/28/4F8EF7/fff?text=${escAttr(msg.sender_initial || '?')}'">`; 
+
+    row.innerHTML = `${avatar}
+      <div class="bubble ${isMine ? 'mine' : 'theirs'}">
+        ${esc(msg.content)}
+        <span class="bubble-time">${msg.time}</span>
+      </div>`;
+    chatEl.appendChild(row);
+
+    /* keep lastId in sync so the poller won't re-add this message */
+    lastId = Math.max(lastId, msg.id);
+  }
+
+  /* ── Send message via AJAX ── */
+  window.submitMsg = async function () {
+    const content = input?.value.trim();
+    if (!content) return;
+
+    const btn = document.querySelector('.send-btn');
+    if (btn) btn.disabled = true;
+
+    try {
+      const fd = new FormData(form);
+      const res = await fetch(form.action || window.location.href, {
+        method: 'POST',
+        headers: { 'X-Requested-With': 'XMLHttpRequest' },
+        credentials: 'same-origin',
+        body: fd,
+      });
+
+      if (res.ok) {
+        const d = await res.json();
+        if (d.id) {
+          /* append immediately AND update lastId so the poller skips it */
+          appendBubble(d, true);
+          input.value = '';
+          input.style.height = 'auto';
+          scrollBottom();
+        }
+      } else {
+        /* server returned an error — fall back to full page POST */
+        form.submit();
+      }
+    } catch (e) {
+      /* network error — fall back to full page POST */
+      form.submit();
+    } finally {
+      if (btn) btn.disabled = false;
+    }
+  };
+
+  /* ── Poll for new messages from the OTHER person ── */
   if (convId) {
     setInterval(async () => {
       try {
-        const r = await fetch(`/messaging/${convId}/poll/?after=${lastId}`, { credentials: 'same-origin' });
-        const d = await r.json();
+        const res = await fetch(
+          `/messaging/${convId}/poll/?after=${lastId}`,
+          { credentials: 'same-origin' }
+        );
+        const d = await res.json();
         if (d.messages?.length) {
           d.messages.forEach(m => {
+            /* appendBubble already guards against duplicates via data-id check */
             appendBubble(m, m.is_mine);
-            lastId = Math.max(lastId, m.id);
           });
           scrollBottom();
         }
-      } catch (e) {}
+      } catch (e) { /* network hiccup — ignore */ }
     }, 3000);
+  }
+
+  /* ── HTML escape helpers ── */
+  function esc(s) {
+    return String(s)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/\n/g, '<br>');
+  }
+  function escAttr(s) {
+    return String(s).replace(/"/g, '&quot;').replace(/'/g, '&#39;');
   }
 })();
 </script>

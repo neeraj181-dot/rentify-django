@@ -1,6 +1,7 @@
 from django.db import models
 from django.contrib.auth.models import User
 from django.urls import reverse
+from django.templatetags.static import static
 
 
 CATEGORY_CHOICES = [
@@ -91,8 +92,8 @@ class Product(models.Model):
         return CATEGORY_ICONS.get(self.category, 'bi-grid')
 
     def get_primary_image(self):
-        img = self.images.first()
-        return img.image.url if img else '/static/images/no-image.png'
+        img = self.images.filter(is_primary=True).first() or self.images.first()
+        return img.image.url if img else static('images/no-image.svg')
 
     def auto_calculate_prices(self):
         if not self.price_per_week:

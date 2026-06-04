@@ -1,62 +1,502 @@
 {% extends 'base.html' %}
+{% load static %}
 {% block title %}Manage Bookings — Rentify{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Page wrapper ── */
+.ob-page {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2.5rem 1.25rem 5rem;
+}
+
+/* ── Page header ── */
+.ob-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 2rem;
+}
+.ob-title {
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #EEF0FF;
+  margin: 0 0 .3rem;
+  letter-spacing: -.025em;
+}
+.ob-sub {
+  font-size: .82rem;
+  color: rgba(238,240,255,.4);
+  margin: 0;
+  line-height: 1.6;
+}
+
+/* ── Compact stat row ── */
+.ob-stats {
+  display: flex;
+  gap: .75rem;
+  margin-bottom: 1.75rem;
+  flex-wrap: wrap;
+}
+.ob-stat {
+  display: flex;
+  align-items: center;
+  gap: .65rem;
+  background: #101428;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 12px;
+  padding: .75rem 1.1rem;
+  min-width: 130px;
+  flex: 1;
+  max-width: 200px;
+}
+.ob-stat-ico {
+  width: 36px;
+  height: 36px;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: .95rem;
+  flex-shrink: 0;
+}
+.ob-stat-ico.gold   { background: rgba(245,158,11,.12); color: #F59E0B; }
+.ob-stat-ico.blue   { background: rgba(79,142,247,.12);  color: #4F8EF7; }
+.ob-stat-ico.green  { background: rgba(0,208,132,.1);    color: #00D084; }
+.ob-stat-val  { font-size: 1.25rem; font-weight: 900; color: #EEF0FF; line-height: 1; }
+.ob-stat-lbl  { font-size: .67rem; font-weight: 700; text-transform: uppercase; letter-spacing: .08em; color: rgba(238,240,255,.35); margin-top: .18rem; }
+
+/* ── Pill tabs ── */
+.ob-tabs {
+  display: flex;
+  gap: .4rem;
+  margin-bottom: 1.75rem;
+  background: rgba(255,255,255,.04);
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 50px;
+  padding: .3rem;
+  width: fit-content;
+}
+.ob-tab {
+  display: flex;
+  align-items: center;
+  gap: .45rem;
+  padding: .52rem 1.2rem;
+  border-radius: 50px;
+  font-size: .82rem;
+  font-weight: 700;
+  cursor: pointer;
+  border: none;
+  background: transparent;
+  color: rgba(238,240,255,.5);
+  font-family: 'Inter', sans-serif;
+  transition: background .18s, color .18s;
+}
+.ob-tab:hover { color: rgba(238,240,255,.8); background: rgba(255,255,255,.06); }
+.ob-tab.active {
+  background: #101428;
+  color: #EEF0FF;
+  box-shadow: 0 1px 4px rgba(0,0,0,.3);
+}
+.ob-tab .tab-count {
+  font-size: .65rem;
+  font-weight: 800;
+  padding: .12rem .45rem;
+  border-radius: 50px;
+  line-height: 1.3;
+}
+.ob-tab.active .tab-count-gold   { background: rgba(245,158,11,.15); color: #F59E0B; }
+.ob-tab.active .tab-count-blue   { background: rgba(79,142,247,.15);  color: #4F8EF7; }
+.ob-tab.active .tab-count-green  { background: rgba(0,208,132,.12);   color: #00D084; }
+.tab-count-gold  { background: rgba(245,158,11,.08); color: #F59E0B; }
+.tab-count-blue  { background: rgba(79,142,247,.08);  color: #4F8EF7; }
+.tab-count-green { background: rgba(0,208,132,.06);   color: #00D084; }
+
+/* ── Panel ── */
+.ob-panel { display: none; }
+.ob-panel.visible { display: block; }
+
+/* ── Booking card grid ── */
+.ob-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.1rem;
+}
+@media (max-width: 1024px) { .ob-grid { grid-template-columns: repeat(2, 1fr); } }
+@media (max-width: 600px)  { .ob-grid { grid-template-columns: 1fr; } }
+
+/* ── Booking card ── */
+.bc {
+  background: #101428;
+  border: 1px solid rgba(255,255,255,.08);
+  border-radius: 18px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  transition: border-color .2s, transform .2s, box-shadow .2s;
+}
+.bc:hover {
+  border-color: rgba(0,208,132,.2);
+  transform: translateY(-3px);
+  box-shadow: 0 12px 36px rgba(0,0,0,.4), 0 0 0 1px rgba(0,208,132,.06);
+}
+
+/* image */
+.bc-img-wrap {
+  position: relative;
+  overflow: hidden;
+}
+.bc-img {
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+  transition: transform .45s ease;
+}
+.bc:hover .bc-img { transform: scale(1.04); }
+.bc-status-badge {
+  position: absolute;
+  top: .7rem;
+  right: .7rem;
+  padding: .22rem .7rem;
+  border-radius: 50px;
+  font-size: .65rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: .05em;
+}
+.bc-status-pending   { background: rgba(245,158,11,.18); color: #F59E0B; border: 1px solid rgba(245,158,11,.3); }
+.bc-status-approved  { background: rgba(79,142,247,.18);  color: #4F8EF7; border: 1px solid rgba(79,142,247,.3); }
+.bc-status-active    { background: rgba(0,208,132,.14);   color: #00D084; border: 1px solid rgba(0,208,132,.25); }
+.bc-status-completed { background: rgba(0,208,132,.1);    color: #00D084; border: 1px solid rgba(0,208,132,.18); }
+.bc-status-rejected,
+.bc-status-cancelled { background: rgba(255,82,114,.12); color: #FF5272; border: 1px solid rgba(255,82,114,.22); }
+
+/* body */
+.bc-body {
+  padding: .95rem 1.1rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  gap: .55rem;
+}
+.bc-title {
+  font-size: .9rem;
+  font-weight: 800;
+  color: #EEF0FF;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-decoration: none;
+  display: block;
+  transition: color .15s;
+}
+.bc-title:hover { color: #00D084; }
+.bc-renter {
+  display: flex;
+  align-items: center;
+  gap: .5rem;
+  font-size: .78rem;
+  color: rgba(238,240,255,.5);
+}
+.bc-renter img {
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+  border: 1.5px solid rgba(255,255,255,.12);
+}
+.bc-dates {
+  font-size: .75rem;
+  color: rgba(238,240,255,.45);
+  display: flex;
+  flex-direction: column;
+  gap: .2rem;
+}
+.bc-dates span { display: flex; align-items: center; gap: .35rem; }
+.bc-dates i { font-size: .68rem; color: rgba(238,240,255,.3); }
+.bc-amount {
+  font-size: 1.05rem;
+  font-weight: 900;
+  color: #00D084;
+  letter-spacing: -.01em;
+  margin-top: auto;
+}
+.bc-amount span { font-size: .65rem; font-weight: 500; color: rgba(238,240,255,.35); }
+
+/* action row */
+.bc-actions {
+  display: flex;
+  gap: .45rem;
+  padding-top: .65rem;
+  border-top: 1px solid rgba(255,255,255,.06);
+  flex-wrap: wrap;
+}
+.bc-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: .35rem;
+  padding: .48rem .9rem;
+  border-radius: 50px;
+  font-size: .75rem;
+  font-weight: 700;
+  border: none;
+  cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  text-decoration: none;
+  transition: background .18s, transform .15s;
+  white-space: nowrap;
+}
+.bc-btn-msg     { background: rgba(255,255,255,.07); color: rgba(238,240,255,.75); border: 1px solid rgba(255,255,255,.1); }
+.bc-btn-msg:hover { background: rgba(255,255,255,.12); color: #EEF0FF; }
+.bc-btn-approve { background: rgba(0,208,132,.14); color: #00D084; border: 1px solid rgba(0,208,132,.25); }
+.bc-btn-approve:hover { background: rgba(0,208,132,.22); transform: translateY(-1px); }
+.bc-btn-decline { background: rgba(255,82,114,.1); color: #FF5272; border: 1px solid rgba(255,82,114,.2); }
+.bc-btn-decline:hover { background: rgba(255,82,114,.18); }
+.bc-btn-return  { background: rgba(79,142,247,.12); color: #4F8EF7; border: 1px solid rgba(79,142,247,.2); }
+.bc-btn-return:hover { background: rgba(79,142,247,.2); }
+
+/* ── Empty state ── */
+.ob-empty {
+  text-align: center;
+  padding: 4rem 2rem;
+  background: #101428;
+  border: 1px dashed rgba(255,255,255,.08);
+  border-radius: 20px;
+}
+.ob-empty-ico {
+  font-size: 3rem;
+  color: rgba(238,240,255,.12);
+  margin-bottom: 1.1rem;
+  display: block;
+}
+.ob-empty h3 { font-size: 1rem; font-weight: 700; color: #EEF0FF; margin-bottom: .4rem; }
+.ob-empty p  { font-size: .82rem; color: rgba(238,240,255,.35); margin: 0; line-height: 1.65; }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="container py-5">
-  <h2 style="font-weight:800;margin-bottom:.2rem;">Manage Bookings</h2>
-  <p class="text-muted mb-5">Review, approve, or manage rental requests for your listings.</p>
+<div class="ob-page">
 
-  <!-- Tabs -->
-  <ul class="nav nav-tabs mb-4 border-0" id="bookingTabs">
-    <li class="nav-item">
-      <button class="nav-link active fw-600 px-4" data-bs-toggle="tab" data-bs-target="#pending-tab">
-        Pending <span class="badge bg-warning-subtle text-warning ms-1">{{ pending|length }}</span>
-      </button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link fw-600 px-4" data-bs-toggle="tab" data-bs-target="#active-tab">
-        Active <span class="badge bg-success-subtle text-success ms-1">{{ active|length }}</span>
-      </button>
-    </li>
-    <li class="nav-item">
-      <button class="nav-link fw-600 px-4" data-bs-toggle="tab" data-bs-target="#history-tab">
-        History <span class="badge bg-secondary-subtle text-secondary ms-1">{{ history|length }}</span>
-      </button>
-    </li>
-  </ul>
-
-  <div class="tab-content">
-      <!-- Pending -->
-    <div class="tab-pane fade show active" id="pending-tab">
-      {% if pending %}
-      {% for b in pending %}
-      {% include 'bookings/_booking_row.html' with booking=b show_actions=True %}
-      {% endfor %}
-      {% else %}
-      <div class="empty-state"><div class="empty-icon"><i class="bi bi-inbox"></i></div><h4>No pending requests</h4><p>When renters request your items they'll appear here.</p></div>
-      {% endif %}
+  <!-- ── Header ── -->
+  <div class="ob-header">
+    <div>
+      <h1 class="ob-title">Manage Bookings</h1>
+      <p class="ob-sub">Review, approve, and track rental requests for all your listings.</p>
     </div>
+    <a href="{% url 'create_listing' %}"
+       style="display:inline-flex;align-items:center;gap:.4rem;background:#00D084;color:#000;font-weight:800;font-size:.82rem;border:none;border-radius:50px;padding:.6rem 1.4rem;cursor:pointer;text-decoration:none;transition:background .18s;"
+       onmouseover="this.style.background='#00F59A'" onmouseout="this.style.background='#00D084'">
+      <i class="bi bi-plus-lg"></i> New Listing
+    </a>
+  </div>
 
-    <!-- Active -->
-    <div class="tab-pane fade" id="active-tab">
-      {% if active %}
-      {% for b in active %}
-      {% include 'bookings/_booking_row.html' with booking=b show_return=True %}
-      {% endfor %}
-      {% else %}
-      <div class="empty-state"><div class="empty-icon"><i class="bi bi-calendar-check"></i></div><h4>No active rentals</h4><p>Approved bookings will show here.</p></div>
-      {% endif %}
+  <!-- ── Compact stat row ── -->
+  <div class="ob-stats">
+    <div class="ob-stat">
+      <div class="ob-stat-ico gold"><i class="bi bi-hourglass-split"></i></div>
+      <div>
+        <div class="ob-stat-val">{{ pending|length }}</div>
+        <div class="ob-stat-lbl">Pending</div>
+      </div>
     </div>
-
-    <!-- History -->
-    <div class="tab-pane fade" id="history-tab">
-      {% if history %}
-      {% for b in history %}
-      {% include 'bookings/_booking_row.html' with booking=b %}
-      {% endfor %}
-      {% else %}
-      <div class="empty-state"><div class="empty-icon"><i class="bi bi-clock-history"></i></div><h4>No history yet</h4></div>
-      {% endif %}
+    <div class="ob-stat">
+      <div class="ob-stat-ico blue"><i class="bi bi-calendar-check"></i></div>
+      <div>
+        <div class="ob-stat-val">{{ active|length }}</div>
+        <div class="ob-stat-lbl">Active</div>
+      </div>
+    </div>
+    <div class="ob-stat">
+      <div class="ob-stat-ico green"><i class="bi bi-clock-history"></i></div>
+      <div>
+        <div class="ob-stat-val">{{ history|length }}</div>
+        <div class="ob-stat-lbl">History</div>
+      </div>
     </div>
   </div>
+
+  <!-- ── Pill tabs ── -->
+  <div class="ob-tabs" id="obTabs">
+    <button class="ob-tab active" data-panel="ob-pending" onclick="switchTab(this,'ob-pending')">
+      Pending
+      <span class="tab-count tab-count-gold">{{ pending|length }}</span>
+    </button>
+    <button class="ob-tab" data-panel="ob-active" onclick="switchTab(this,'ob-active')">
+      Active
+      <span class="tab-count tab-count-blue">{{ active|length }}</span>
+    </button>
+    <button class="ob-tab" data-panel="ob-history" onclick="switchTab(this,'ob-history')">
+      History
+      <span class="tab-count tab-count-green">{{ history|length }}</span>
+    </button>
+  </div>
+
+  <!-- ── PENDING PANEL ── -->
+  <div class="ob-panel visible" id="ob-pending">
+    {% if pending %}
+    <div class="ob-grid">
+      {% for b in pending %}
+      <article class="bc">
+        <div class="bc-img-wrap">
+          <a href="{% url 'booking_detail' b.pk %}">
+            <img class="bc-img" src="{{ b.product.get_primary_image }}" alt="{{ b.product.title }}"
+                 onerror="this.src='https://placehold.co/600x175/0d1020/4F8EF7?text=No+Photo'">
+          </a>
+          <span class="bc-status-badge bc-status-{{ b.status }}">{{ b.get_status_display }}</span>
+        </div>
+        <div class="bc-body">
+          <a href="{% url 'booking_detail' b.pk %}" class="bc-title">{{ b.product.title }}</a>
+          <div class="bc-renter">
+            <img src="{{ b.renter.profile.get_photo_url }}" alt="{{ b.renter.username }}"
+                 onerror="this.src='https://placehold.co/22/4F8EF7/fff?text={{ b.renter.username|first|upper }}'">
+            <span>{{ b.renter.get_full_name|default:b.renter.username }}</span>
+          </div>
+          <div class="bc-dates">
+            <span><i class="bi bi-calendar3"></i> {{ b.start_date|date:"d M Y" }} → {{ b.end_date|date:"d M Y" }}</span>
+            <span><i class="bi bi-clock"></i> {{ b.total_days }} day{{ b.total_days|pluralize }}</span>
+          </div>
+          <div class="bc-amount">₹{{ b.total_amount|floatformat:0 }}<span> total</span></div>
+          <div class="bc-actions">
+            <a href="{% url 'start_conversation' b.renter.username %}" class="bc-btn bc-btn-msg">
+              <i class="bi bi-chat-dots"></i> Message
+            </a>
+            <form method="post" action="{% url 'approve_booking' b.pk %}" style="margin:0;">
+              {% csrf_token %}
+              <button type="submit" class="bc-btn bc-btn-approve">
+                <i class="bi bi-check-lg"></i> Approve
+              </button>
+            </form>
+            <form method="post" action="{% url 'reject_booking' b.pk %}" style="margin:0;">
+              {% csrf_token %}
+              <button type="submit" class="bc-btn bc-btn-decline">
+                <i class="bi bi-x-lg"></i> Decline
+              </button>
+            </form>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="ob-empty">
+      <i class="bi bi-inbox ob-empty-ico"></i>
+      <h3>No pending requests</h3>
+      <p>When renters request your listings they'll appear here.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── ACTIVE PANEL ── -->
+  <div class="ob-panel" id="ob-active">
+    {% if active %}
+    <div class="ob-grid">
+      {% for b in active %}
+      <article class="bc">
+        <div class="bc-img-wrap">
+          <a href="{% url 'booking_detail' b.pk %}">
+            <img class="bc-img" src="{{ b.product.get_primary_image }}" alt="{{ b.product.title }}"
+                 onerror="this.src='https://placehold.co/600x175/0d1020/4F8EF7?text=No+Photo'">
+          </a>
+          <span class="bc-status-badge bc-status-{{ b.status }}">{{ b.get_status_display }}</span>
+        </div>
+        <div class="bc-body">
+          <a href="{% url 'booking_detail' b.pk %}" class="bc-title">{{ b.product.title }}</a>
+          <div class="bc-renter">
+            <img src="{{ b.renter.profile.get_photo_url }}" alt="{{ b.renter.username }}"
+                 onerror="this.src='https://placehold.co/22/4F8EF7/fff?text={{ b.renter.username|first|upper }}'">
+            <span>{{ b.renter.get_full_name|default:b.renter.username }}</span>
+          </div>
+          <div class="bc-dates">
+            <span><i class="bi bi-calendar3"></i> {{ b.start_date|date:"d M Y" }} → {{ b.end_date|date:"d M Y" }}</span>
+            <span><i class="bi bi-clock"></i> {{ b.total_days }} day{{ b.total_days|pluralize }}</span>
+          </div>
+          <div class="bc-amount">₹{{ b.total_amount|floatformat:0 }}<span> total</span></div>
+          <div class="bc-actions">
+            <a href="{% url 'start_conversation' b.renter.username %}" class="bc-btn bc-btn-msg">
+              <i class="bi bi-chat-dots"></i> Message
+            </a>
+            <form method="post" action="{% url 'mark_returned' b.pk %}" style="margin:0;">
+              {% csrf_token %}
+              <button type="submit" class="bc-btn bc-btn-return">
+                <i class="bi bi-box-arrow-in-down"></i> Mark Returned
+              </button>
+            </form>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="ob-empty">
+      <i class="bi bi-calendar-check ob-empty-ico"></i>
+      <h3>No active rentals</h3>
+      <p>Approved bookings appear here once the rental starts.</p>
+    </div>
+    {% endif %}
+  </div>
+
+  <!-- ── HISTORY PANEL ── -->
+  <div class="ob-panel" id="ob-history">
+    {% if history %}
+    <div class="ob-grid">
+      {% for b in history %}
+      <article class="bc">
+        <div class="bc-img-wrap">
+          <a href="{% url 'booking_detail' b.pk %}">
+            <img class="bc-img" src="{{ b.product.get_primary_image }}" alt="{{ b.product.title }}"
+                 onerror="this.src='https://placehold.co/600x175/0d1020/4F8EF7?text=No+Photo'"
+                 style="filter:grayscale(40%);">
+          </a>
+          <span class="bc-status-badge bc-status-{{ b.status }}">{{ b.get_status_display }}</span>
+        </div>
+        <div class="bc-body">
+          <a href="{% url 'booking_detail' b.pk %}" class="bc-title">{{ b.product.title }}</a>
+          <div class="bc-renter">
+            <img src="{{ b.renter.profile.get_photo_url }}" alt="{{ b.renter.username }}"
+                 onerror="this.src='https://placehold.co/22/4F8EF7/fff?text={{ b.renter.username|first|upper }}'">
+            <span>{{ b.renter.get_full_name|default:b.renter.username }}</span>
+          </div>
+          <div class="bc-dates">
+            <span><i class="bi bi-calendar3"></i> {{ b.start_date|date:"d M Y" }} → {{ b.end_date|date:"d M Y" }}</span>
+            <span><i class="bi bi-clock"></i> {{ b.total_days }} day{{ b.total_days|pluralize }}</span>
+          </div>
+          <div class="bc-amount">₹{{ b.total_amount|floatformat:0 }}<span> total</span></div>
+          <div class="bc-actions">
+            <a href="{% url 'booking_detail' b.pk %}" class="bc-btn bc-btn-msg">
+              <i class="bi bi-eye"></i> View Details
+            </a>
+          </div>
+        </div>
+      </article>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="ob-empty">
+      <i class="bi bi-clock-history ob-empty-ico"></i>
+      <h3>No history yet</h3>
+      <p>Completed and declined bookings will appear here.</p>
+    </div>
+    {% endif %}
+  </div>
+
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function switchTab(btn, panelId) {
+  // Update tab buttons
+  document.querySelectorAll('.ob-tab').forEach(t => t.classList.remove('active'));
+  btn.classList.add('active');
+  // Update panels
+  document.querySelectorAll('.ob-panel').forEach(p => p.classList.remove('visible'));
+  document.getElementById(panelId).classList.add('visible');
+}
+</script>
 {% endblock %}

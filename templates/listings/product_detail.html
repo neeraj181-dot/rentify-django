@@ -1,0 +1,285 @@
+{% extends 'base.html' %}{% load static %}
+{% block title %}{{ product.title }} — Rentify{% endblock %}
+{% block content %}
+<div class="lp-page">
+<div class="mk">
+<div class="mk-wrap" style="padding:6rem 1.5rem 5rem;">
+
+  <!-- breadcrumb -->
+  <div style="display:flex;align-items:center;gap:.5rem;font-size:.78rem;color:var(--text3);margin-bottom:2rem;flex-wrap:wrap;">
+    <a href="{% url 'home' %}" style="color:var(--text3);">Home</a>
+    <i class="bi bi-chevron-right" style="font-size:.6rem;"></i>
+    <a href="{% url 'category_detail' product.category %}" style="color:var(--text3);">{{ product.get_category_display_name }}</a>
+    <i class="bi bi-chevron-right" style="font-size:.6rem;"></i>
+    <span style="color:var(--text2);">{{ product.title|truncatechars:40 }}</span>
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 400px;gap:3rem;align-items:start;">
+
+    <!-- LEFT: gallery + info -->
+    <div>
+      <!-- Gallery -->
+      {% if images %}
+      <div style="border-radius:var(--r-xl);overflow:hidden;margin-bottom:1rem;position:relative;background:var(--surf);">
+        <div id="mainImgWrap">
+          <img id="mainImg" src="{{ images.0.image.url }}" alt="{{ product.title }}"
+               style="width:100%;height:460px;object-fit:cover;display:block;transition:opacity .3s;">
+        </div>
+        {% if images|length > 1 %}
+        <button onclick="slideImg(-1)" style="position:absolute;left:1rem;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(9,12,26,.75);backdrop-filter:blur(8px);border:1px solid var(--border2);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;">
+          <i class="bi bi-chevron-left"></i>
+        </button>
+        <button onclick="slideImg(1)" style="position:absolute;right:1rem;top:50%;transform:translateY(-50%);width:40px;height:40px;border-radius:50%;background:rgba(9,12,26,.75);backdrop-filter:blur(8px);border:1px solid var(--border2);color:var(--text);cursor:pointer;display:flex;align-items:center;justify-content:center;">
+          <i class="bi bi-chevron-right"></i>
+        </button>
+        {% endif %}
+      </div>
+      {% if images|length > 1 %}
+      <div style="display:flex;gap:.6rem;overflow-x:auto;padding-bottom:.5rem;scrollbar-width:none;">
+        {% for img in images %}
+        <img src="{{ img.image.url }}" onclick="setImg('{{ img.image.url }}',this)"
+             style="width:80px;height:65px;border-radius:var(--r-sm);object-fit:cover;cursor:pointer;flex-shrink:0;border:2px solid {% if forloop.first %}var(--green){% else %}var(--border){% endif %};transition:.2s;"
+             class="thumb-img">
+        {% endfor %}
+      </div>
+      {% endif %}
+      {% else %}
+      <div style="height:420px;background:var(--surf);border-radius:var(--r-xl);display:flex;align-items:center;justify-content:center;border:1px solid var(--border);">
+        <span style="font-size:5rem;opacity:.2;">📷</span>
+      </div>
+      {% endif %}
+
+      <!-- Description -->
+      <div class="gcard" style="padding:1.75rem;margin-top:2rem;">
+        <h3 style="font-weight:700;margin-bottom:1rem;color:var(--text);">About This Item</h3>
+        <p style="color:var(--text2);line-height:1.85;font-size:.9rem;">{{ product.description }}</p>
+
+        <!-- meta chips -->
+        <div style="display:flex;gap:.6rem;flex-wrap:wrap;margin-top:1.25rem;">
+          <span class="chip chip-gray"><i class="bi bi-tag"></i> {{ product.get_category_display_name }}</span>
+          <span class="chip chip-gray"><i class="bi bi-geo-alt"></i> {{ product.get_public_location }}</span>
+          <span class="chip chip-gray"><i class="bi bi-eye"></i> {{ product.views_count }} views</span>
+          {% if product.is_available %}
+          <span class="chip chip-green"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Available</span>
+          {% else %}
+          <span class="chip chip-red"><i class="bi bi-circle-fill" style="font-size:.45rem;"></i> Unavailable</span>
+          {% endif %}
+        </div>
+      </div>
+
+      <!-- Reviews -->
+      <div style="margin-top:2rem;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;">
+          <h3 style="font-weight:700;color:var(--text);">
+            Reviews
+            <span style="font-size:.85rem;font-weight:500;color:var(--text3);margin-left:.4rem;">({{ reviews|length }})</span>
+          </h3>
+          {% if user_booked %}
+          <a href="{% url 'create_review' reviews.0.booking.pk %}" class="btn btn-outline btn-sm">Write Review</a>
+          {% endif %}
+        </div>
+
+        {% for review in reviews %}
+        <div class="gcard" style="padding:1.25rem;margin-bottom:.85rem;">
+          <div style="display:flex;gap:.9rem;align-items:flex-start;">
+            <img src="{{ review.reviewer.profile.get_photo_url }}" class="avatar av-sm"
+                 onerror="this.src='https://placehold.co/36/4F8EF7/fff?text={{ review.reviewer.username|first|upper }}'">
+            <div style="flex:1;">
+              <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.5rem;">
+                <span style="font-weight:700;font-size:.875rem;color:var(--text);">{{ review.reviewer.get_full_name|default:review.reviewer.username }}</span>
+                <span style="font-size:.72rem;color:var(--text3);">{{ review.created_at|date:"M d, Y" }}</span>
+              </div>
+              <div style="display:flex;gap:.2rem;margin:.3rem 0 .5rem;">
+                {% for i in review.get_stars %}<i class="bi bi-star-fill" style="color:var(--gold);font-size:.8rem;"></i>{% endfor %}
+                {% for i in review.get_empty_stars %}<i class="bi bi-star" style="color:var(--border2);font-size:.8rem;"></i>{% endfor %}
+              </div>
+              <p style="font-size:.875rem;color:var(--text2);margin:0;line-height:1.65;">{{ review.comment }}</p>
+            </div>
+          </div>
+        </div>
+        {% empty %}
+        <div style="text-align:center;padding:2.5rem;color:var(--text3);font-size:.875rem;border:1px dashed var(--border);border-radius:var(--r-lg);">
+          <i class="bi bi-star d-block mb-2" style="font-size:2rem;opacity:.3;"></i>
+          No reviews yet. Be the first to rent and review!
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- Similar items -->
+      {% if similar %}
+      <div style="margin-top:2.5rem;">
+        <h3 style="font-weight:700;color:var(--text);margin-bottom:1.25rem;">Similar Items</h3>
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:1rem;">
+          {% for item in similar %}
+          {% include 'listings/_product_card.html' with product=item %}
+          {% endfor %}
+        </div>
+      </div>
+      {% endif %}
+    </div>
+
+    <!-- RIGHT: booking sidebar -->
+    <div style="position:sticky;top:84px;">
+
+      <!-- Price card -->
+      <div class="gcard" style="padding:1.75rem;margin-bottom:1rem;border-color:var(--border2);">
+        <h2 style="font-size:1.25rem;font-weight:800;color:var(--text);margin-bottom:.5rem;line-height:1.3;">{{ product.title }}</h2>
+
+        <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:1.1rem;flex-wrap:wrap;">
+          <span class="chip chip-gray" style="font-size:.7rem;">{{ product.get_category_display_name }}</span>
+          {% if product.is_available %}
+          <span class="chip chip-green" style="font-size:.7rem;"><i class="bi bi-circle-fill" style="font-size:.4rem;"></i> Available</span>
+          {% else %}
+          <span class="chip chip-red" style="font-size:.7rem;">Unavailable</span>
+          {% endif %}
+        </div>
+
+        <!-- Star rating -->
+        <div style="display:flex;align-items:center;gap:.4rem;margin-bottom:1.25rem;">
+          {% for i in rating_range %}
+          <i class="bi bi-star{% if i <= product.rating %}-fill{% endif %}" style="color:{% if i <= product.rating %}var(--gold){% else %}var(--border2){% endif %};font-size:.9rem;"></i>
+          {% endfor %}
+          <span style="font-weight:700;font-size:.875rem;color:var(--text);">{{ product.rating|floatformat:1 }}</span>
+          <span style="font-size:.78rem;color:var(--text3);">({{ product.total_reviews }} review{{ product.total_reviews|pluralize }})</span>
+        </div>
+
+        <!-- Pricing grid -->
+        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:.5rem;margin-bottom:1rem;">
+          <div style="background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);padding:.85rem .6rem;text-align:center;">
+            <div style="font-size:1.05rem;font-weight:900;color:var(--green);">₹{{ product.price_per_day }}</div>
+            <div style="font-size:.62rem;color:var(--text3);margin-top:.15rem;">per day</div>
+          </div>
+          {% if product.price_per_week %}
+          <div style="background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);padding:.85rem .6rem;text-align:center;">
+            <div style="font-size:1.05rem;font-weight:900;color:var(--blue);">₹{{ product.price_per_week }}</div>
+            <div style="font-size:.62rem;color:var(--text3);margin-top:.15rem;">per week</div>
+          </div>
+          {% endif %}
+          {% if product.price_per_month %}
+          <div style="background:var(--surf2);border:1px solid var(--border);border-radius:var(--r);padding:.85rem .6rem;text-align:center;">
+            <div style="font-size:1.05rem;font-weight:900;color:var(--purple);">₹{{ product.price_per_month }}</div>
+            <div style="font-size:.62rem;color:var(--text3);margin-top:.15rem;">per month</div>
+          </div>
+          {% endif %}
+        </div>
+
+        {% if product.security_deposit > 0 %}
+        <div style="background:rgba(0,208,132,.06);border:1px solid var(--gborder);border-radius:var(--r);padding:.65rem .9rem;margin-bottom:1rem;font-size:.82rem;color:var(--text2);display:flex;align-items:center;gap:.5rem;">
+          <i class="bi bi-shield-check" style="color:var(--green);"></i>
+          Security deposit: <strong style="color:var(--text);">₹{{ product.security_deposit }}</strong>
+          <span style="color:var(--text3);">(refundable)</span>
+        </div>
+        {% endif %}
+
+        <div style="font-size:.82rem;color:var(--text3);margin-bottom:1.25rem;display:flex;align-items:center;gap:.4rem;">
+          <i class="bi bi-geo-alt-fill" style="color:var(--blue);"></i> {{ product.get_public_location }}
+        </div>
+
+        {% if show_private_address and product.address_private %}
+        <div style="background:rgba(245,158,11,.06);border:1px solid rgba(245,158,11,.15);border-radius:var(--r);padding:.65rem .9rem;margin-bottom:1.25rem;font-size:.82rem;color:var(--text2);">
+          <div style="display:flex;align-items:center;gap:.4rem;font-weight:600;color:var(--text);margin-bottom:.35rem;">
+            <i class="bi bi-lock-fill" style="color:#F59E0B;font-size:.75rem;"></i> Private address
+          </div>
+          {{ product.address_private }}
+        </div>
+        {% endif %}
+
+        <!-- CTAs -->
+        {% if user.is_authenticated %}
+          {% if product.owner == user %}
+          <a href="{% url 'edit_listing' product.pk %}" class="btn btn-outline" style="width:100%;margin-bottom:.6rem;">
+            <i class="bi bi-pencil"></i> Edit Listing
+          </a>
+          {% elif product.is_available %}
+          <a href="{% url 'create_booking' product.pk %}" class="btn btn-primary btn-lg" style="width:100%;margin-bottom:.6rem;">
+            <i class="bi bi-calendar-plus"></i> Rent Now
+          </a>
+          {% else %}
+          <button class="btn btn-ghost" style="width:100%;cursor:not-allowed;margin-bottom:.6rem;" disabled>Currently Unavailable</button>
+          {% endif %}
+        {% else %}
+        <button class="btn btn-primary btn-lg" style="width:100%;margin-bottom:.6rem;" data-modal="login">
+          <i class="bi bi-calendar-plus"></i> Rent Now
+        </button>
+        <button class="btn btn-ghost" style="width:100%;" data-modal="login">
+          <i class="bi bi-chat"></i> Message Owner
+        </button>
+        {% endif %}
+
+        {% if user.is_authenticated and product.owner != user %}
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:.6rem;margin-top:.6rem;">
+          <button class="btn btn-ghost pk-wl-full {% if in_wishlist %}on{% endif %}" data-pid="{{ product.pk }}" onclick="wlToggle(this)">
+            <i class="bi {% if in_wishlist %}bi-heart-fill{% else %}bi-heart{% endif %}" style="{% if in_wishlist %}color:var(--red){% endif %}"></i>
+            {% if in_wishlist %}Saved{% else %}Save{% endif %}
+          </button>
+          <a href="{% url 'start_conversation' product.owner.username %}" class="btn btn-ghost">
+            <i class="bi bi-chat"></i> Message
+          </a>
+        </div>
+        {% endif %}
+      </div>
+
+      <!-- Owner card -->
+      <div class="gcard" style="padding:1.25rem;">
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:1rem;">About the Owner</div>
+        <div style="display:flex;align-items:center;gap:.9rem;">
+          <a href="{% url 'public_profile' product.owner.username %}">
+            <img src="{{ product.owner.profile.get_photo_url }}" class="avatar av-md"
+                 onerror="this.src='https://placehold.co/52/4F8EF7/fff?text={{ product.owner.username|first|upper }}'">
+          </a>
+          <div>
+            <a href="{% url 'public_profile' product.owner.username %}" style="font-weight:700;font-size:.9rem;color:var(--text);display:flex;align-items:center;gap:.4rem;">
+              {{ product.owner.get_full_name|default:product.owner.username }}
+              {% if product.owner.profile.is_verified %}
+              <i class="bi bi-patch-check-fill" style="color:var(--blue);font-size:.8rem;"></i>
+              {% endif %}
+            </a>
+            <div style="font-size:.75rem;color:var(--text3);margin-top:.2rem;">
+              <i class="bi bi-star-fill" style="color:var(--gold);font-size:.65rem;"></i>
+              {{ product.owner.profile.rating|floatformat:1 }} &nbsp;·&nbsp;
+              Member since {{ product.owner.date_joined|date:"M Y" }}
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Safety note -->
+      <div style="margin-top:.85rem;padding:.9rem 1rem;background:rgba(79,142,247,.06);border:1px solid rgba(79,142,247,.15);border-radius:var(--r);font-size:.78rem;color:var(--text3);line-height:1.6;">
+        <i class="bi bi-shield-fill-check" style="color:var(--blue);margin-right:.4rem;"></i>
+        Always communicate and transact through Rentify for your safety and protection.
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Gallery
+const imgs = [{% for img in images %}'{{ img.image.url }}'{% if not forloop.last %},{% endif %}{% endfor %}];
+let cur = 0;
+function setImg(src, el){
+  document.getElementById('mainImg').style.opacity='0';
+  setTimeout(()=>{ document.getElementById('mainImg').src=src; document.getElementById('mainImg').style.opacity='1'; },180);
+  document.querySelectorAll('.thumb-img').forEach(t=>t.style.borderColor='var(--border)');
+  if(el) el.style.borderColor='var(--green)';
+  cur = imgs.indexOf(src);
+}
+function slideImg(dir){
+  cur = (cur+dir+imgs.length)%imgs.length;
+  setImg(imgs[cur], document.querySelectorAll('.thumb-img')[cur]);
+}
+// Wishlist inline
+function wlToggle(btn){
+  const pid = btn.dataset.pid;
+  fetch(`/wishlist/toggle/${pid}/`,{headers:{'X-Requested-With':'XMLHttpRequest'},credentials:'same-origin'})
+    .then(r=>r.json()).then(d=>{
+      const i=btn.querySelector('i');
+      if(d.in_wishlist){btn.classList.add('on');i.className='bi bi-heart-fill';i.style.color='var(--red)';btn.childNodes[btn.childNodes.length-1].textContent=' Saved';}
+      else{btn.classList.remove('on');i.className='bi bi-heart';i.style.color='';btn.childNodes[btn.childNodes.length-1].textContent=' Save';}
+    }).catch(()=>{ if (window.rfyOpenModal) window.rfyOpenModal('login'); });
+}
+</script>
+{% endblock %}

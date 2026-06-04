@@ -1,0 +1,466 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{% if q %}{{ q }} — {% endif %}Browse Rentals · Rentify{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Browse page overrides ── */
+.browse-wrap { max-width: 1400px; margin: 0 auto; padding: 0 1.5rem; }
+
+/* Search hero */
+.browse-hero {
+  background: linear-gradient(180deg, #0a0d20 0%, #070a18 100%);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  padding: 2rem 0 0;
+}
+.browse-searchbar {
+  display: flex; align-items: center; gap: .6rem;
+  background: rgba(255,255,255,.06);
+  border: 1.5px solid rgba(255,255,255,.12);
+  border-radius: 50px;
+  padding: .55rem .55rem .55rem 1.4rem;
+  max-width: 720px; margin: 0 auto;
+  transition: border-color .2s, box-shadow .2s;
+}
+.browse-searchbar:focus-within {
+  border-color: #00D084;
+  box-shadow: 0 0 0 3px rgba(0,208,132,.12);
+}
+.browse-searchbar input {
+  flex: 1; background: none; border: none; outline: none;
+  color: #EEF0FF; font-size: 1rem; font-family: 'Inter', sans-serif;
+}
+.browse-searchbar input::placeholder { color: rgba(238,240,255,.35); }
+.browse-search-btn {
+  background: #00D084; color: #000; font-weight: 700; font-size: .9rem;
+  border: none; border-radius: 50px; padding: .65rem 1.5rem;
+  cursor: pointer; display: flex; align-items: center; gap: .4rem;
+  transition: background .18s, transform .18s; white-space: nowrap;
+  font-family: 'Inter', sans-serif; flex-shrink: 0;
+}
+.browse-search-btn:hover { background: #00F59A; transform: translateY(-1px); }
+
+/* Category pills */
+.cat-scroll {
+  display: flex; gap: .5rem; overflow-x: auto; padding: 1.1rem 0 0;
+  scrollbar-width: none; -ms-overflow-style: none;
+}
+.cat-scroll::-webkit-scrollbar { display: none; }
+.cpill {
+  display: inline-flex; align-items: center; gap: .45rem;
+  padding: .5rem 1rem; border-radius: 50px; white-space: nowrap;
+  font-size: .8rem; font-weight: 600; cursor: pointer;
+  border: 1.5px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.04); color: rgba(238,240,255,.65);
+  text-decoration: none; transition: all .18s;
+}
+.cpill:hover { border-color: #00D084; color: #00D084; background: rgba(0,208,132,.08); }
+.cpill.active { background: rgba(0,208,132,.12); border-color: #00D084; color: #00D084; }
+.cpill i { font-size: .85rem; }
+
+/* Layout */
+.browse-layout {
+  display: grid;
+  grid-template-columns: 248px 1fr;
+  gap: 2rem;
+  align-items: start;
+  padding: 2rem 0 5rem;
+}
+@media (max-width: 992px) { .browse-layout { grid-template-columns: 1fr; } }
+
+/* Sidebar */
+.filter-box {
+  background: #101428;
+  border: 1px solid rgba(255,255,255,.07);
+  border-radius: 16px;
+  padding: 1.4rem;
+  position: sticky; top: 80px;
+}
+.filter-box-title {
+  font-weight: 700; font-size: .875rem; color: #EEF0FF;
+  margin-bottom: 1.25rem; display: flex; justify-content: space-between; align-items: center;
+}
+.filter-box-title a {
+  font-size: .72rem; font-weight: 500; color: rgba(238,240,255,.35); text-decoration: none;
+}
+.filter-box-title a:hover { color: #00D084; }
+.fgroup { margin-bottom: 1.25rem; padding-bottom: 1.25rem; border-bottom: 1px solid rgba(255,255,255,.06); }
+.fgroup:last-child { margin-bottom: 0; padding-bottom: 0; border-bottom: none; }
+.flabel { font-size: .67rem; font-weight: 700; text-transform: uppercase; letter-spacing: .1em; color: rgba(238,240,255,.32); margin-bottom: .65rem; }
+.finput, .fselect {
+  width: 100%; background: rgba(255,255,255,.05);
+  border: 1.5px solid rgba(255,255,255,.08);
+  border-radius: 10px; padding: .6rem .9rem;
+  color: #EEF0FF; font-size: .85rem; font-family: 'Inter', sans-serif;
+  outline: none; transition: border-color .18s;
+}
+.finput:focus, .fselect:focus { border-color: #00D084; }
+.finput::placeholder { color: rgba(238,240,255,.3); }
+.fselect option { background: #101428; }
+.price-pair { display: grid; grid-template-columns: 1fr 1fr; gap: .5rem; }
+.apply-btn {
+  width: 100%; background: #00D084; color: #000; font-weight: 700;
+  font-size: .875rem; border: none; border-radius: 50px; padding: .7rem;
+  cursor: pointer; font-family: 'Inter', sans-serif; transition: background .18s;
+}
+.apply-btn:hover { background: #00F59A; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="lp-page">
+<!-- ══════════════ SEARCH HERO ══════════════ -->
+<div class="browse-hero lp-hero" style="padding:6rem 0 2rem;text-align:left;">
+  <div class="lp-grid-bg"></div>
+  <div class="browse-wrap" style="position:relative;z-index:1;">
+    <div class="lp-eyebrow" style="margin-bottom:1rem;"><span class="dot"></span> Marketplace</div>
+    <h1 class="lp-h1" style="font-size:clamp(1.75rem,3vw,2.5rem);text-align:left;margin-bottom:1.25rem;">
+      Browse <span class="accent">Rentals</span>
+    </h1>
+    <!-- Search bar -->
+    <form method="get" action="{% url 'browse' %}">
+      <div class="browse-searchbar">
+        <i class="bi bi-search" style="color:rgba(238,240,255,.35);font-size:.95rem;flex-shrink:0;"></i>
+        <input type="text" name="q" value="{{ q }}" placeholder="Search cameras, laptops, bikes, drones…" autofocus>
+        {% if request.GET.category %}
+        <input type="hidden" name="category" value="{{ request.GET.category }}">
+        {% endif %}
+        <button type="submit" class="browse-search-btn">
+          <i class="bi bi-search"></i> Search
+        </button>
+      </div>
+    </form>
+
+    <!-- Category pills — built from view context, NO split filter -->
+    <div class="cat-scroll">
+      <a href="{% url 'browse' %}{% if q %}?q={{ q }}{% endif %}"
+         class="cpill {% if not category %}active{% endif %}">
+        <i class="bi bi-grid-3x3-gap"></i> All
+      </a>
+      {% for cat_slug, cat_name, cat_icon in CATEGORY_DATA %}
+      <a href="{% url 'browse' %}?category={{ cat_slug }}{% if q %}&q={{ q }}{% endif %}"
+         class="cpill {% if category == cat_slug %}active{% endif %}">
+        <i class="bi {{ cat_icon }}"></i> {{ cat_name }}
+      </a>
+      {% endfor %}
+    </div>
+  </div><!-- /browse-wrap -->
+</div><!-- /browse-hero -->
+
+<!-- ══════════════ MAIN LAYOUT ══════════════ -->
+<div class="browse-wrap">
+
+  {% if featured and not has_filters %}
+  <!-- Featured products -->
+  <section style="padding:2rem 0 1rem;">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem;flex-wrap:wrap;gap:.75rem;">
+      <div>
+        <div class="lp-sec-label">Featured</div>
+        <h2 class="lp-sec-title" style="font-size:1.35rem;margin-bottom:0;">Top Rated This Week</h2>
+      </div>
+      <a href="{% url 'browse' %}?sort=rating" class="lp-btn-ghost lp-btn-sm">View all →</a>
+    </div>
+    <div class="product-grid" style="display:grid;grid-template-columns:repeat(4,1fr);gap:1.1rem;">
+      {% for product in featured %}
+      <div>{% include 'listings/_product_card.html' with product=product %}</div>
+      {% endfor %}
+    </div>
+  </section>
+  {% endif %}
+
+  <div class="browse-layout">
+
+    <!-- ── SIDEBAR ── -->
+    <aside class="filter-box" id="filterSidebar">
+      <div class="filter-box-title">
+        <span>Filters</span>
+        <a href="{% url 'browse' %}">Reset all</a>
+      </div>
+
+      <form method="get" action="{% url 'browse' %}" id="filterForm">
+        {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+        {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+
+        <div class="fgroup">
+          <div class="flabel">Location</div>
+          <div style="position:relative;">
+            <i class="bi bi-geo-alt" style="position:absolute;left:.85rem;top:50%;transform:translateY(-50%);color:rgba(238,240,255,.3);font-size:.85rem;"></i>
+            <input type="text" name="location" class="finput" style="padding-left:2.4rem;"
+                   placeholder="City or area" value="{{ request.GET.location }}">
+          </div>
+        </div>
+
+        <div class="fgroup">
+          <div class="flabel">Price per Day (₹)</div>
+          <div class="price-pair">
+            <input type="number" name="min_price" class="finput" placeholder="Min"
+                   value="{{ request.GET.min_price }}" min="0">
+            <input type="number" name="max_price" class="finput" placeholder="Max"
+                   value="{{ request.GET.max_price }}" min="0">
+          </div>
+        </div>
+
+        <div class="fgroup">
+          <div class="flabel">Min Rating</div>
+          <select name="min_rating" class="fselect">
+            <option value="">Any Rating</option>
+            <option value="4" {% if request.GET.min_rating == "4" %}selected{% endif %}>4★ &amp; above — Excellent</option>
+            <option value="3" {% if request.GET.min_rating == "3" %}selected{% endif %}>3★ &amp; above — Good</option>
+            <option value="2" {% if request.GET.min_rating == "2" %}selected{% endif %}>2★ &amp; above — Fair</option>
+          </select>
+        </div>
+
+        <div class="fgroup">
+          <div class="flabel">Sort By</div>
+          <select name="sort" class="fselect">
+            <option value="newest"     {% if sort == 'newest'     %}selected{% endif %}>Newest First</option>
+            <option value="price_low"  {% if sort == 'price_low'  %}selected{% endif %}>Price: Low to High</option>
+            <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+            <option value="rating"     {% if sort == 'rating'     %}selected{% endif %}>Top Rated</option>
+            <option value="popular"    {% if sort == 'popular'    %}selected{% endif %}>Most Popular</option>
+          </select>
+        </div>
+
+        <button type="submit" class="apply-btn">
+          <i class="bi bi-funnel-fill me-1"></i> Apply Filters
+        </button>
+      </form>
+    </aside>
+
+    <!-- ── RESULTS PANEL ── -->
+    <section>
+
+      <!-- Results header -->
+      <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:.75rem;margin-bottom:1.5rem;">
+        <div>
+          {% if q %}
+          <h1 style="font-size:1.25rem;font-weight:800;color:#EEF0FF;margin:0 0 .2rem;">
+            Results for "<span style="color:#00D084;">{{ q }}</span>"
+          </h1>
+          {% elif active_category_name %}
+          <h1 style="font-size:1.25rem;font-weight:800;color:#EEF0FF;margin:0 0 .2rem;">
+            {{ active_category_name }} Rentals
+          </h1>
+          {% else %}
+          <h1 style="font-size:1.25rem;font-weight:800;color:#EEF0FF;margin:0 0 .2rem;">
+            All Rental Listings
+          </h1>
+          {% endif %}
+          <p style="font-size:.8rem;color:rgba(238,240,255,.35);margin:0;">
+            {{ total_count }} item{{ total_count|pluralize }} available
+          </p>
+        </div>
+
+        <div style="display:flex;gap:.6rem;align-items:center;">
+          <!-- Mobile filter toggle -->
+          <button class="d-lg-none" onclick="document.getElementById('mobileFilterPanel').style.display='flex'"
+                  style="display:inline-flex;align-items:center;gap:.4rem;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);color:rgba(238,240,255,.75);border-radius:50px;padding:.5rem 1rem;font-size:.82rem;font-weight:600;cursor:pointer;font-family:'Inter',sans-serif;">
+            <i class="bi bi-sliders"></i> Filters
+          </button>
+          <!-- Sort (desktop inline) -->
+          <form method="get" id="sortForm" style="display:flex;align-items:center;gap:.4rem;">
+            {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+            {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+            {% if request.GET.location %}<input type="hidden" name="location" value="{{ request.GET.location }}">{% endif %}
+            {% if request.GET.min_price %}<input type="hidden" name="min_price" value="{{ request.GET.min_price }}">{% endif %}
+            {% if request.GET.max_price %}<input type="hidden" name="max_price" value="{{ request.GET.max_price }}">{% endif %}
+            <select name="sort" class="fselect" style="width:auto;padding:.48rem .85rem;font-size:.8rem;" onchange="this.form.submit()">
+              <option value="newest"     {% if sort == 'newest'     %}selected{% endif %}>Newest</option>
+              <option value="price_low"  {% if sort == 'price_low'  %}selected{% endif %}>Price ↑</option>
+              <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price ↓</option>
+              <option value="rating"     {% if sort == 'rating'     %}selected{% endif %}>Top Rated</option>
+              <option value="popular"    {% if sort == 'popular'    %}selected{% endif %}>Popular</option>
+            </select>
+          </form>
+        </div>
+      </div>
+
+      {% if products %}
+      <!-- ── PRODUCT GRID: 4 cols desktop / 3 tablet / 2 mobile / 1 small ── -->
+      <div style="display:grid;
+                  grid-template-columns:repeat(4,1fr);
+                  gap:1.1rem;">
+        {% for product in products %}
+        <div class="browse-card-wrap" style="opacity:0;transform:translateY(16px);animation:cardIn .4s ease forwards;animation-delay:{{ forloop.counter0 }}00ms;">
+          {% include 'listings/_product_card.html' with product=product %}
+        </div>
+        {% endfor %}
+      </div>
+
+      <!-- PAGINATION -->
+      {% if page_obj.has_other_pages %}
+      <div style="display:flex;justify-content:center;align-items:center;gap:.4rem;margin-top:3rem;flex-wrap:wrap;">
+        {% if page_obj.has_previous %}
+        <a href="?{% if q %}q={{ q }}&{% endif %}{% if category %}category={{ category }}&{% endif %}sort={{ sort }}&page={{ page_obj.previous_page_number }}"
+           style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#101428;border:1px solid rgba(255,255,255,.08);color:rgba(238,240,255,.65);text-decoration:none;font-size:.85rem;transition:all .18s;"
+           onmouseover="this.style.borderColor='#00D084';this.style.color='#00D084'"
+           onmouseout="this.style.borderColor='rgba(255,255,255,.08)';this.style.color='rgba(238,240,255,.65)'">
+          <i class="bi bi-chevron-left"></i>
+        </a>
+        {% endif %}
+
+        {% for num in page_obj.paginator.page_range %}
+          {% if page_obj.number == num %}
+          <span style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#00D084;color:#000;font-weight:700;font-size:.85rem;">{{ num }}</span>
+          {% elif num > page_obj.number|add:"-3" and num < page_obj.number|add:"3" %}
+          <a href="?{% if q %}q={{ q }}&{% endif %}{% if category %}category={{ category }}&{% endif %}sort={{ sort }}&page={{ num }}"
+             style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#101428;border:1px solid rgba(255,255,255,.08);color:rgba(238,240,255,.65);text-decoration:none;font-size:.85rem;transition:all .18s;"
+             onmouseover="this.style.borderColor='#00D084';this.style.color='#00D084'"
+             onmouseout="this.style.borderColor='rgba(255,255,255,.08)';this.style.color='rgba(238,240,255,.65)'">{{ num }}</a>
+          {% endif %}
+        {% endfor %}
+
+        {% if page_obj.has_next %}
+        <a href="?{% if q %}q={{ q }}&{% endif %}{% if category %}category={{ category }}&{% endif %}sort={{ sort }}&page={{ page_obj.next_page_number }}"
+           style="width:38px;height:38px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:#101428;border:1px solid rgba(255,255,255,.08);color:rgba(238,240,255,.65);text-decoration:none;font-size:.85rem;transition:all .18s;"
+           onmouseover="this.style.borderColor='#00D084';this.style.color='#00D084'"
+           onmouseout="this.style.borderColor='rgba(255,255,255,.08)';this.style.color='rgba(238,240,255,.65)'">
+          <i class="bi bi-chevron-right"></i>
+        </a>
+        {% endif %}
+      </div>
+      {% endif %}
+
+      {% else %}
+      <!-- EMPTY STATE -->
+      <div style="text-align:center;padding:5rem 2rem;background:#101428;border:1px solid rgba(255,255,255,.07);border-radius:20px;">
+        <div style="font-size:4rem;margin-bottom:1.25rem;opacity:.25;">🔍</div>
+        <h3 style="font-size:1.2rem;font-weight:700;color:#EEF0FF;margin-bottom:.5rem;">
+          {% if q %}No results for "{{ q }}"{% else %}No listings yet{% endif %}
+        </h3>
+        <p style="color:rgba(238,240,255,.4);font-size:.875rem;margin-bottom:1.75rem;line-height:1.7;">
+          {% if q %}Try different keywords or browse all categories.
+          {% else %}Be the first to list an item and start earning!{% endif %}
+        </p>
+        <div style="display:flex;justify-content:center;gap:.75rem;flex-wrap:wrap;">
+          {% if q %}
+          <a href="{% url 'browse' %}" style="background:#00D084;color:#000;font-weight:700;padding:.75rem 2rem;border-radius:50px;font-size:.9rem;text-decoration:none;">Browse All</a>
+          {% endif %}
+          {% if user.is_authenticated %}
+          <a href="{% url 'create_listing' %}" style="background:rgba(255,255,255,.07);color:#EEF0FF;font-weight:600;padding:.75rem 2rem;border-radius:50px;font-size:.9rem;text-decoration:none;border:1.5px solid rgba(255,255,255,.1);">+ Add Listing</a>
+          {% else %}
+          <button type="button" data-modal="register" style="background:rgba(255,255,255,.07);color:#EEF0FF;font-weight:600;padding:.75rem 2rem;border-radius:50px;font-size:.9rem;border:1.5px solid rgba(255,255,255,.1);cursor:pointer;font-family:'Inter',sans-serif;">+ Add Listing</button>
+          {% endif %}
+        </div>
+      </div>
+      {% endif %}
+
+    </section>
+  </div><!-- /browse-layout -->
+</div><!-- /browse-wrap -->
+
+<!-- ══════════════ MOBILE FILTER PANEL ══════════════ -->
+<div id="mobileFilterPanel" style="display:none;position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.8);backdrop-filter:blur(8px);align-items:flex-end;justify-content:center;">
+  <div style="background:#101428;border-radius:24px 24px 0 0;padding:1.75rem;width:100%;max-width:600px;max-height:88vh;overflow-y:auto;border-top:1px solid rgba(255,255,255,.1);">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.5rem;">
+      <span style="font-weight:700;font-size:1rem;color:#EEF0FF;">Filters</span>
+      <button onclick="document.getElementById('mobileFilterPanel').style.display='none'"
+              style="background:rgba(255,255,255,.08);border:none;border-radius:50%;width:34px;height:34px;cursor:pointer;color:rgba(238,240,255,.75);font-size:.9rem;display:flex;align-items:center;justify-content:center;">
+        <i class="bi bi-x-lg"></i>
+      </button>
+    </div>
+    <form method="get" action="{% url 'browse' %}">
+      {% if q %}<input type="hidden" name="q" value="{{ q }}">{% endif %}
+      {% if category %}<input type="hidden" name="category" value="{{ category }}">{% endif %}
+      <div style="margin-bottom:1rem;">
+        <div class="flabel">Location</div>
+        <input type="text" name="location" class="finput" placeholder="City or area" value="{{ request.GET.location }}">
+      </div>
+      <div style="margin-bottom:1rem;">
+        <div class="flabel">Price per Day (₹)</div>
+        <div class="price-pair">
+          <input type="number" name="min_price" class="finput" placeholder="Min" value="{{ request.GET.min_price }}">
+          <input type="number" name="max_price" class="finput" placeholder="Max" value="{{ request.GET.max_price }}">
+        </div>
+      </div>
+      <div style="margin-bottom:1rem;">
+        <div class="flabel">Min Rating</div>
+        <select name="min_rating" class="fselect">
+          <option value="">Any Rating</option>
+          <option value="4" {% if request.GET.min_rating == "4" %}selected{% endif %}>4★ &amp; above</option>
+          <option value="3" {% if request.GET.min_rating == "3" %}selected{% endif %}>3★ &amp; above</option>
+        </select>
+      </div>
+      <div style="margin-bottom:1.5rem;">
+        <div class="flabel">Sort By</div>
+        <select name="sort" class="fselect">
+          <option value="newest"     {% if sort == 'newest'     %}selected{% endif %}>Newest First</option>
+          <option value="price_low"  {% if sort == 'price_low'  %}selected{% endif %}>Price: Low to High</option>
+          <option value="price_high" {% if sort == 'price_high' %}selected{% endif %}>Price: High to Low</option>
+          <option value="rating"     {% if sort == 'rating'     %}selected{% endif %}>Top Rated</option>
+        </select>
+      </div>
+      <button type="submit" class="apply-btn">Apply Filters</button>
+    </form>
+  </div>
+</div>
+
+</div><!-- /lp-page -->
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+/* Responsive grid: 4 cols desktop, 3 tablet, 2 phone, 1 small */
+(function () {
+  function setGrid() {
+    const grid = document.querySelector('.browse-layout > section > div[style*="grid-template-columns"]');
+    if (!grid) return;
+    const w = window.innerWidth;
+    if (w >= 1200)      grid.style.gridTemplateColumns = 'repeat(4,1fr)';
+    else if (w >= 900)  grid.style.gridTemplateColumns = 'repeat(3,1fr)';
+    else if (w >= 560)  grid.style.gridTemplateColumns = 'repeat(2,1fr)';
+    else                grid.style.gridTemplateColumns = '1fr';
+  }
+  setGrid();
+  window.addEventListener('resize', setGrid);
+})();
+
+/* Wishlist toggle */
+function wlToggle(btn) {
+  const pid = btn.dataset.pid;
+  fetch('/wishlist/toggle/' + pid + '/', {
+    headers: { 'X-Requested-With': 'XMLHttpRequest' },
+    credentials: 'same-origin'
+  }).then(r => r.json()).then(d => {
+    const i = btn.querySelector('i');
+    if (d.in_wishlist) {
+      btn.classList.add('on');
+      if (i) { i.className = 'bi bi-heart-fill'; i.style.color = '#FF5272'; }
+    } else {
+      btn.classList.remove('on');
+      if (i) { i.className = 'bi bi-heart'; i.style.color = ''; }
+    }
+  }).catch(() => { if (window.rfyOpenModal) window.rfyOpenModal('login'); });
+}
+</script>
+<style>
+@keyframes cardIn {
+  to { opacity:1; transform:translateY(0); }
+}
+/* Responsive sidebar hide */
+@media (max-width: 992px) {
+  #filterSidebar { display: none !important; }
+  .browse-layout { grid-template-columns: 1fr !important; }
+}
+/* Responsive grid */
+@media (max-width: 1199px) {
+  .product-grid,
+  .browse-layout > section > div[style*="grid-template-columns"] {
+    grid-template-columns: repeat(3,1fr) !important;
+  }
+}
+@media (max-width: 899px) {
+  .product-grid,
+  .browse-layout > section > div[style*="grid-template-columns"] {
+    grid-template-columns: repeat(2,1fr) !important;
+  }
+}
+@media (max-width: 559px) {
+  .product-grid,
+  .browse-layout > section > div[style*="grid-template-columns"] {
+    grid-template-columns: 1fr !important;
+  }
+}
+</style>
+{% endblock %}

@@ -1,0 +1,269 @@
+/* ============================================================
+   RENTIFY — Auth Modal + Auth Pages
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+
+/* ── Modal overlay ── */
+.rfy-modal-overlay {
+  position: fixed; inset: 0; z-index: 99999;
+  background: rgba(0, 0, 0, .65);
+  backdrop-filter: blur(12px) saturate(140%);
+  -webkit-backdrop-filter: blur(12px) saturate(140%);
+  display: flex; align-items: center; justify-content: center;
+  padding: 1rem;
+  opacity: 0; pointer-events: none;
+  transition: opacity .25s ease;
+}
+.rfy-modal-overlay.open {
+  opacity: 1; pointer-events: all;
+}
+
+/* ── Modal box ── */
+.rfy-modal {
+  background: #ffffff;
+  border-radius: 24px;
+  width: 100%; max-width: 460px;
+  box-shadow: 0 32px 80px rgba(0,0,0,.25), 0 0 0 1px rgba(0,0,0,.06);
+  transform: translateY(16px) scale(.97);
+  transition: transform .3s cubic-bezier(.16,1,.3,1), opacity .3s ease;
+  opacity: 0;
+  max-height: 92vh; overflow-y: auto;
+  scrollbar-width: none;
+}
+.rfy-modal::-webkit-scrollbar { display: none; }
+.rfy-modal-overlay.open .rfy-modal {
+  transform: none; opacity: 1;
+}
+
+/* ── Header ── */
+.rfy-modal-header {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 1.5rem 1.75rem 0;
+}
+.rfy-modal-brand {
+  font-size: 1.25rem; font-weight: 900; letter-spacing: -.04em;
+  color: #2563EB;
+}
+.rfy-modal-brand em { color: #F59E0B; font-style: normal; }
+.rfy-modal-close {
+  width: 34px; height: 34px; border-radius: 50%;
+  border: none; background: #F4F4F5;
+  display: flex; align-items: center; justify-content: center;
+  cursor: pointer; font-size: .9rem; color: #71717A;
+  transition: background .18s, color .18s;
+}
+.rfy-modal-close:hover { background: #E4E4E7; color: #18181B; }
+
+/* ── Body ── */
+.rfy-modal-body { padding: 1.25rem 1.75rem 1.75rem; }
+
+/* ── Tab switcher ── */
+.rfy-tabs {
+  display: flex; background: #F4F4F5; border-radius: 999px;
+  padding: 4px; gap: 4px; margin-bottom: 1.5rem;
+}
+.rfy-tab {
+  flex: 1; padding: .55rem; border-radius: 999px; border: none;
+  background: transparent; font-size: .875rem; font-weight: 600;
+  color: #71717A; cursor: pointer;
+  transition: background .2s, color .2s, box-shadow .2s;
+  font-family: 'Inter', sans-serif;
+}
+.rfy-tab.active {
+  background: #ffffff; color: #18181B;
+  box-shadow: 0 1px 4px rgba(0,0,0,.1), 0 0 0 1px rgba(0,0,0,.04);
+}
+
+/* ── Panels ── */
+.rfy-panel { display: none; }
+.rfy-panel.active { display: block; }
+
+/* ── Social button ── */
+.rfy-social-btn {
+  width: 100%; display: flex; align-items: center; justify-content: center;
+  gap: .65rem; padding: .75rem 1rem; border-radius: 12px;
+  border: 1.5px solid #E4E4E7; background: #fff;
+  font-size: .9rem; font-weight: 600; color: #18181B;
+  cursor: pointer; transition: box-shadow .2s, border-color .2s;
+  font-family: 'Inter', sans-serif;
+}
+.rfy-social-btn:hover {
+  box-shadow: 0 4px 12px rgba(0,0,0,.08); border-color: #D1D5DB;
+}
+.rfy-social-btn svg { flex-shrink: 0; }
+
+/* ── Divider ── */
+.rfy-divider {
+  display: flex; align-items: center; gap: .75rem;
+  margin: 1rem 0; color: #A1A1AA; font-size: .75rem; font-weight: 500;
+}
+.rfy-divider::before, .rfy-divider::after {
+  content: ''; flex: 1; border-top: 1px solid #E4E4E7;
+}
+
+/* ── Form inputs ── */
+.auth-input {
+  width: 100%; padding: .75rem 1rem;
+  border: 1.5px solid #E4E4E7; border-radius: 12px;
+  font-size: .9rem; font-family: 'Inter', sans-serif;
+  color: #18181B; background: #fff; outline: none;
+  transition: border-color .18s, box-shadow .18s;
+}
+.auth-input::placeholder { color: #A1A1AA; }
+.auth-input:focus {
+  border-color: #2563EB;
+  box-shadow: 0 0 0 3px rgba(37,99,235,.12);
+}
+.auth-input.error { border-color: #EF4444; }
+.auth-input.success { border-color: #22C55E; }
+
+/* ── Field wrapper ── */
+.rfy-field { margin-bottom: 1rem; }
+.rfy-field label {
+  display: block; font-size: .78rem; font-weight: 600;
+  color: #52525B; margin-bottom: .4rem; text-transform: uppercase;
+  letter-spacing: .04em;
+}
+.rfy-field-error {
+  font-size: .78rem; color: #EF4444; margin-top: .3rem;
+  display: flex; align-items: center; gap: .3rem;
+}
+.rfy-field-hint { font-size: .75rem; color: #A1A1AA; margin-top: .25rem; }
+
+/* ── Input with icon ── */
+.rfy-input-wrap { position: relative; }
+.rfy-input-wrap .auth-input { padding-left: 2.75rem; }
+.rfy-input-icon {
+  position: absolute; left: 1rem; top: 50%; transform: translateY(-50%);
+  color: #A1A1AA; font-size: .9rem; pointer-events: none;
+}
+.rfy-input-wrap .rfy-eye-btn {
+  position: absolute; right: .85rem; top: 50%; transform: translateY(-50%);
+  background: none; border: none; cursor: pointer; color: #A1A1AA;
+  font-size: .9rem; padding: .1rem; transition: color .18s;
+}
+.rfy-eye-btn:hover { color: #71717A; }
+
+/* ── Password strength ── */
+.pwd-strength-bar {
+  height: 3px; border-radius: 99px; background: #E4E4E7;
+  margin-top: .5rem; overflow: hidden;
+}
+.pwd-strength-fill {
+  height: 100%; border-radius: 99px;
+  transition: width .4s ease, background-color .4s ease;
+  width: 0%;
+}
+.pwd-strength-label {
+  font-size: .72rem; font-weight: 600; margin-top: .3rem;
+}
+
+/* ── Submit button ── */
+.rfy-submit {
+  width: 100%; padding: .85rem; border-radius: 12px;
+  border: none; font-size: .95rem; font-weight: 700;
+  background: #2563EB; color: #fff; cursor: pointer;
+  font-family: 'Inter', sans-serif;
+  transition: background .2s, transform .15s, box-shadow .2s;
+  display: flex; align-items: center; justify-content: center; gap: .5rem;
+  margin-top: .25rem;
+}
+.rfy-submit:hover {
+  background: #1D4ED8; transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(37,99,235,.35);
+}
+.rfy-submit:active { transform: none; }
+.rfy-submit:disabled {
+  background: #93C5FD; cursor: not-allowed; transform: none; box-shadow: none;
+}
+.rfy-submit .spinner {
+  width: 18px; height: 18px; border-radius: 50%;
+  border: 2.5px solid rgba(255,255,255,.3);
+  border-top-color: #fff;
+  animation: spin .7s linear infinite; display: none;
+}
+.rfy-submit.loading .spinner { display: block; }
+.rfy-submit.loading .btn-text { display: none; }
+@keyframes spin { to { transform: rotate(360deg); } }
+
+/* ── Remember / Forgot row ── */
+.rfy-meta-row {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 1rem;
+}
+.rfy-check-label {
+  display: flex; align-items: center; gap: .5rem;
+  font-size: .82rem; color: #52525B; cursor: pointer; user-select: none;
+}
+.rfy-check-label input[type=checkbox] {
+  width: 16px; height: 16px; accent-color: #2563EB;
+  border-radius: 4px; cursor: pointer;
+}
+.rfy-forgot { font-size: .82rem; color: #2563EB; font-weight: 500; }
+.rfy-forgot:hover { color: #1D4ED8; text-decoration: underline; }
+
+/* ── Footer note ── */
+.rfy-modal-note {
+  text-align: center; font-size: .75rem; color: #A1A1AA;
+  margin-top: 1.25rem; line-height: 1.6;
+}
+.rfy-modal-note a { color: #2563EB; font-weight: 500; }
+.rfy-modal-note a:hover { text-decoration: underline; }
+
+/* ── Success state ── */
+.rfy-success-state {
+  text-align: center; padding: 2rem 1rem; display: none;
+}
+.rfy-success-icon {
+  width: 64px; height: 64px; border-radius: 50%;
+  background: #DCFCE7; color: #16A34A;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 1.75rem; margin: 0 auto 1rem;
+}
+.rfy-success-state h3 { font-weight: 800; margin-bottom: .4rem; color: #18181B; }
+.rfy-success-state p { color: #71717A; font-size: .9rem; }
+
+/* ── Standalone auth pages (login.html / register.html) ── */
+.auth-page {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #0F172A 0%, #1E293B 50%, #0F172A 100%);
+  display: flex; align-items: center; justify-content: center; padding: 2rem 1rem;
+}
+.auth-card {
+  background: #fff; border-radius: 24px; width: 100%; max-width: 480px;
+  box-shadow: 0 32px 80px rgba(0,0,0,.3);
+  overflow: hidden;
+}
+.auth-card-header {
+  background: linear-gradient(135deg, #1E3A8A, #2563EB);
+  padding: 2rem 2rem 1.5rem; text-align: center;
+}
+.auth-card-body { padding: 2rem; }
+
+/* ── Notification toast ── */
+.rfy-toast-wrap {
+  position: fixed; top: 1.25rem; right: 1.25rem; z-index: 99999;
+  display: flex; flex-direction: column; gap: .5rem; pointer-events: none;
+}
+.rfy-toast {
+  background: #fff; border-radius: 12px; padding: .85rem 1.25rem;
+  font-size: .875rem; font-weight: 500; color: #18181B;
+  box-shadow: 0 8px 28px rgba(0,0,0,.12), 0 0 0 1px rgba(0,0,0,.05);
+  display: flex; align-items: center; gap: .65rem; min-width: 260px;
+  animation: slideInRight .3s cubic-bezier(.16,1,.3,1);
+  pointer-events: auto;
+}
+.rfy-toast.success { border-left: 3px solid #22C55E; }
+.rfy-toast.error   { border-left: 3px solid #EF4444; }
+.rfy-toast.info    { border-left: 3px solid #2563EB; }
+@keyframes slideInRight {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ── Responsive ── */
+@media (max-width: 480px) {
+  .rfy-modal { border-radius: 20px; }
+  .rfy-modal-body { padding: 1rem 1.25rem 1.5rem; }
+  .rfy-modal-header { padding: 1.25rem 1.25rem 0; }
+}

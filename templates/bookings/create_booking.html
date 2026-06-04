@@ -1,0 +1,136 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Book {{ product.title }} — Rentify{% endblock %}
+
+{% block content %}
+<div class="bk-layout">
+
+  <div>
+    <nav class="bk-crumb" style="display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;font-size:.75rem;color:rgba(238,240,255,.35);margin-bottom:1.5rem;">
+      <a href="{% url 'home' %}" style="color:inherit;text-decoration:none;">Home</a>
+      <i class="bi bi-chevron-right" style="font-size:.6rem;"></i>
+      <a href="{% url 'product_detail' product.pk %}" style="color:inherit;text-decoration:none;">{{ product.title|truncatechars:28 }}</a>
+      <i class="bi bi-chevron-right" style="font-size:.6rem;"></i>
+      <span style="color:rgba(238,240,255,.65);">Book</span>
+    </nav>
+
+    <h1 style="font-size:1.55rem;font-weight:900;color:#EEF0FF;margin:0 0 .35rem;letter-spacing:-.02em;">Request to Book</h1>
+    <p style="font-size:.85rem;color:rgba(238,240,255,.4);margin:0 0 1.75rem;line-height:1.6;">
+      Pick your dates and send a request. The owner approves before you're charged.
+    </p>
+
+    <form method="post" novalidate id="bookingForm">
+      {% csrf_token %}
+      <input type="hidden" id="booking-product-id" value="{{ product.pk }}">
+
+      <div class="bk-glass" style="margin-bottom:1rem;">
+        <div class="bk-form-section">
+          <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(238,240,255,.35);margin-bottom:1rem;">
+            <i class="bi bi-calendar3 me-1" style="color:#00D084;"></i> Dates
+          </div>
+          <div class="bk-date-row" style="display:grid;grid-template-columns:1fr 1fr;gap:1rem;">
+            <div>
+              <label class="listing-label" for="{{ form.start_date.id_for_label }}">Check-in</label>
+              <input type="date" name="start_date" id="{{ form.start_date.id_for_label }}" class="rfy-field-input" required value="{{ form.start_date.value|default:'' }}">
+              {% if form.start_date.errors %}<div class="field-error">{{ form.start_date.errors.0 }}</div>{% endif %}
+            </div>
+            <div>
+              <label class="listing-label" for="{{ form.end_date.id_for_label }}">Return</label>
+              <input type="date" name="end_date" id="{{ form.end_date.id_for_label }}" class="rfy-field-input" required value="{{ form.end_date.value|default:'' }}">
+              {% if form.end_date.errors %}<div class="field-error">{{ form.end_date.errors.0 }}</div>{% endif %}
+            </div>
+          </div>
+        </div>
+        <div class="bk-form-section">
+          <label class="listing-label" for="renter_note">Message to owner (optional)</label>
+          <textarea name="renter_note" id="renter_note" class="rfy-field-input rfy-field-textarea" rows="4"
+                    placeholder="Introduce yourself and how you'll use the item…">{{ form.renter_note.value|default:'' }}</textarea>
+        </div>
+      </div>
+
+      {% if form.non_field_errors %}
+      <div class="field-error" style="padding:1rem;border-radius:14px;background:rgba(255,82,114,.08);border:1px solid rgba(255,82,114,.2);margin-bottom:1rem;">
+        <i class="bi bi-exclamation-triangle-fill"></i> {{ form.non_field_errors.0 }}
+      </div>
+      {% endif %}
+
+      <button type="submit" class="listing-submit-btn" style="width:100%;">
+        <i class="bi bi-calendar-check-fill"></i> Send Booking Request
+      </button>
+      <p style="text-align:center;font-size:.72rem;color:rgba(238,240,255,.3);margin-top:.85rem;">
+        <i class="bi bi-shield-check" style="color:#00D084;"></i> No charge until the owner approves
+      </p>
+    </form>
+  </div>
+
+  <aside class="bk-sticky">
+    <div class="bk-glass">
+      <div class="bk-summary-product">
+        <img src="{{ product.get_primary_image }}" alt=""
+             onerror="this.src='https://placehold.co/96x72/0d1020/00D084?text=📦'">
+        <div style="min-width:0;">
+          <h2 style="font-size:.95rem;font-weight:800;color:#EEF0FF;margin:0 0 .25rem;line-height:1.3;">{{ product.title }}</h2>
+          <div style="font-size:.75rem;color:rgba(238,240,255,.4);">
+            <i class="bi bi-geo-alt" style="color:#00D084;"></i> {{ product.get_public_location }}
+          </div>
+          <div style="margin-top:.5rem;font-size:.8rem;font-weight:700;color:#00D084;">
+            ₹{{ product.price_per_day|floatformat:0 }} <span style="font-weight:500;color:rgba(238,240,255,.35);">/ day</span>
+          </div>
+        </div>
+      </div>
+      <div class="bk-summary-body">
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(238,240,255,.35);margin-bottom:.75rem;">Price details</div>
+        <div id="bk-summary-lines">
+          <div class="bk-summary-empty">Select dates to see your total</div>
+        </div>
+        <div id="bk-summary-total-wrap" style="display:none;">
+          <div class="bk-summary-total">
+            <span>Total</span>
+            <span class="amt" id="ps-total">—</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bk-glass" style="margin-top:1rem;padding:1rem 1.15rem;font-size:.78rem;color:rgba(238,240,255,.45);line-height:1.6;display:flex;gap:.5rem;">
+      <i class="bi bi-shield-fill-check" style="color:#4F8EF7;flex-shrink:0;"></i>
+      Book and pay through Rentify for full protection.
+    </div>
+  </aside>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+(function () {
+  const startInp = document.getElementById('{{ form.start_date.id_for_label }}');
+  const endInp   = document.getElementById('{{ form.end_date.id_for_label }}');
+  const pid      = document.getElementById('booking-product-id')?.value;
+  const linesEl  = document.getElementById('bk-summary-lines');
+  const totalWrap = document.getElementById('bk-summary-total-wrap');
+  const totalEl  = document.getElementById('ps-total');
+
+  const today = new Date().toISOString().split('T')[0];
+  if (startInp) startInp.min = today;
+  if (endInp) endInp.min = today;
+  startInp?.addEventListener('change', () => { if (endInp) endInp.min = startInp.value; calc(); });
+  endInp?.addEventListener('change', calc);
+
+  async function calc() {
+    const s = startInp?.value, e = endInp?.value;
+    if (!s || !e || !pid) return;
+    try {
+      const r = await fetch(`/bookings/api/calculate/?product_id=${pid}&start_date=${s}&end_date=${e}`, { credentials: 'same-origin' });
+      const d = await r.json();
+      if (d.error) return;
+      linesEl.innerHTML = `
+        <div class="bk-summary-row"><span>Rental (${d.total_days} day${d.total_days > 1 ? 's' : ''})</span><strong>₹${parseFloat(d.rental_cost).toFixed(2)}</strong></div>
+        <div class="bk-summary-row"><span>Security deposit</span><strong>₹${parseFloat(d.deposit).toFixed(2)}</strong></div>
+        <div class="bk-summary-row"><span>Service</span><strong>₹0.00</strong></div>`;
+      totalEl.textContent = '₹' + parseFloat(d.total).toFixed(2);
+      totalWrap.style.display = 'block';
+    } catch (err) {}
+  }
+})();
+</script>
+{% endblock %}

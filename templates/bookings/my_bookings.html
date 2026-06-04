@@ -1,0 +1,32 @@
+{% extends 'base.html' %}
+{% block title %}My Rentals — Rentify{% endblock %}
+{% block body_class %}page-my-rentals{% endblock %}
+
+{% block content %}
+<div class="dash-app">
+
+  <div class="hub-hero" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <div class="hub-eyebrow">Renter Hub</div>
+      <h1 class="hub-title">My Rentals</h1>
+      <p class="hub-sub">Everything you've rented or requested</p>
+    </div>
+    <a href="{% url 'browse' %}" class="dash-btn dash-btn--ghost"><i class="bi bi-search"></i> Browse</a>
+  </div>
+
+  {% if bookings %}
+  <div class="hub-card-grid">
+    {% for booking in bookings %}
+    {% include 'bookings/_renter_booking_card.html' with booking=booking %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="hub-empty">
+    <div class="hub-empty-icon"><i class="bi bi-calendar-x"></i></div>
+    <h3>No Active Rentals</h3>
+    <p>Browse available products and rent something today.</p>
+    <a href="{% url 'browse' %}" class="dash-btn dash-btn--primary"><i class="bi bi-search"></i> Browse Items</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

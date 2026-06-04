@@ -1,0 +1,231 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}How It Works — Rentify{% endblock %}
+{% block meta_description %}Learn how Rentify works — rent anything from trusted people near you or earn money from items you already own.{% endblock %}
+
+{% block content %}
+<div class="lp-page">
+
+  <!-- ══ HERO ══ -->
+  <div class="lp-hero">
+    <div class="lp-grid-bg"></div>
+    <div class="lp-eyebrow"><span class="dot"></span> Simple & Transparent</div>
+    <h1 class="lp-h1">How <span class="accent">Rentify</span> Works</h1>
+    <p class="lp-sub">Five simple steps to rent anything — or earn from what you already own. No complexity, no hidden fees.</p>
+    <div style="display:flex;justify-content:center;gap:.85rem;flex-wrap:wrap;">
+      <a href="{% url 'browse' %}" class="lp-btn-primary"><i class="bi bi-search"></i> Browse Items</a>
+      {% if user.is_authenticated %}
+      <a href="{% url 'create_listing' %}" class="lp-btn-ghost"><i class="bi bi-plus-circle"></i> List an Item</a>
+      {% else %}
+      <button type="button" class="lp-btn-ghost" data-modal="register"><i class="bi bi-plus-circle"></i> List an Item</button>
+      {% endif %}
+    </div>
+  </div>
+
+  <!-- ══ STEPS ══ -->
+  <section class="lp-section" style="background:#07091a;">
+    <div class="lp-wrap">
+      <div style="text-align:center;margin-bottom:4rem;">
+        <div class="lp-sec-label">The Process</div>
+        <div class="lp-sec-title">5 Steps to Your Perfect Rental</div>
+        <p class="lp-sec-sub">From sign-up to return — here's exactly what happens at every step.</p>
+      </div>
+
+      <!-- Timeline steps -->
+      <div style="position:relative;max-width:760px;margin:0 auto;">
+        <!-- Vertical line -->
+        <div style="position:absolute;left:29px;top:0;bottom:0;width:2px;background:linear-gradient(to bottom, rgba(0,208,132,.4), rgba(0,208,132,.1));display:block;" class="d-none d-md-block"></div>
+
+        {% for step in steps %}{% endfor %}
+
+        <!-- Step 1 -->
+        <div class="sr" style="display:flex;gap:2rem;align-items:flex-start;margin-bottom:3rem;">
+          <div style="width:60px;height:60px;border-radius:50%;background:var(--g);color:#000;display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;flex-shrink:0;z-index:1;box-shadow:0 0 0 6px rgba(0,208,132,.12),0 8px 24px rgba(0,208,132,.25);">1</div>
+          <div class="lp-card" style="flex:1;padding:1.75rem;">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
+              <div class="lp-icon-circle lic-green"><i class="bi bi-person-plus-fill"></i></div>
+              <h3 style="font-size:1.15rem;font-weight:800;color:#fff;margin:0;">Create Your Account</h3>
+            </div>
+            <p style="color:rgba(238,240,255,.55);font-size:.9rem;line-height:1.75;margin:0;">Sign up in under 60 seconds with your email. Verify your profile to build trust with renters and owners. A verified badge increases your bookings significantly.</p>
+            <div style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap;">
+              <span class="lp-chip lpc-green"><i class="bi bi-check2"></i> Free to join</span>
+              <span class="lp-chip lpc-blue"><i class="bi bi-shield-check"></i> Instant access</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 2 -->
+        <div class="sr sr-d1" style="display:flex;gap:2rem;align-items:flex-start;margin-bottom:3rem;">
+          <div style="width:60px;height:60px;border-radius:50%;background:rgba(0,208,132,.12);color:var(--g);border:2px solid rgba(0,208,132,.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;flex-shrink:0;z-index:1;">2</div>
+          <div class="lp-card" style="flex:1;padding:1.75rem;">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
+              <div class="lp-icon-circle lic-blue"><i class="bi bi-search"></i></div>
+              <h3 style="font-size:1.15rem;font-weight:800;color:#fff;margin:0;">Browse or List an Item</h3>
+            </div>
+            <p style="color:rgba(238,240,255,.55);font-size:.9rem;line-height:1.75;margin:0;">
+              <strong style="color:#EEF0FF;">As a Renter:</strong> Search by category, location, or price. Filter by rating, availability, and more. Each listing shows real photos, pricing, and owner reviews.<br><br>
+              <strong style="color:#EEF0FF;">As an Owner:</strong> Upload photos, set daily/weekly/monthly rates, and use our AI assistant to write a compelling description and suggest the ideal price.
+            </p>
+            <div style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap;">
+              <span class="lp-chip lpc-blue"><i class="bi bi-stars"></i> AI price assistant</span>
+              <span class="lp-chip lpc-green"><i class="bi bi-image"></i> Multi-photo upload</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 3 -->
+        <div class="sr sr-d2" style="display:flex;gap:2rem;align-items:flex-start;margin-bottom:3rem;">
+          <div style="width:60px;height:60px;border-radius:50%;background:rgba(0,208,132,.12);color:var(--g);border:2px solid rgba(0,208,132,.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;flex-shrink:0;z-index:1;">3</div>
+          <div class="lp-card" style="flex:1;padding:1.75rem;">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
+              <div class="lp-icon-circle lic-gold"><i class="bi bi-calendar-plus-fill"></i></div>
+              <h3 style="font-size:1.15rem;font-weight:800;color:#fff;margin:0;">Send a Rental Request</h3>
+            </div>
+            <p style="color:rgba(238,240,255,.55);font-size:.9rem;line-height:1.75;margin:0;">Choose your start and end dates. The system automatically calculates the total cost including the refundable security deposit. Add a message to the owner explaining your use case.</p>
+            <div style="margin-top:1rem;padding:.85rem 1rem;background:rgba(0,208,132,.06);border:1px solid rgba(0,208,132,.15);border-radius:12px;font-size:.82rem;color:rgba(238,240,255,.6);">
+              <i class="bi bi-info-circle-fill" style="color:var(--g);margin-right:.4rem;"></i>
+              You are <strong style="color:#EEF0FF;">not charged</strong> until the owner approves your request.
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 4 -->
+        <div class="sr sr-d3" style="display:flex;gap:2rem;align-items:flex-start;margin-bottom:3rem;">
+          <div style="width:60px;height:60px;border-radius:50%;background:rgba(0,208,132,.12);color:var(--g);border:2px solid rgba(0,208,132,.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;flex-shrink:0;z-index:1;">4</div>
+          <div class="lp-card" style="flex:1;padding:1.75rem;">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
+              <div class="lp-icon-circle lic-purple"><i class="bi bi-check-circle-fill"></i></div>
+              <h3 style="font-size:1.15rem;font-weight:800;color:#fff;margin:0;">Owner Reviews & Approves</h3>
+            </div>
+            <p style="color:rgba(238,240,255,.55);font-size:.9rem;line-height:1.75;margin:0;">The owner gets notified instantly. They review your profile and rental request. Once approved, you receive a confirmation notification. You can message the owner directly to arrange pickup or delivery.</p>
+            <div style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap;">
+              <span class="lp-chip lpc-green"><i class="bi bi-bell"></i> Instant notification</span>
+              <span class="lp-chip lpc-blue"><i class="bi bi-chat-dots"></i> Direct messaging</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Step 5 -->
+        <div class="sr sr-d4" style="display:flex;gap:2rem;align-items:flex-start;">
+          <div style="width:60px;height:60px;border-radius:50%;background:rgba(0,208,132,.12);color:var(--g);border:2px solid rgba(0,208,132,.3);display:flex;align-items:center;justify-content:center;font-size:1.2rem;font-weight:900;flex-shrink:0;z-index:1;">5</div>
+          <div class="lp-card" style="flex:1;padding:1.75rem;">
+            <div style="display:flex;align-items:center;gap:.75rem;margin-bottom:.75rem;">
+              <div class="lp-icon-circle lic-cyan"><i class="bi bi-box-arrow-in-down-right"></i></div>
+              <h3 style="font-size:1.15rem;font-weight:800;color:#fff;margin:0;">Rent, Return & Review</h3>
+            </div>
+            <p style="color:rgba(238,240,255,.55);font-size:.9rem;line-height:1.75;margin:0;">Use the item for the agreed period. Return it on time. The owner marks it returned on the platform. Your security deposit is refunded. Both parties leave reviews — building a trusted community.</p>
+            <div style="margin-top:1rem;display:flex;gap:.5rem;flex-wrap:wrap;">
+              <span class="lp-chip lpc-gold"><i class="bi bi-star-fill"></i> Leave a review</span>
+              <span class="lp-chip lpc-green"><i class="bi bi-shield-fill-check"></i> Deposit refunded</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ ROLES ══ -->
+  <section class="lp-section">
+    <div class="lp-wrap">
+      <div style="text-align:center;margin-bottom:3rem;">
+        <div class="lp-sec-label">Two Sides, One Platform</div>
+        <div class="lp-sec-title">Renter or Owner?</div>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:1.5rem;">
+        <div class="lp-card-solid" style="padding:2rem;">
+          <div style="font-size:2.5rem;margin-bottom:1rem;">🔍</div>
+          <h3 style="font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:.75rem;">I Want to Rent</h3>
+          <ul style="list-style:none;padding:0;margin:0 0 1.5rem;">
+            <li style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;font-size:.875rem;color:rgba(238,240,255,.6);border-bottom:1px solid rgba(255,255,255,.05);"><i class="bi bi-check-circle-fill" style="color:var(--g);flex-shrink:0;font-size:.8rem;"></i>Save money on rarely-used items</li>
+            <li style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;font-size:.875rem;color:rgba(238,240,255,.6);border-bottom:1px solid rgba(255,255,255,.05);"><i class="bi bi-check-circle-fill" style="color:var(--g);flex-shrink:0;font-size:.8rem;"></i>Access premium gear without buying</li>
+            <li style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;font-size:.875rem;color:rgba(238,240,255,.6);border-bottom:1px solid rgba(255,255,255,.05);"><i class="bi bi-check-circle-fill" style="color:var(--g);flex-shrink:0;font-size:.8rem;"></i>Flexible daily or monthly pricing</li>
+            <li style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;font-size:.875rem;color:rgba(238,240,255,.6);border-bottom:1px solid rgba(255,255,255,.05);"><i class="bi bi-check-circle-fill" style="color:var(--g);flex-shrink:0;font-size:.8rem;"></i>Thousands of items near you</li>
+            <li style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;font-size:.875rem;color:rgba(238,240,255,.6);"><i class="bi bi-check-circle-fill" style="color:var(--g);flex-shrink:0;font-size:.8rem;"></i>Verified owners you can trust</li>
+          </ul>
+          <a href="{% url 'browse' %}" class="lp-btn-primary lp-btn-sm" style="width:100%;justify-content:center;">
+            <i class="bi bi-search"></i> Browse Listings
+          </a>
+        </div>
+        <div class="lp-card-solid" style="padding:2rem;border-color:rgba(0,208,132,.15);">
+          <div style="font-size:2.5rem;margin-bottom:1rem;">💰</div>
+          <h3 style="font-size:1.2rem;font-weight:800;color:#fff;margin-bottom:.75rem;">I Want to Earn</h3>
+          <ul style="list-style:none;padding:0;margin:0 0 1.5rem;">
+            <li style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;font-size:.875rem;color:rgba(238,240,255,.6);border-bottom:1px solid rgba(255,255,255,.05);"><i class="bi bi-check-circle-fill" style="color:var(--g);flex-shrink:0;font-size:.8rem;"></i>Earn from items collecting dust</li>
+            <li style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;font-size:.875rem;color:rgba(238,240,255,.6);border-bottom:1px solid rgba(255,255,255,.05);"><i class="bi bi-check-circle-fill" style="color:var(--g);flex-shrink:0;font-size:.8rem;"></i>Set your own prices and schedule</li>
+            <li style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;font-size:.875rem;color:rgba(238,240,255,.6);border-bottom:1px solid rgba(255,255,255,.05);"><i class="bi bi-check-circle-fill" style="color:var(--g);flex-shrink:0;font-size:.8rem;"></i>AI suggests optimal pricing</li>
+            <li style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;font-size:.875rem;color:rgba(238,240,255,.6);border-bottom:1px solid rgba(255,255,255,.05);"><i class="bi bi-check-circle-fill" style="color:var(--g);flex-shrink:0;font-size:.8rem;"></i>Full control — approve or decline</li>
+            <li style="display:flex;align-items:center;gap:.6rem;padding:.45rem 0;font-size:.875rem;color:rgba(238,240,255,.6);"><i class="bi bi-check-circle-fill" style="color:var(--g);flex-shrink:0;font-size:.8rem;"></i>Get paid after each rental</li>
+          </ul>
+          {% if user.is_authenticated %}
+          <a href="{% url 'create_listing' %}" class="lp-btn-primary lp-btn-sm" style="width:100%;justify-content:center;background:var(--g);">
+            <i class="bi bi-plus-circle"></i> Start Listing
+          </a>
+          {% else %}
+          <button type="button" class="lp-btn-primary lp-btn-sm" data-modal="register" style="width:100%;justify-content:center;background:var(--g);border:none;font-family:'Inter',sans-serif;">
+            <i class="bi bi-plus-circle"></i> Start Listing
+          </button>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ══ FAQ ══ -->
+  <section class="lp-section" style="background:#07091a;">
+    <div class="lp-wrap-sm">
+      <div style="text-align:center;margin-bottom:3rem;">
+        <div class="lp-sec-label">FAQ</div>
+        <div class="lp-sec-title">Common Questions</div>
+      </div>
+
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>How does payment work?</span><i class="bi bi-plus faq-ico"></i></button><div class="faq-a">Currently Rentify uses a trust-based system where payments are arranged directly between renter and owner. An integrated payment system with Razorpay is coming soon for fully secure in-app transactions.</div></div>
+
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>What is a security deposit?</span><i class="bi bi-plus faq-ico"></i></button><div class="faq-a">A security deposit is a refundable amount collected by the owner to cover potential damage. It is fully returned to the renter once the owner confirms the item has been returned in good condition.</div></div>
+
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>What happens if an item is damaged?</span><i class="bi bi-plus faq-ico"></i></button><div class="faq-a">If an item is damaged during the rental period, the owner can raise a dispute through the platform. The security deposit helps cover repair costs. Always inspect items at pickup and document their condition.</div></div>
+
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>Can I cancel a booking?</span><i class="bi bi-plus faq-ico"></i></button><div class="faq-a">Yes — renters can cancel a pending or approved booking from their dashboard. Cancellation policies vary by listing. Check the owner's terms before booking.</div></div>
+
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>How do reviews work?</span><i class="bi bi-plus faq-ico"></i></button><div class="faq-a">After a rental is completed and the item returned, the renter can leave a 1–5 star review with a comment. Reviews are shown publicly on owner and product profiles, helping build community trust.</div></div>
+
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>Is Rentify free to use?</span><i class="bi bi-plus faq-ico"></i></button><div class="faq-a">Yes — creating an account, browsing listings, and listing items is completely free. Rentify may introduce a small service fee on completed rentals in the future to sustain the platform.</div></div>
+
+      <div class="faq-item"><button class="faq-q" onclick="toggleFaq(this)"><span>How do I become a verified owner?</span><i class="bi bi-plus faq-ico"></i></button><div class="faq-a">Verified status is granted after ID verification and platform review. Verified owners get a blue badge, appear higher in search results, and see significantly more bookings.</div></div>
+    </div>
+  </section>
+
+  <!-- ══ CTA ══ -->
+  <section class="lp-section-sm" style="background:linear-gradient(135deg,#0a1628,#0e2040);">
+    <div style="text-align:center;max-width:560px;margin:0 auto;">
+      <h2 style="font-size:clamp(1.6rem,3vw,2.2rem);font-weight:900;color:#fff;margin-bottom:1rem;letter-spacing:-.02em;">
+        Ready to get started?
+      </h2>
+      <p style="color:rgba(238,240,255,.55);font-size:.95rem;margin-bottom:2rem;line-height:1.75;">
+        Join thousands of people already renting smarter across India.
+      </p>
+      <div style="display:flex;justify-content:center;gap:.85rem;flex-wrap:wrap;">
+        <a href="{% url 'register' %}" class="lp-btn-primary"><i class="bi bi-rocket-takeoff"></i> Create Free Account</a>
+        <a href="{% url 'browse' %}" class="lp-btn-ghost"><i class="bi bi-search"></i> Browse Listings</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function toggleFaq(btn) {
+  const ans = btn.nextElementSibling;
+  const ico = btn.querySelector('.faq-ico');
+  const open = ans.classList.contains('open');
+  document.querySelectorAll('.faq-a.open').forEach(a => a.classList.remove('open'));
+  document.querySelectorAll('.faq-q.open').forEach(b => b.classList.remove('open'));
+  if (!open) { ans.classList.add('open'); btn.classList.add('open'); }
+}
+const io = new IntersectionObserver(es => es.forEach((e,i) => {
+  if(e.isIntersecting){ e.target.style.transitionDelay=(i%6*.08)+'s'; e.target.classList.add('in'); io.unobserve(e.target); }
+}),{threshold:.08});
+document.querySelectorAll('.sr').forEach(el=>io.observe(el));
+</script>
+{% endblock %}

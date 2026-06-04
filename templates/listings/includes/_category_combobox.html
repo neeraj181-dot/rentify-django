@@ -1,0 +1,20 @@
+<div class="rfy-combobox" data-type="category">
+  <select name="category" id="id_category" class="rfy-combobox-native" aria-hidden="true" tabindex="-1">
+    <option value="">Select category</option>
+    {% for cat in listing_categories %}
+    <option value="{{ cat.value }}" data-icon="{{ cat.icon }}"
+            {% if form.category.value == cat.value %}selected{% endif %}>{{ cat.label }}</option>
+    {% endfor %}
+  </select>
+  <button type="button" class="rfy-combobox-trigger" aria-haspopup="listbox">
+    <span class="rfy-combobox-label placeholder">Select category</span>
+    <i class="bi bi-chevron-down ico-caret"></i>
+  </button>
+  <div class="rfy-combobox-panel">
+    <div class="rfy-combobox-search">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Search categories…" autocomplete="off">
+    </div>
+    <div class="rfy-combobox-list" role="listbox"></div>
+  </div>
+</div>

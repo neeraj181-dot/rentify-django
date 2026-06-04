@@ -1,0 +1,114 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}All Categories — Rentify{% endblock %}
+
+{% block content %}
+<div class="lp-page">
+
+  <!-- ══ HERO ══ -->
+  <div class="lp-hero">
+    <div class="lp-grid-bg"></div>
+    <div class="lp-eyebrow"><span class="dot"></span> {{ total_listings }}+ items available</div>
+    <h1 class="lp-h1">Browse <span class="accent">Categories</span></h1>
+    <p class="lp-sub">From premium cameras to electric bikes — find everything available to rent near you, organised by category.</p>
+    <form action="{% url 'browse' %}" method="get" style="max-width:520px;margin:0 auto;">
+      <div style="display:flex;gap:.5rem;background:rgba(255,255,255,.07);border:1.5px solid rgba(255,255,255,.12);border-radius:50px;padding:.45rem .45rem .45rem 1.25rem;transition:border-color .2s;" onfocusin="this.style.borderColor='rgba(0,208,132,.5)'" onfocusout="this.style.borderColor='rgba(255,255,255,.12)'">
+        <i class="bi bi-search" style="color:rgba(238,240,255,.3);align-self:center;font-size:.9rem;flex-shrink:0;"></i>
+        <input type="text" name="q" placeholder="Search within categories…" style="flex:1;background:none;border:none;outline:none;color:#EEF0FF;font-size:.9rem;font-family:'Inter',sans-serif;">
+        <button type="submit" class="lp-btn-primary lp-btn-sm" style="flex-shrink:0;">Search</button>
+      </div>
+    </form>
+  </div>
+
+  <!-- ══ STAT STRIP ══ -->
+  <div class="lp-stat-strip">
+    <div class="lp-stat-item">
+      <div class="lp-stat-val">{{ total_listings }}+</div>
+      <div class="lp-stat-lbl">Total Listings</div>
+    </div>
+    <div class="lp-stat-item">
+      <div class="lp-stat-val">{{ categories_with_counts|length }}</div>
+      <div class="lp-stat-lbl">Categories</div>
+    </div>
+    <div class="lp-stat-item">
+      <div class="lp-stat-val">500+</div>
+      <div class="lp-stat-lbl">Cities</div>
+    </div>
+    <div class="lp-stat-item">
+      <div class="lp-stat-val">100%</div>
+      <div class="lp-stat-lbl">Trusted</div>
+    </div>
+  </div>
+
+  <!-- ══ CATEGORIES GRID ══ -->
+  <section class="lp-section">
+    <div class="lp-wrap">
+      <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1.25rem;">
+        {% for slug, name, icon, count in categories_with_counts %}
+        <a href="{% url 'browse' %}?category={{ slug }}"
+           class="lp-card sr sr-d{{ forloop.counter|add:'0'|slice:'-1' }}"
+           style="padding:1.75rem;display:flex;flex-direction:column;align-items:flex-start;text-decoration:none;color:inherit;gap:.85rem;">
+          <!-- Icon -->
+          <div style="width:56px;height:56px;border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:1.5rem;
+            {% if slug == 'electronics' or slug == 'laptops' %}background:rgba(79,142,247,.12);color:#4F8EF7;
+            {% elif slug == 'cameras' %}background:rgba(236,72,153,.12);color:#EC4899;
+            {% elif slug == 'gaming' %}background:rgba(167,139,250,.12);color:#A78BFA;
+            {% elif slug == 'drones' %}background:rgba(0,208,132,.12);color:#00D084;
+            {% elif slug == 'bikes' or slug == 'cars' %}background:rgba(245,158,11,.12);color:#F59E0B;
+            {% elif slug == 'furniture' %}background:rgba(139,92,246,.12);color:#8B5CF6;
+            {% elif slug == 'sports' %}background:rgba(34,197,94,.12);color:#22C55E;
+            {% elif slug == 'tools' %}background:rgba(148,163,184,.12);color:#94A3B8;
+            {% elif slug == 'books' %}background:rgba(251,146,60,.12);color:#FB923C;
+            {% elif slug == 'musical_instruments' %}background:rgba(244,114,182,.12);color:#F472B6;
+            {% elif slug == 'projectors' %}background:rgba(56,189,248,.12);color:#38BDF8;
+            {% else %}background:rgba(255,255,255,.07);color:rgba(238,240,255,.5);{% endif %}">
+            <i class="bi {{ icon }}"></i>
+          </div>
+          <!-- Info -->
+          <div style="flex:1;">
+            <div style="font-size:1rem;font-weight:800;color:#EEF0FF;margin-bottom:.25rem;">{{ name }}</div>
+            <div style="font-size:.78rem;color:rgba(238,240,255,.4);">
+              {{ count }} item{{ count|pluralize }} available
+            </div>
+          </div>
+          <!-- Browse button -->
+          <div style="display:flex;align-items:center;gap:.4rem;font-size:.78rem;font-weight:700;color:#00D084;margin-top:.25rem;">
+            Browse {{ name }} <i class="bi bi-arrow-right" style="font-size:.75rem;"></i>
+          </div>
+        </a>
+        {% endfor %}
+      </div>
+
+      {% if not categories_with_counts %}
+      <div style="text-align:center;padding:4rem;color:rgba(238,240,255,.3);">
+        <i class="bi bi-grid" style="font-size:3rem;display:block;margin-bottom:1rem;opacity:.3;"></i>
+        <p>No categories found. Be the first to list an item!</p>
+        <a href="{% url 'create_listing' %}" class="lp-btn-primary" style="margin-top:1rem;display:inline-flex;">+ List an Item</a>
+      </div>
+      {% endif %}
+    </div>
+  </section>
+
+  <!-- ══ CTA ══ -->
+  <section class="lp-section-sm" style="background:linear-gradient(135deg,#0a1628,#0e2040);">
+    <div style="text-align:center;max-width:520px;margin:0 auto;">
+      <h2 style="font-size:1.85rem;font-weight:900;color:#fff;margin-bottom:1rem;">Don't see your category?</h2>
+      <p style="color:rgba(238,240,255,.5);font-size:.9rem;margin-bottom:2rem;line-height:1.7;">List anything — if someone needs it, you can rent it out. Rentify supports all types of items.</p>
+      <div style="display:flex;justify-content:center;gap:.75rem;flex-wrap:wrap;">
+        <a href="{% url 'create_listing' %}" class="lp-btn-primary"><i class="bi bi-plus-circle"></i> List Your Item</a>
+        <a href="{% url 'browse' %}" class="lp-btn-ghost"><i class="bi bi-search"></i> Browse All</a>
+      </div>
+    </div>
+  </section>
+
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+const io = new IntersectionObserver(es => es.forEach((e,i) => {
+  if(e.isIntersecting){ e.target.style.transitionDelay=(i%8*.06)+'s'; e.target.classList.add('in'); io.unobserve(e.target); }
+}),{threshold:.07});
+document.querySelectorAll('.sr').forEach(el=>io.observe(el));
+</script>
+{% endblock %}

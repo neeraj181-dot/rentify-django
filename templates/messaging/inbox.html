@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Messages — Rentify{% endblock %}
+{% block footer %}{% endblock %}
+
+{% block extra_css %}
+<style>
+/* ── Messaging layout ── */
+.msg-shell {
+  height: calc(100vh - 66px);
+  display: flex;
+  overflow: hidden;
+  background: #070a18;
+}
+
+/* Sidebar */
+.msg-sidebar {
+  width: 320px;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid rgba(255,255,255,.07);
+  background: #0d1022;
+  overflow: hidden;
+}
+.msg-sidebar-head {
+  padding: 1.1rem 1.25rem .9rem;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  flex-shrink: 0;
+}
+.msg-sidebar-title {
+  font-size: 1.05rem; font-weight: 800; color: #EEF0FF; margin: 0 0 .15rem;
+}
+.msg-sidebar-sub {
+  font-size: .72rem; color: rgba(238,240,255,.35);
+}
+.conv-list {
+  flex: 1; overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: rgba(255,255,255,.08) transparent;
+}
+.conv-list::-webkit-scrollbar { width: 4px; }
+.conv-list::-webkit-scrollbar-thumb { background: rgba(255,255,255,.08); border-radius: 4px; }
+
+.conv-item {
+  display: flex; align-items: center; gap: .85rem;
+  padding: .9rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,.05);
+  text-decoration: none; color: #EEF0FF;
+  transition: background .15s;
+  position: relative;
+}
+.conv-item:hover { background: rgba(255,255,255,.04); }
+.conv-item.active { background: rgba(0,208,132,.07); border-left: 2px solid #00D084; }
+.conv-item.unread { background: rgba(0,208,132,.04); }
+.conv-item.unread .ci-name { font-weight: 700; }
+
+.ci-avatar { position: relative; flex-shrink: 0; }
+.ci-avatar img { width: 46px; height: 46px; border-radius: 50%; object-fit: cover;
+  border: 2px solid rgba(255,255,255,.08); }
+.ci-online { position: absolute; bottom: 1px; right: 1px; width: 11px; height: 11px;
+  border-radius: 50%; background: #00D084; border: 2px solid #0d1022; }
+
+.ci-body { flex: 1; min-width: 0; }
+.ci-top  { display: flex; justify-content: space-between; align-items: baseline; gap: .4rem; }
+.ci-name { font-size: .875rem; font-weight: 500; color: #EEF0FF;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.ci-time { font-size: .65rem; color: rgba(238,240,255,.28); flex-shrink: 0; }
+.ci-preview { font-size: .75rem; color: rgba(238,240,255,.38);
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: .15rem; }
+
+.ci-badge { background: #FF5272; color: #fff; font-size: .6rem; font-weight: 800;
+  border-radius: 50px; padding: .15rem .45rem; min-width: 18px;
+  text-align: center; flex-shrink: 0; }
+
+/* No chat selected / empty */
+.msg-empty-area {
+  flex: 1; display: flex; flex-direction: column;
+  align-items: center; justify-content: center;
+  background: #070a18;
+  text-align: center; padding: 2rem;
+}
+
+/* ── Responsive: mobile hides sidebar when a conv is open ── */
+@media (max-width: 768px) {
+  .msg-sidebar { width: 100%; border-right: none; }
+  .msg-shell   { flex-direction: column; }
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="msg-shell">
+
+  <!-- ══ SIDEBAR ══ -->
+  <aside class="msg-sidebar">
+    <div class="msg-sidebar-head">
+      <div class="msg-sidebar-title">
+        Messages
+        {% if total_unread > 0 %}
+        <span style="background:#FF5272;color:#fff;font-size:.6rem;font-weight:800;border-radius:50px;padding:.15rem .5rem;vertical-align:middle;margin-left:.3rem;">{{ total_unread }}</span>
+        {% endif %}
+      </div>
+      <div class="msg-sidebar-sub">{{ conv_data|length }} conversation{{ conv_data|length|pluralize }}</div>
+    </div>
+
+    <div class="conv-list">
+      {% if conv_data %}
+        {% for item in conv_data %}
+        <a href="{% url 'conversation' item.conversation.pk %}" class="conv-item {% if item.unread > 0 %}unread{% endif %}">
+          <div class="ci-avatar">
+            <img src="{{ item.other.profile.get_photo_url }}"
+                 onerror="this.src='https://placehold.co/46/4F8EF7/fff?text={{ item.other.username|first|upper }}'">
+            <span class="ci-online"></span>
+          </div>
+          <div class="ci-body">
+            <div class="ci-top">
+              <span class="ci-name">{{ item.other.get_full_name|default:item.other.username }}</span>
+              {% if item.last_message %}
+              <span class="ci-time">{{ item.last_message.created_at|timesince }}</span>
+              {% endif %}
+            </div>
+            <div class="ci-preview">
+              {% if item.last_message %}
+                {% if item.last_message.sender == request.user %}<span style="color:rgba(238,240,255,.22);">You: </span>{% endif %}
+                {{ item.last_message.content|truncatechars:40 }}
+              {% else %}
+                <span style="font-style:italic;color:rgba(238,240,255,.2);">Say hello!</span>
+              {% endif %}
+            </div>
+          </div>
+          {% if item.unread > 0 %}
+          <span class="ci-badge">{{ item.unread }}</span>
+          {% endif %}
+        </a>
+        {% endfor %}
+      {% else %}
+      <div style="padding:3rem 1.5rem;text-align:center;">
+        <div style="font-size:3rem;margin-bottom:1rem;opacity:.2;">💬</div>
+        <div style="font-size:.875rem;font-weight:600;color:rgba(238,240,255,.5);margin-bottom:.5rem;">No conversations yet</div>
+        <div style="font-size:.75rem;color:rgba(238,240,255,.25);line-height:1.6;">Browse a listing and message the owner to get started.</div>
+        <a href="{% url 'search' %}" style="display:inline-flex;align-items:center;gap:.4rem;margin-top:1.25rem;background:#00D084;color:#000;font-weight:700;font-size:.8rem;padding:.55rem 1.25rem;border-radius:50px;text-decoration:none;">
+          <i class="bi bi-search"></i> Browse
+        </a>
+      </div>
+      {% endif %}
+    </div>
+  </aside>
+
+  <!-- ══ PLACEHOLDER (no conversation selected) ══ -->
+  <div class="msg-empty-area d-none d-md-flex">
+    <div style="font-size:4rem;margin-bottom:1.25rem;opacity:.15;">💬</div>
+    <h3 style="font-size:1rem;font-weight:700;color:rgba(238,240,255,.5);margin-bottom:.5rem;">Select a conversation</h3>
+    <p style="font-size:.8rem;color:rgba(238,240,255,.25);max-width:240px;line-height:1.7;">
+      Click any conversation on the left to start chatting.
+    </p>
+  </div>
+
+</div>
+{% endblock %}

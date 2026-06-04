@@ -1,0 +1,134 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Edit Profile — Rentify{% endblock %}
+
+{% block content %}
+<div class="ep-wrap">
+  <a href="{% url 'dashboard' %}" class="acct-back" aria-label="Back"><i class="bi bi-arrow-left"></i></a>
+  <div class="acct-page-head" style="margin-bottom:1.5rem;">
+    <div class="acct-page-head-text">
+      <h1 class="acct-page-title">Settings</h1>
+      <p class="acct-page-sub">Update your public profile and contact details</p>
+    </div>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+
+    <!-- Photo + basic -->
+    <div class="ep-card" style="margin-bottom:1rem;">
+      <div class="ep-card-head">
+        <i class="bi bi-person-circle" style="color:#4F8EF7;font-size:.9rem;"></i>
+        <span class="ep-card-head-title">Profile Photo & Name</span>
+      </div>
+      <div class="ep-card-body">
+        <!-- Avatar + name row -->
+        <div class="ep-avatar-section" style="margin-bottom:1.5rem;">
+          <div class="ep-avatar-wrap">
+            <img src="{{ request.user.profile.get_photo_url }}" class="ep-avatar" id="avatarPreview"
+                 onerror="this.src='https://placehold.co/88/4F8EF7/fff?text={{ request.user.username|first|upper }}'">
+            <label for="{{ form.profile_photo.id_for_label }}" class="ep-cam-label" title="Change photo">
+              <i class="bi bi-camera-fill"></i>
+            </label>
+          </div>
+          <div style="flex:1;min-width:180px;">
+            <p style="font-size:.82rem;color:rgba(238,240,255,.4);margin:0 0 .4rem;line-height:1.6;">
+              Click the camera icon to upload a new photo.<br>
+              JPG, PNG or GIF · Max 5 MB
+            </p>
+            {% if request.user.profile.is_verified %}
+            <span style="display:inline-flex;align-items:center;gap:.3rem;background:rgba(0,208,132,.1);color:#00D084;font-size:.72rem;font-weight:700;padding:.25rem .75rem;border-radius:50px;border:1px solid rgba(0,208,132,.2);">
+              <i class="bi bi-patch-check-fill"></i> Verified Profile
+            </span>
+            {% endif %}
+          </div>
+        </div>
+        <div style="display:none;">{{ form.profile_photo }}</div>
+
+        <!-- Name row -->
+        <div class="ep-grid-2">
+          <div class="ep-field">
+            <label class="ep-label">First Name</label>
+            <input type="text" name="first_name" class="ep-input"
+                   value="{{ form.first_name.value|default:'' }}" placeholder="First name">
+            {% if form.first_name.errors %}<div class="ep-error"><i class="bi bi-exclamation-circle"></i>{{ form.first_name.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="ep-field">
+            <label class="ep-label">Last Name</label>
+            <input type="text" name="last_name" class="ep-input"
+                   value="{{ form.last_name.value|default:'' }}" placeholder="Last name">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Contact info -->
+    <div class="ep-card" style="margin-bottom:1rem;">
+      <div class="ep-card-head">
+        <i class="bi bi-envelope-fill" style="color:#00D084;font-size:.9rem;"></i>
+        <span class="ep-card-head-title">Contact Information</span>
+      </div>
+      <div class="ep-card-body">
+        <div class="ep-grid-2">
+          <div class="ep-field">
+            <label class="ep-label">Email Address</label>
+            <input type="email" name="email" class="ep-input"
+                   value="{{ form.email.value|default:'' }}" placeholder="you@example.com">
+            {% if form.email.errors %}<div class="ep-error"><i class="bi bi-exclamation-circle"></i>{{ form.email.errors.0 }}</div>{% endif %}
+          </div>
+          <div class="ep-field">
+            <label class="ep-label">Phone Number</label>
+            <input type="tel" name="phone" class="ep-input"
+                   value="{{ form.phone.value|default:'' }}" placeholder="+91 98765 43210">
+          </div>
+        </div>
+        <div class="ep-field" style="margin-bottom:0;">
+          <label class="ep-label">Location / City</label>
+          <input type="text" name="address" class="ep-input"
+                 value="{{ form.address.value|default:'' }}" placeholder="e.g. Mumbai, Maharashtra">
+        </div>
+      </div>
+    </div>
+
+    <!-- Bio -->
+    <div class="ep-card" style="margin-bottom:1.5rem;">
+      <div class="ep-card-head">
+        <i class="bi bi-file-person-fill" style="color:#A78BFA;font-size:.9rem;"></i>
+        <span class="ep-card-head-title">About You</span>
+      </div>
+      <div class="ep-card-body">
+        <div class="ep-field" style="margin-bottom:0;">
+          <label class="ep-label">Bio</label>
+          <textarea name="bio" class="ep-textarea"
+                    placeholder="Tell renters and owners about yourself — your interests, what you usually rent, how quickly you respond…">{{ form.bio.value|default:'' }}</textarea>
+          <div class="ep-hint">Max 500 characters. Shown on your public profile.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Actions -->
+    <div style="display:flex;align-items:center;gap:.75rem;flex-wrap:wrap;">
+      <button type="submit" class="ep-save-btn">
+        <i class="bi bi-check-circle-fill me-1"></i> Save Changes
+      </button>
+      <a href="{% url 'dashboard' %}" class="ep-cancel-btn">Cancel</a>
+      <a href="{% url 'change_password' %}" class="ep-pwd-btn" style="margin-left:auto;">
+        <i class="bi bi-lock-fill"></i> Change Password
+      </a>
+    </div>
+  </form>
+</div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.getElementById('{{ form.profile_photo.id_for_label }}').addEventListener('change', function () {
+  const file = this.files[0];
+  if (file) {
+    const r = new FileReader();
+    r.onload = e => document.getElementById('avatarPreview').src = e.target.result;
+    r.readAsDataURL(file);
+  }
+});
+</script>
+{% endblock %}

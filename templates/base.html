@@ -1,0 +1,525 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="description" content="{% block meta_description %}Rent Anything. Earn From Everything.{% endblock %}">
+<title>{% block title %}Rentify — Rent Anything. Earn From Everything.{% endblock %}</title>
+<link rel="icon" href="{% static 'branding/favicon.ico' %}" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'branding/favicon-32x32.png' %}">
+<link rel="icon" type="image/png" sizes="16x16" href="{% static 'branding/favicon-16x16.png' %}">
+<link rel="apple-touch-icon" sizes="180x180" href="{% static 'branding/apple-touch-icon.png' %}">
+<link rel="manifest" href="{% static 'branding/site.webmanifest' %}">
+<meta name="theme-color" content="#00D084">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="{% static 'css/auth-modal.css' %}">
+<link rel="stylesheet" href="{% static 'css/marketplace.css' %}">
+<link rel="stylesheet" href="{% static 'css/forms.css' %}">
+<link rel="stylesheet" href="{% static 'css/landing-shared.css' %}">
+<link rel="stylesheet" href="{% static 'css/navbar-app.css' %}">
+<link rel="stylesheet" href="{% static 'css/account-ui.css' %}">
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+<link rel="stylesheet" href="{% static 'css/photo-uploader.css' %}">
+<link rel="stylesheet" href="{% static 'css/rfy-combobox.css' %}">
+{% block extra_css %}{% endblock %}
+<style>
+/* ═══════════════════════════════════════════
+   BASE — Dark Premium Shell
+   ═══════════════════════════════════════════ */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; -webkit-font-smoothing: antialiased; }
+
+body {
+  font-family: 'Inter', sans-serif;
+  background: #050510;
+  color: #EEF0FF;
+  min-height: 100vh;
+  background-image:
+    linear-gradient(rgba(255,255,255,.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.022) 1px, transparent 1px);
+  background-size: 72px 72px;
+}
+
+a { text-decoration: none; color: inherit; }
+img { display: block; max-width: 100%; }
+button { cursor: pointer; font-family: inherit; }
+
+/* ─── CSS VARIABLES ─── */
+:root {
+  --green:   #00D084;
+  --green2:  #00F59A;
+  --gdim:    rgba(0,208,132,.1);
+  --gborder: rgba(0,208,132,.22);
+  --blue:    #4F8EF7;
+  --gold:    #F59E0B;
+  --red:     #FF5272;
+  --purple:  #A78BFA;
+  --surf:    #101428;
+  --surf2:   #151930;
+  --surf3:   #1C2038;
+  --border:  rgba(255,255,255,.07);
+  --border2: rgba(255,255,255,.13);
+  --text:    #EEF0FF;
+  --text2:   rgba(238,240,255,.6);
+  --text3:   rgba(238,240,255,.32);
+  --ease:    cubic-bezier(.16,1,.3,1);
+}
+
+/* ═══════════════════════════════════════════
+   NAVBAR
+   ═══════════════════════════════════════════ */
+.rfy-nav {
+  position: sticky; top: 0; z-index: 800;
+  height: 68px;
+  background: rgba(5,5,16,.92);
+  backdrop-filter: blur(24px) saturate(160%);
+  -webkit-backdrop-filter: blur(24px) saturate(160%);
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  display: flex; align-items: center;
+}
+.rfy-nav-inner {
+  width: 100%; max-width: 1440px; margin: 0 auto;
+  padding: 0 1.5rem;
+  display: flex; align-items: center; gap: .75rem;
+}
+
+/* Brand */
+.rfy-brand {
+  font-size: 1.35rem; font-weight: 900; letter-spacing: -.05em;
+  color: var(--green); text-decoration: none; flex-shrink: 0;
+  display: flex; align-items: center; gap: .1rem;
+}
+.rfy-brand .b-dark { color: #fff; }
+.rfy-brand .b-dot  { color: var(--gold); }
+
+/* Search bar */
+.rfy-search {
+  flex: 1; min-width: 0; max-width: 420px;
+  display: flex; align-items: center; gap: .5rem;
+  background: rgba(255,255,255,.05);
+  border: 1.5px solid rgba(255,255,255,.09);
+  border-radius: 50px;
+  padding: .38rem .38rem .38rem 1rem;
+  transition: border-color .18s, box-shadow .18s, background .18s;
+}
+.rfy-search:focus-within {
+  border-color: var(--green);
+  background: rgba(255,255,255,.08);
+  box-shadow: 0 0 0 3px rgba(0,208,132,.12);
+}
+.rfy-search input {
+  flex: 1; min-width: 0; border: none; background: transparent;
+  outline: none; font-size: .875rem; color: var(--text);
+  font-family: 'Inter', sans-serif;
+}
+.rfy-search input::placeholder { color: rgba(238,240,255,.35); }
+
+/* Location selector */
+.rfy-loc {
+  display: flex; align-items: center; gap: .35rem;
+  padding: .45rem .85rem; border-radius: 50px;
+  background: rgba(255,255,255,.05);
+  border: 1.5px solid rgba(255,255,255,.09);
+  cursor: pointer; transition: all .18s;
+  font-size: .8rem; font-weight: 600;
+  color: rgba(238,240,255,.75);
+  white-space: nowrap; flex-shrink: 0;
+  position: relative;
+}
+.rfy-loc:hover { border-color: var(--green); color: var(--green); background: rgba(0,208,132,.06); }
+.rfy-loc .loc-dot { color: var(--green); font-size: .9rem; }
+.rfy-loc .loc-caret { color: rgba(238,240,255,.4); font-size: .65rem; }
+.loc-dropdown {
+  position: absolute; top: calc(100% + 8px); left: 0;
+  min-width: 260px; background: rgba(10,12,28,.97);
+  border: 1px solid rgba(255,255,255,.12); border-radius: 16px;
+  box-shadow: 0 20px 48px rgba(0,0,0,.65);
+  z-index: 900; padding: .85rem;
+  opacity: 0; transform: translateY(-8px) scale(.97);
+  pointer-events: none; transition: opacity .2s, transform .2s;
+  backdrop-filter: blur(24px);
+}
+.loc-dropdown.open { opacity: 1; transform: none; pointer-events: all; }
+.loc-input {
+  width: 100%; background: rgba(255,255,255,.06);
+  border: 1.5px solid rgba(255,255,255,.1);
+  border-radius: 10px; padding: .6rem .85rem;
+  color: var(--text); font-size: .85rem; font-family: 'Inter', sans-serif;
+  outline: none; transition: border-color .18s;
+}
+.loc-input:focus { border-color: var(--green); }
+.loc-input::placeholder { color: rgba(238,240,255,.3); }
+.loc-preset {
+  display: flex; align-items: center; gap: .6rem;
+  padding: .55rem .75rem; border-radius: 10px;
+  font-size: .82rem; color: rgba(238,240,255,.65);
+  cursor: pointer; transition: background .15s;
+}
+.loc-preset:hover { background: rgba(255,255,255,.07); color: var(--text); }
+.loc-preset i { color: var(--green); font-size: .85rem; }
+
+/* Nav items */
+.rfy-nav-right {
+  display: flex; align-items: center; gap: .3rem;
+  margin-left: auto; flex-shrink: 0;
+}
+.rfy-navlink {
+  display: flex; align-items: center; gap: .3rem;
+  padding: .42rem .8rem; border-radius: 50px;
+  font-size: .82rem; font-weight: 600;
+  color: rgba(238,240,255,.65);
+  transition: background .18s, color .18s;
+  text-decoration: none;
+}
+.rfy-navlink:hover { background: rgba(255,255,255,.08); color: #fff; }
+.rfy-navlink.active { color: var(--green); background: rgba(0,208,132,.1); }
+.rfy-navlink i { font-size: .9rem; }
+
+/* Icon btn */
+.rfy-iconbtn {
+  width: 38px; height: 38px; border-radius: 50%; border: none;
+  background: transparent; display: flex; align-items: center;
+  justify-content: center; font-size: 1rem;
+  color: rgba(238,240,255,.65);
+  transition: background .18s, color .18s;
+  cursor: pointer; position: relative; text-decoration: none;
+  flex-shrink: 0;
+}
+.rfy-iconbtn:hover { background: rgba(255,255,255,.08); color: #fff; }
+.rfy-iconbtn .rfy-badge {
+  position: absolute; top: 4px; right: 4px;
+  min-width: 16px; height: 16px; padding: 0 4px;
+  border-radius: 50px; background: #FF5272;
+  border: 2px solid #050816;
+  font-size: .55rem; font-weight: 800;
+  color: #fff; display: flex; align-items: center; justify-content: center;
+  line-height: 1;
+}
+
+/* Messages link with unread badge */
+.rfy-msg-link {
+  display: flex; align-items: center; gap: .3rem;
+  padding: .42rem .8rem; border-radius: 50px;
+  font-size: .82rem; font-weight: 600;
+  color: rgba(238,240,255,.65);
+  transition: background .18s, color .18s;
+  text-decoration: none; position: relative;
+}
+.rfy-msg-link:hover { background: rgba(255,255,255,.08); color: #fff; }
+.rfy-msg-link.active { color: var(--green); background: rgba(0,208,132,.1); }
+.rfy-msg-badge {
+  background: #FF5272; color: #fff;
+  font-size: .6rem; font-weight: 800;
+  border-radius: 50px; padding: .1rem .38rem;
+  min-width: 18px; text-align: center; line-height: 1.4;
+  flex-shrink: 0;
+}
+
+/* List Item btn */
+.rfy-list-btn {
+  display: flex; align-items: center; gap: .35rem;
+  padding: .5rem 1.1rem; border-radius: 50px;
+  background: var(--green); color: #000;
+  font-size: .82rem; font-weight: 800;
+  border: none; cursor: pointer;
+  transition: background .18s, transform .18s, box-shadow .18s;
+  text-decoration: none; flex-shrink: 0;
+}
+.rfy-list-btn:hover { background: var(--green2); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,208,132,.3); color: #000; }
+
+/* Notifications dropdown */
+.rfy-notif-dd {
+  position: absolute; top: calc(100% + 10px); right: -20px;
+  width: 340px; background: rgba(10,12,28,.97);
+  border: 1px solid rgba(255,255,255,.12); border-radius: 18px;
+  box-shadow: 0 24px 56px rgba(0,0,0,.7);
+  z-index: 900;
+  opacity: 0; transform: translateY(-10px) scale(.97);
+  pointer-events: none; transition: opacity .2s, transform .2s;
+  backdrop-filter: blur(24px); overflow: hidden;
+}
+.rfy-notif-dd.open { opacity: 1; transform: none; pointer-events: all; }
+
+/* Profile dropdown */
+.rfy-profile-trigger {
+  display: flex; align-items: center; gap: .5rem;
+  padding: .28rem .75rem .28rem .28rem; border-radius: 50px;
+  border: 1.5px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.05);
+  cursor: pointer; transition: all .18s; flex-shrink: 0;
+}
+.rfy-profile-trigger:hover { background: rgba(255,255,255,.09); border-color: rgba(255,255,255,.18); }
+.rfy-profile-trigger img {
+  width: 34px; height: 34px; border-radius: 50%; object-fit: cover;
+  border: 2px solid rgba(0,208,132,.3);
+}
+.rfy-profile-trigger .pt-name { font-size: .8rem; font-weight: 700; color: var(--text); }
+.rfy-profile-trigger .pt-caret { font-size: .6rem; color: rgba(238,240,255,.4); }
+
+.rfy-user-dd {
+  position: absolute; top: calc(100% + 10px); right: 0;
+  min-width: 240px; background: rgba(10,12,28,.97);
+  border: 1px solid rgba(255,255,255,.12); border-radius: 18px;
+  box-shadow: 0 24px 56px rgba(0,0,0,.7);
+  z-index: 900; padding: .45rem;
+  opacity: 0; transform: translateY(-10px) scale(.97);
+  pointer-events: none; transition: opacity .2s, transform .2s;
+  backdrop-filter: blur(24px);
+}
+.rfy-user-dd.open { opacity: 1; transform: none; pointer-events: all; }
+.rfy-dd-header {
+  padding: .75rem .9rem .65rem;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  margin-bottom: .35rem;
+}
+.rfy-dd-name { font-weight: 800; font-size: .9rem; color: var(--text); }
+.rfy-dd-email { font-size: .72rem; color: rgba(238,240,255,.35); margin-top: .15rem; }
+.rfy-dd-link {
+  display: flex; align-items: center; gap: .65rem;
+  padding: .58rem .9rem; border-radius: 10px;
+  font-size: .85rem; color: rgba(238,240,255,.7);
+  transition: background .15s, color .15s; cursor: pointer;
+  text-decoration: none;
+}
+.rfy-dd-link:hover { background: rgba(255,255,255,.07); color: var(--text); }
+.rfy-dd-link.danger { color: #FF5272; }
+.rfy-dd-link.danger:hover { background: rgba(255,82,114,.1); }
+.rfy-dd-link i { width: 16px; text-align: center; font-size: .9rem; flex-shrink: 0; }
+.rfy-dd-sep { border: none; border-top: 1px solid rgba(255,255,255,.07); margin: .35rem 0; }
+
+/* Notif rows */
+.rfy-notif-row {
+  display: flex; align-items: flex-start; gap: .8rem;
+  padding: .8rem 1rem; border-bottom: 1px solid rgba(255,255,255,.05);
+  text-decoration: none; color: var(--text);
+  transition: background .15s;
+}
+.rfy-notif-row:hover { background: rgba(255,255,255,.04); }
+.rfy-notif-row.unread { background: rgba(0,208,132,.04); border-left: 2px solid var(--green); }
+.rfy-notif-icon {
+  width: 36px; height: 36px; border-radius: 50%;
+  background: rgba(79,142,247,.12); color: var(--blue);
+  display: flex; align-items: center; justify-content: center;
+  font-size: .85rem; flex-shrink: 0;
+}
+
+/* Django messages toasts */
+.rfy-msg-toast {
+  display: flex; align-items: center; gap: .65rem;
+  background: rgba(16,20,40,.97); border: 1px solid rgba(255,255,255,.1);
+  border-radius: 12px; padding: .8rem 1rem; font-size: .875rem;
+  box-shadow: 0 8px 24px rgba(0,0,0,.5);
+  animation: toastSlide .3s var(--ease);
+}
+.rfy-msg-toast.success { border-left: 3px solid var(--green); }
+.rfy-msg-toast.error, .rfy-msg-toast.danger { border-left: 3px solid var(--red); }
+.rfy-msg-toast.warning { border-left: 3px solid var(--gold); }
+.rfy-msg-toast.info    { border-left: 3px solid var(--blue); }
+@keyframes toastSlide { from { opacity:0; transform:translateY(-8px); } to { opacity:1; transform:none; } }
+
+/* Mobile hamburger */
+.rfy-burger {
+  width: 38px; height: 38px; border-radius: 10px; border: 1.5px solid rgba(255,255,255,.1);
+  background: rgba(255,255,255,.05); display: flex; align-items: center;
+  justify-content: center; cursor: pointer; font-size: 1.1rem;
+  color: rgba(238,240,255,.75); margin-left: auto; flex-shrink: 0;
+  transition: background .18s;
+}
+.rfy-burger:hover { background: rgba(255,255,255,.1); }
+
+/* Mobile menu */
+.rfy-mobile-menu {
+  display: none; position: fixed; inset: 0; z-index: 700;
+  background: rgba(0,0,0,.85); backdrop-filter: blur(12px);
+  flex-direction: column;
+}
+.rfy-mobile-menu.open { display: flex; }
+.rfy-mobile-inner {
+  background: #0d1022; border-top: 1px solid rgba(255,255,255,.08);
+  padding: 1.5rem; display: flex; flex-direction: column; gap: .35rem;
+  max-height: 85vh; overflow-y: auto; margin-top: auto;
+  border-radius: 24px 24px 0 0;
+}
+.rfy-mob-link {
+  display: flex; align-items: center; gap: .75rem;
+  padding: .75rem 1rem; border-radius: 12px;
+  font-size: .9rem; font-weight: 600; color: rgba(238,240,255,.75);
+  text-decoration: none; transition: background .15s, color .15s;
+}
+.rfy-mob-link:hover, .rfy-mob-link.active { background: rgba(255,255,255,.07); color: var(--text); }
+.rfy-mob-link i { width: 20px; text-align: center; font-size: 1rem; }
+</style>
+</head>
+<body class="{% block body_class %}{% endblock %}"
+      data-server-auth="{% if user.is_authenticated %}true{% else %}false{% endif %}">
+
+{% include 'includes/navbar.html' %}
+{% include 'includes/navbar_mobile.html' %}
+
+<!-- ═══════════════════════════════════════════
+     DJANGO MESSAGES
+     ═══════════════════════════════════════════ -->
+{% if messages %}
+<div style="position:fixed;top:80px;right:1.25rem;z-index:1000;display:flex;flex-direction:column;gap:.5rem;max-width:360px;">
+  {% for msg in messages %}
+  <div class="rfy-msg-toast {{ msg.tags|default:'info' }}" id="toast-{{ forloop.counter }}">
+    {% if msg.tags == 'success' %}<i class="bi bi-check-circle-fill" style="color:#00D084;flex-shrink:0;"></i>
+    {% elif msg.tags == 'error' or msg.tags == 'danger' %}<i class="bi bi-exclamation-triangle-fill" style="color:#FF5272;flex-shrink:0;"></i>
+    {% elif msg.tags == 'warning' %}<i class="bi bi-exclamation-circle-fill" style="color:#F59E0B;flex-shrink:0;"></i>
+    {% else %}<i class="bi bi-info-circle-fill" style="color:#4F8EF7;flex-shrink:0;"></i>{% endif %}
+    <span style="color:var(--text);font-size:.875rem;">{{ msg }}</span>
+    <button onclick="this.closest('.rfy-msg-toast').remove()"
+            style="margin-left:auto;background:none;border:none;color:rgba(238,240,255,.35);cursor:pointer;font-size:.85rem;flex-shrink:0;">✕</button>
+  </div>
+  {% endfor %}
+</div>
+{% endif %}
+
+<!-- MAIN CONTENT -->
+<main>{% block content %}{% endblock %}</main>
+
+<!-- FOOTER -->
+{% block footer %}
+<footer style="background:#06080f;border-top:1px solid rgba(255,255,255,.06);padding:4rem 0 2rem;margin-top:5rem;">
+  <div style="max-width:1280px;margin:0 auto;padding:0 1.5rem;">
+    <div style="display:grid;grid-template-columns:1.5fr 1fr 1fr 1fr 1fr;gap:2.5rem;flex-wrap:wrap;">
+      <div>
+        <div style="font-size:1.3rem;font-weight:900;letter-spacing:-.04em;margin-bottom:.75rem;">
+          <span style="color:#00D084;">Rent</span><span style="color:#fff;">ify</span><span style="color:#F59E0B;">.</span>
+        </div>
+        <p style="font-size:.82rem;line-height:1.75;color:rgba(238,240,255,.35);max-width:240px;">
+          Rent Anything. Earn From Everything. The peer-to-peer rental marketplace for India.
+        </p>
+        <div style="display:flex;gap:.9rem;margin-top:1.25rem;">
+          <a href="#" style="color:rgba(238,240,255,.35);font-size:1.05rem;text-decoration:none;"><i class="bi bi-twitter-x"></i></a>
+          <a href="#" style="color:rgba(238,240,255,.35);font-size:1.05rem;text-decoration:none;"><i class="bi bi-instagram"></i></a>
+          <a href="#" style="color:rgba(238,240,255,.35);font-size:1.05rem;text-decoration:none;"><i class="bi bi-linkedin"></i></a>
+        </div>
+      </div>
+      {% for section, links in footer_sections %}
+      <div>
+        <h5 style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.12em;color:rgba(238,240,255,.3);margin-bottom:.9rem;">{{ section }}</h5>
+        {% for label, url in links %}
+        <a href="{{ url }}" style="display:block;font-size:.82rem;color:rgba(238,240,255,.45);margin-bottom:.5rem;text-decoration:none;transition:color .18s;" onmouseover="this.style.color='#00D084'" onmouseout="this.style.color='rgba(238,240,255,.45)'">{{ label }}</a>
+        {% endfor %}
+      </div>
+      {% endfor %}
+    </div>
+    <div style="border-top:1px solid rgba(255,255,255,.06);margin-top:2.5rem;padding-top:1.5rem;display:flex;justify-content:space-between;flex-wrap:wrap;gap:.75rem;font-size:.75rem;color:rgba(238,240,255,.2);">
+      <span>© 2024 Rentify Technologies Pvt. Ltd. All rights reserved.</span>
+      <span>Made with <span style="color:#FF5272;">♥</span> in India</span>
+    </div>
+  </div>
+</footer>
+{% endblock %}
+
+<!-- ═══════════════════════════════════════════
+     AUTH MODAL
+     ═══════════════════════════════════════════ -->
+{% if not user.is_authenticated %}
+<div class="rfy-modal-overlay" id="rfyAuthModal" role="dialog" aria-modal="true">
+  <div class="rfy-modal">
+    <div class="rfy-modal-header">
+      <div class="rfy-modal-brand">Rent<span style="color:#18181B">ify</span><em>.</em></div>
+      <button class="rfy-modal-close" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    </div>
+    <div class="rfy-modal-body">
+      <div class="rfy-tabs">
+        <button class="rfy-tab active" data-tab="login">Sign In</button>
+        <button class="rfy-tab" data-tab="register">Create Account</button>
+      </div>
+      <!-- LOGIN PANEL -->
+      <div class="rfy-panel active" id="rfy-panel-login">
+        <div class="rfy-form-inner">
+          <button class="rfy-social-btn" type="button" onclick="alert('Google login coming soon!')">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+            Continue with Google
+          </button>
+          <div class="rfy-divider">or sign in with email</div>
+          <div class="rfy-general-error" style="display:none;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:10px;padding:.75rem 1rem;font-size:.85rem;color:#991B1B;align-items:center;gap:.5rem;margin-bottom:1rem;"><i class="bi bi-exclamation-triangle-fill"></i><span></span></div>
+          <form method="post" action="{% url 'login' %}" novalidate>
+            {% csrf_token %}
+            <div class="rfy-field"><label for="m-lu">Email or Username</label>
+              <div class="rfy-input-wrap"><i class="bi bi-person rfy-input-icon"></i>
+                <input id="m-lu" class="auth-input" type="text" name="username" placeholder="you@example.com" autocomplete="username" required>
+              </div>
+            </div>
+            <div class="rfy-field"><label for="m-lp">Password</label>
+              <div class="rfy-input-wrap"><i class="bi bi-lock rfy-input-icon"></i>
+                <input id="m-lp" class="auth-input" type="password" name="password" placeholder="Your password" autocomplete="current-password" required>
+                <button type="button" class="rfy-eye-btn"><i class="bi bi-eye"></i></button>
+              </div>
+            </div>
+            <div class="rfy-meta-row">
+              <label class="rfy-check-label"><input type="checkbox" name="remember_me"> Remember me</label>
+              <a href="{% url 'password_reset' %}" class="rfy-forgot">Forgot password?</a>
+            </div>
+            <button type="submit" class="rfy-submit"><div class="spinner"></div><span class="btn-text"><i class="bi bi-arrow-right-circle"></i> Sign In</span></button>
+          </form>
+        </div>
+        <div class="rfy-success-state"><div class="rfy-success-icon"><i class="bi bi-check2"></i></div><h3>Welcome back!</h3><p>Redirecting to your dashboard…</p></div>
+        <p class="rfy-modal-note">No account? <a href="#" data-switch-tab="register">Create one free →</a></p>
+      </div>
+      <!-- REGISTER PANEL -->
+      <div class="rfy-panel" id="rfy-panel-register">
+        <div class="rfy-form-inner">
+          <button class="rfy-social-btn" type="button" onclick="alert('Google signup coming soon!')">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+            Continue with Google
+          </button>
+          <div class="rfy-divider">or create with email</div>
+          <div class="rfy-general-error" style="display:none;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:10px;padding:.75rem 1rem;font-size:.85rem;color:#991B1B;align-items:center;gap:.5rem;margin-bottom:1rem;"><i class="bi bi-exclamation-triangle-fill"></i><span></span></div>
+          <form method="post" action="{% url 'register' %}" novalidate>
+            {% csrf_token %}
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+              <div class="rfy-field"><label>First Name</label><input class="auth-input" type="text" name="first_name" placeholder="Alex" required></div>
+              <div class="rfy-field"><label>Last Name</label><input class="auth-input" type="text" name="last_name" placeholder="Kumar" required></div>
+            </div>
+            <div class="rfy-field"><label>Username</label>
+              <div class="rfy-input-wrap"><i class="bi bi-at rfy-input-icon"></i><input id="reg-username" class="auth-input" type="text" name="username" placeholder="alexkumar" autocomplete="username" required></div>
+            </div>
+            <div class="rfy-field"><label>Email Address</label>
+              <div class="rfy-input-wrap"><i class="bi bi-envelope rfy-input-icon"></i><input id="reg-email" class="auth-input" type="email" name="email" placeholder="alex@example.com" required></div>
+            </div>
+            <div class="rfy-field"><label>Phone <span style="color:#A1A1AA;font-weight:400">(optional)</span></label>
+              <div class="rfy-input-wrap"><i class="bi bi-phone rfy-input-icon"></i><input class="auth-input" type="tel" name="phone" placeholder="+91 98765 43210"></div>
+            </div>
+            <div class="rfy-field"><label>Password</label>
+              <div class="rfy-input-wrap"><i class="bi bi-lock rfy-input-icon"></i><input class="auth-input" type="password" name="password1" placeholder="Create a strong password" data-strength required><button type="button" class="rfy-eye-btn"><i class="bi bi-eye"></i></button></div>
+              <div class="pwd-strength-bar"><div class="pwd-strength-fill"></div></div><div class="pwd-strength-label"></div>
+            </div>
+            <div class="rfy-field"><label>Confirm Password</label>
+              <div class="rfy-input-wrap"><i class="bi bi-lock-fill rfy-input-icon"></i><input class="auth-input" type="password" name="password2" placeholder="Repeat your password" required><button type="button" class="rfy-eye-btn"><i class="bi bi-eye"></i></button></div>
+            </div>
+            <button type="submit" class="rfy-submit" style="background:#16A34A;"><div class="spinner"></div><span class="btn-text"><i class="bi bi-person-plus"></i> Create Account</span></button>
+          </form>
+        </div>
+        <div class="rfy-success-state"><div class="rfy-success-icon"><i class="bi bi-check2"></i></div><h3>Account created!</h3><p>Welcome to Rentify. Setting up your dashboard…</p></div>
+        <p class="rfy-modal-note">Already a member? <a href="#" data-switch-tab="login">Sign in →</a></p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endif %}
+
+<!-- SCRIPTS -->
+<script src="{% static 'js/auth-session.js' %}"></script>
+<script src="{% static 'js/location-picker.js' %}"></script>
+<script src="{% static 'js/auth-modal.js' %}"></script>
+<script src="{% static 'js/navbar.js' %}"></script>
+<script src="{% static 'js/rentify.js' %}"></script>
+
+<script>
+(function () {
+  /* Auto-dismiss toasts */
+  document.querySelectorAll('.rfy-msg-toast').forEach(t => {
+    setTimeout(() => { t.style.transition = 'opacity .4s'; t.style.opacity = '0'; setTimeout(() => t.remove(), 400); }, 5000);
+  });
+})();
+</script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

@@ -1,0 +1,75 @@
+{% comment %}Marketplace profile dropdown — requires authenticated user{% endcomment %}
+<div class="rfy-user-dd" id="profileDD">
+  <div class="rfy-dd-hero">
+    <div class="rfy-dd-hero-bg"></div>
+    <div class="rfy-dd-hero-inner">
+      <img src="{{ request.user.profile.get_photo_url }}" class="rfy-dd-avatar" alt=""
+           onerror="this.src='https://placehold.co/72/101428/00D084?text={{ request.user.username|first|upper }}'">
+      <div class="rfy-dd-identity">
+        <div class="rfy-dd-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+        {% if request.user.profile.address %}
+        <div class="rfy-dd-loc"><i class="bi bi-geo-alt-fill"></i> {{ request.user.profile.address|truncatechars:28 }}</div>
+        {% endif %}
+        <div class="rfy-dd-badge {% if request.user.profile.is_verified or request.user.profile.total_reviews >= 3 %}rfy-dd-badge--trusted{% endif %}">
+          {% if request.user.profile.is_verified or request.user.profile.total_reviews >= 3 %}
+          <i class="bi bi-patch-check-fill"></i> Trusted Seller
+          {% else %}
+          <i class="bi bi-star-fill"></i> New Seller
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="rfy-dd-stats">
+    <a href="{% url 'my_listings' %}" class="rfy-dd-stat">
+      <span class="rfy-dd-stat-ico">📦</span>
+      <span class="rfy-dd-stat-val">{{ user_listings_count }}</span>
+      <span class="rfy-dd-stat-lbl">Listings</span>
+    </a>
+    <a href="{% url 'inbox' %}" class="rfy-dd-stat">
+      <span class="rfy-dd-stat-ico">💬</span>
+      <span class="rfy-dd-stat-val">{% if user_messages_unread > 0 %}{{ user_messages_unread }}{% else %}0{% endif %}</span>
+      <span class="rfy-dd-stat-lbl">Messages</span>
+    </a>
+    <a href="{% url 'wishlist' %}" class="rfy-dd-stat">
+      <span class="rfy-dd-stat-ico">❤️</span>
+      <span class="rfy-dd-stat-val">{{ user_wishlist_count }}</span>
+      <span class="rfy-dd-stat-lbl">Wishlist</span>
+    </a>
+  </div>
+
+  <nav class="rfy-dd-nav" aria-label="Account menu">
+    <a href="{% url 'public_profile' request.user.username %}" class="rfy-dd-link">
+      <span class="rfy-dd-link-ico lic-blue"><i class="bi bi-person-circle"></i></span>
+      <span>My Profile</span>
+    </a>
+    <a href="{% url 'dashboard' %}" class="rfy-dd-link">
+      <span class="rfy-dd-link-ico lic-green"><i class="bi bi-speedometer2"></i></span>
+      <span>Dashboard</span>
+    </a>
+    <a href="{% url 'my_listings' %}" class="rfy-dd-link">
+      <span class="rfy-dd-link-ico lic-purple"><i class="bi bi-box-seam"></i></span>
+      <span>My Listings</span>
+    </a>
+    <a href="{% url 'inbox' %}" class="rfy-dd-link">
+      <span class="rfy-dd-link-ico lic-gold"><i class="bi bi-chat-dots"></i></span>
+      <span>Messages</span>
+      {% if user_messages_unread > 0 %}<span class="rfy-dd-pill">{{ user_messages_unread }}</span>{% endif %}
+    </a>
+    <a href="{% url 'wishlist' %}" class="rfy-dd-link">
+      <span class="rfy-dd-link-ico lic-red"><i class="bi bi-heart"></i></span>
+      <span>Wishlist</span>
+    </a>
+    <a href="{% url 'edit_profile' %}" class="rfy-dd-link">
+      <span class="rfy-dd-link-ico lic-muted"><i class="bi bi-gear"></i></span>
+      <span>Settings</span>
+    </a>
+  </nav>
+
+  <div class="rfy-dd-footer">
+    <a href="{% url 'logout' %}" class="rfy-dd-logout">
+      <i class="bi bi-box-arrow-right"></i> Log out
+    </a>
+  </div>
+</div>

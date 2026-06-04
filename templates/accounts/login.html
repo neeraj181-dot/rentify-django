@@ -1,0 +1,99 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Sign In — Rentify</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="{% static 'css/auth-modal.css' %}">
+<style>
+  body{background:linear-gradient(135deg,#0A0A1A 0%,#0F172A 50%,#1E1B4B 100%);min-height:100vh;display:flex;align-items:center;justify-content:center;padding:1rem;font-family:'Inter',sans-serif;}
+  .auth-wrap{width:100%;max-width:460px;}
+  .auth-brand{text-align:center;margin-bottom:1.75rem;}
+  .auth-brand a{font-size:1.75rem;font-weight:900;letter-spacing:-.05em;color:#fff;text-decoration:none;}
+  .auth-brand a span{color:#00D084;}
+  .auth-brand a em{color:#F59E0B;font-style:normal;}
+  .auth-brand p{color:rgba(255,255,255,.5);font-size:.85rem;margin-top:.3rem;}
+  .auth-card{background:#fff;border-radius:24px;padding:2rem 2rem 1.5rem;box-shadow:0 32px 80px rgba(0,0,0,.4);}
+  .auth-card h2{font-size:1.4rem;font-weight:800;color:#18181B;margin-bottom:.3rem;}
+  .auth-card .sub{font-size:.875rem;color:#71717A;margin-bottom:1.5rem;}
+  .auth-card .sub a{color:#2563EB;font-weight:500;}
+  .auth-footer{text-align:center;margin-top:1.25rem;font-size:.75rem;color:rgba(255,255,255,.3);}
+  .auth-footer a{color:rgba(255,255,255,.5);}
+  .form-error{background:#FEF2F2;border:1px solid #FCA5A5;border-radius:10px;padding:.75rem 1rem;font-size:.85rem;color:#991B1B;display:flex;align-items:center;gap:.5rem;margin-bottom:1rem;}
+</style>
+</head>
+<body>
+<div class="auth-wrap">
+  <div class="auth-brand">
+    <a href="{% url 'home' %}">Rent<span>ify</span><em>.</em></a>
+    <p>Sign in to continue renting &amp; earning</p>
+  </div>
+
+  <div class="auth-card">
+    <h2>Welcome back</h2>
+    <p class="sub">New to Rentify? <a href="{% url 'register' %}">Create a free account →</a></p>
+
+    {% if form.errors %}
+    <div class="form-error">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      Invalid username/email or password. Please try again.
+    </div>
+    {% endif %}
+
+    <!-- Google -->
+    <button class="rfy-social-btn" type="button" onclick="alert('Google login coming soon!')" style="margin-bottom:.75rem;">
+      <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+      Continue with Google
+    </button>
+
+    <div class="rfy-divider">or sign in with email</div>
+
+    <form method="post" novalidate>
+      {% csrf_token %}
+      <div class="rfy-field">
+        <label for="id_username">Email or Username</label>
+        <div class="rfy-input-wrap">
+          <i class="bi bi-person rfy-input-icon"></i>
+          {{ form.username }}
+        </div>
+        {% if form.username.errors %}<div class="rfy-field-error"><i class="bi bi-exclamation-circle"></i>{{ form.username.errors.0 }}</div>{% endif %}
+      </div>
+
+      <div class="rfy-field">
+        <label for="id_password">Password</label>
+        <div class="rfy-input-wrap">
+          <i class="bi bi-lock rfy-input-icon"></i>
+          {{ form.password }}
+          <button type="button" class="rfy-eye-btn" onclick="togglePwd(this)"><i class="bi bi-eye"></i></button>
+        </div>
+      </div>
+
+      <div class="rfy-meta-row">
+        <label class="rfy-check-label"><input type="checkbox" name="remember_me"> Remember me</label>
+        <a href="{% url 'password_reset' %}" class="rfy-forgot">Forgot password?</a>
+      </div>
+
+      <button type="submit" class="rfy-submit">
+        <i class="bi bi-arrow-right-circle" style="font-size:1rem;"></i> Sign In
+      </button>
+    </form>
+  </div>
+
+  <p class="auth-footer">
+    By signing in you agree to our <a href="#">Terms</a> &amp; <a href="#">Privacy Policy</a>
+  </p>
+</div>
+
+<script>
+function togglePwd(btn){
+  const inp = btn.closest('.rfy-input-wrap').querySelector('input');
+  const show = inp.type==='password';
+  inp.type = show?'text':'password';
+  btn.querySelector('i').className = show?'bi bi-eye-slash':'bi bi-eye';
+}
+</script>
+</body>
+</html>

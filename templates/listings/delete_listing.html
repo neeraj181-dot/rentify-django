@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block title %}Delete Listing — Rentify{% endblock %}
+{% block content %}
+<div class="mk-page py-5 d-flex align-items-center" style="min-height:75vh;">
+  <div class="container-xl" style="max-width:520px;">
+    <div class="gcard text-center p-5">
+      <div style="width:64px; height:64px; background:rgba(255,92,92,.1); border:1px solid rgba(255,92,92,.25); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.75rem; margin:0 auto 1.5rem; color:var(--red);">
+        <i class="bi bi-trash3-fill"></i>
+      </div>
+      <h4 style="font-weight:800; margin-bottom:.5rem; color:var(--text);">Delete Listing?</h4>
+      <p style="font-size:.9rem; color:var(--text-2); margin-bottom:1.75rem;">
+        You're about to permanently delete <strong>{{ product.title }}</strong>. This action cannot be undone.
+      </p>
+      <form method="post" style="display:flex; flex-direction:column; gap:.75rem;">
+        {% csrf_token %}
+        <button type="submit" class="mk-btn mk-btn-danger mk-btn-lg" style="width:100%;">Yes, Delete Listing</button>
+        <a href="{% url 'product_detail' product.pk %}" class="mk-btn mk-btn-outline" style="text-align:center;">Cancel</a>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,62 @@
+{% extends 'base.html' %}
+{% block title %}Manage Bookings — Rentify{% endblock %}
+{% block content %}
+<div class="container py-5">
+  <h2 style="font-weight:800;margin-bottom:.2rem;">Manage Bookings</h2>
+  <p class="text-muted mb-5">Review, approve, or manage rental requests for your listings.</p>
+
+  <!-- Tabs -->
+  <ul class="nav nav-tabs mb-4 border-0" id="bookingTabs">
+    <li class="nav-item">
+      <button class="nav-link active fw-600 px-4" data-bs-toggle="tab" data-bs-target="#pending-tab">
+        Pending <span class="badge bg-warning-subtle text-warning ms-1">{{ pending|length }}</span>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link fw-600 px-4" data-bs-toggle="tab" data-bs-target="#active-tab">
+        Active <span class="badge bg-success-subtle text-success ms-1">{{ active|length }}</span>
+      </button>
+    </li>
+    <li class="nav-item">
+      <button class="nav-link fw-600 px-4" data-bs-toggle="tab" data-bs-target="#history-tab">
+        History <span class="badge bg-secondary-subtle text-secondary ms-1">{{ history|length }}</span>
+      </button>
+    </li>
+  </ul>
+
+  <div class="tab-content">
+      <!-- Pending -->
+    <div class="tab-pane fade show active" id="pending-tab">
+      {% if pending %}
+      {% for b in pending %}
+      {% include 'bookings/_booking_row.html' with booking=b show_actions=True %}
+      {% endfor %}
+      {% else %}
+      <div class="empty-state"><div class="empty-icon"><i class="bi bi-inbox"></i></div><h4>No pending requests</h4><p>When renters request your items they'll appear here.</p></div>
+      {% endif %}
+    </div>
+
+    <!-- Active -->
+    <div class="tab-pane fade" id="active-tab">
+      {% if active %}
+      {% for b in active %}
+      {% include 'bookings/_booking_row.html' with booking=b show_return=True %}
+      {% endfor %}
+      {% else %}
+      <div class="empty-state"><div class="empty-icon"><i class="bi bi-calendar-check"></i></div><h4>No active rentals</h4><p>Approved bookings will show here.</p></div>
+      {% endif %}
+    </div>
+
+    <!-- History -->
+    <div class="tab-pane fade" id="history-tab">
+      {% if history %}
+      {% for b in history %}
+      {% include 'bookings/_booking_row.html' with booking=b %}
+      {% endfor %}
+      {% else %}
+      <div class="empty-state"><div class="empty-icon"><i class="bi bi-clock-history"></i></div><h4>No history yet</h4></div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+{% endblock %}

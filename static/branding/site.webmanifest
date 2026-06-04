@@ -1,0 +1,22 @@
+{
+  "name": "Rentify",
+  "short_name": "Rentify",
+  "description": "Rent Anything. Earn From Everything.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#050510",
+  "theme_color": "#00D084",
+  "icons": [
+    {
+      "src": "/static/branding/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/static/branding/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ]
+}

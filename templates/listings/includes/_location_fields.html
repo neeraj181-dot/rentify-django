@@ -1,0 +1,36 @@
+{# Structured location fields — city/area public, address private #}
+<div class="rfy-location-section">
+  <p class="rfy-location-hint">
+    <i class="bi bi-eye"></i>
+    Only area and city are shown on your listing. Full address stays private.
+  </p>
+
+  <div class="rfy-form-row">
+    <div class="rfy-form-field">
+      <label class="listing-label" for="id_state">State <span class="rfy-required">*</span></label>
+      {{ form.state }}
+      {% if form.state.errors %}<div class="field-error"><i class="bi bi-exclamation-circle"></i>{{ form.state.errors.0 }}</div>{% endif %}
+    </div>
+    <div class="rfy-form-field">
+      <label class="listing-label" for="id_city">City / District <span class="rfy-required">*</span></label>
+      {{ form.city }}
+      <datalist id="rfy-city-suggestions"></datalist>
+      {% if form.city.errors %}<div class="field-error"><i class="bi bi-exclamation-circle"></i>{{ form.city.errors.0 }}</div>{% endif %}
+    </div>
+  </div>
+
+  <div class="rfy-form-field">
+    <label class="listing-label" for="id_area_locality">Area / Locality <span class="rfy-required">*</span></label>
+    {{ form.area_locality }}
+    {% if form.area_locality.errors %}<div class="field-error"><i class="bi bi-exclamation-circle"></i>{{ form.area_locality.errors.0 }}</div>{% endif %}
+  </div>
+
+  <div class="rfy-form-field rfy-form-field--private">
+    <label class="listing-label" for="id_address_private">
+      Address <span class="rfy-optional">(optional, private)</span>
+    </label>
+    {{ form.address_private }}
+    <p class="rfy-field-note"><i class="bi bi-lock-fill"></i> Visible only to you and confirmed renters.</p>
+    {% if form.address_private.errors %}<div class="field-error"><i class="bi bi-exclamation-circle"></i>{{ form.address_private.errors.0 }}</div>{% endif %}
+  </div>
+</div>

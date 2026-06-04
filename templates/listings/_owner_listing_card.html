@@ -1,0 +1,36 @@
+{% load static %}
+<article class="hub-card">
+  <div class="hub-card-img-wrap">
+    <a href="{% url 'product_detail' listing.pk %}">
+      <img src="{{ listing.get_primary_image }}" alt="{{ listing.title }}"
+           loading="lazy"
+           onerror="this.src='https://placehold.co/600x375/0d1020/00D084?text=No+Photo'">
+    </a>
+    {% if listing.display_status == 'active' %}
+    <span class="hub-card-badge hub-badge--active">Active</span>
+    {% elif listing.display_status == 'pending' %}
+    <span class="hub-card-badge hub-badge--pending">Pending</span>
+    {% elif listing.display_status == 'rented' %}
+    <span class="hub-card-badge hub-badge--rented">Rented</span>
+    {% else %}
+    <span class="hub-card-badge hub-badge--paused">Paused</span>
+    {% endif %}
+  </div>
+  <div class="hub-card-body">
+    <h3 class="hub-card-title">
+      <a href="{% url 'product_detail' listing.pk %}">{{ listing.title }}</a>
+    </h3>
+    <div class="hub-card-meta">
+      <span><i class="bi bi-tag"></i>{{ listing.get_category_display }}</span>
+      <span><i class="bi bi-geo-alt"></i>{{ listing.get_public_location }}</span>
+      <span><i class="bi bi-eye"></i>{{ listing.views_count }} views</span>
+    </div>
+    <div class="hub-card-price">₹{{ listing.price_per_day }}<span>/day</span></div>
+    <div class="hub-card-actions">
+      <a href="{% url 'edit_listing' listing.pk %}" class="hub-act hub-act--primary"><i class="bi bi-pencil"></i> Edit</a>
+      <a href="{% url 'product_detail' listing.pk %}" class="hub-act"><i class="bi bi-box-arrow-up-right"></i> Details</a>
+      <a href="{% url 'product_detail' listing.pk %}" class="hub-act" title="Views &amp; rating"><i class="bi bi-graph-up"></i> Analytics</a>
+      <a href="{% url 'delete_listing' listing.pk %}" class="hub-act hub-act--danger"><i class="bi bi-trash3"></i> Delete</a>
+    </div>
+  </div>
+</article>

@@ -1,0 +1,15 @@
+<div class="rfy-combobox" data-type="location">
+  <input type="text" name="location" id="id_location" class="rfy-combobox-native"
+         value="{{ form.location.value|default:'' }}" autocomplete="off" tabindex="-1" aria-hidden="true">
+  <button type="button" class="rfy-combobox-trigger" aria-haspopup="listbox">
+    <span class="rfy-combobox-label placeholder">City or area</span>
+    <i class="bi bi-chevron-down ico-caret"></i>
+  </button>
+  <div class="rfy-combobox-panel">
+    <div class="rfy-combobox-search">
+      <i class="bi bi-search"></i>
+      <input type="text" placeholder="Search or type location…" autocomplete="off">
+    </div>
+    <div class="rfy-combobox-list" role="listbox"></div>
+  </div>
+</div>

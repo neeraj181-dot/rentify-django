@@ -1,0 +1,160 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Dashboard — Rentify{% endblock %}
+{% block body_class %}page-dashboard{% endblock %}
+
+{% block content %}
+<div class="dash-app">
+
+  <header class="dash-top">
+    <div class="dash-top-user">
+      <img src="{{ request.user.profile.get_photo_url }}" class="dash-top-avatar" alt=""
+           onerror="this.src='https://placehold.co/56/101428/00D084?text={{ request.user.username|first|upper }}'">
+      <div>
+        <h1 class="dash-top-title">Hey, {{ request.user.first_name|default:request.user.username }} 👋</h1>
+        <p class="dash-top-sub">@{{ request.user.username }} · Your marketplace command center</p>
+      </div>
+    </div>
+    <div class="dash-actions">
+      <a href="{% url 'create_listing' %}" class="dash-btn dash-btn--primary"><i class="bi bi-plus-lg"></i> New Listing</a>
+      <a href="{% url 'edit_profile' %}" class="dash-btn dash-btn--ghost"><i class="bi bi-gear"></i> Settings</a>
+    </div>
+  </header>
+
+  <div class="dash-stats">
+    <a href="{% url 'my_listings' %}" class="dash-stat">
+      <div class="dash-stat-icon dash-stat-icon--green"><i class="bi bi-box-seam-fill"></i></div>
+      <div>
+        <div class="dash-stat-val">{{ my_listings_count }}</div>
+        <div class="dash-stat-lbl">Total Listings</div>
+      </div>
+    </a>
+    <a href="{% url 'my_bookings' %}" class="dash-stat">
+      <div class="dash-stat-icon dash-stat-icon--blue"><i class="bi bi-calendar-check-fill"></i></div>
+      <div>
+        <div class="dash-stat-val">{{ my_rentals_active }}</div>
+        <div class="dash-stat-lbl">Active Rentals</div>
+      </div>
+    </a>
+    <div class="dash-stat" style="cursor:default;">
+      <div class="dash-stat-icon dash-stat-icon--purple"><i class="bi bi-currency-rupee"></i></div>
+      <div>
+        <div class="dash-stat-val">₹{{ total_earnings|floatformat:0 }}</div>
+        <div class="dash-stat-lbl">Earnings</div>
+      </div>
+    </div>
+    <a href="{% url 'inbox' %}" class="dash-stat">
+      <div class="dash-stat-icon dash-stat-icon--gold"><i class="bi bi-chat-dots-fill"></i></div>
+      <div>
+        <div class="dash-stat-val">{{ messages_unread }}</div>
+        <div class="dash-stat-lbl">Messages</div>
+      </div>
+    </a>
+  </div>
+
+  <div class="dash-grid">
+    <div>
+      <div class="dash-panel">
+        <div class="dash-panel-head">
+          <span class="dash-panel-title"><i class="bi bi-box-seam" style="color:#4F8EF7;"></i> My Listings</span>
+          <a href="{% url 'my_listings' %}" class="dash-panel-link">View all →</a>
+        </div>
+        {% if my_listings %}
+          {% for listing in my_listings|slice:":4" %}
+          <div class="dash-row" style="cursor:default;">
+            <img src="{{ listing.get_primary_image }}" alt=""
+                 onerror="this.src='https://placehold.co/52x44/101428/4F8EF7?text=📦'">
+            <div style="flex:1;min-width:0;">
+              <a href="{% url 'product_detail' listing.pk %}" style="font-weight:700;font-size:.875rem;color:#EEF0FF;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-decoration:none;">{{ listing.title }}</a>
+              <div style="font-size:.7rem;color:rgba(238,240,255,.35);margin-top:.15rem;">₹{{ listing.price_per_day }}/day</div>
+            </div>
+            {% if listing.is_available %}
+            <span class="dash-chip dash-chip--green">Active</span>
+            {% else %}
+            <span class="dash-chip" style="background:rgba(255,255,255,.06);color:rgba(238,240,255,.4);border:1px solid rgba(255,255,255,.1);">Paused</span>
+            {% endif %}
+            <a href="{% url 'edit_listing' listing.pk %}" class="dash-btn dash-btn--ghost" style="padding:.4rem .65rem;font-size:.75rem;"><i class="bi bi-pencil"></i></a>
+          </div>
+          {% endfor %}
+        {% else %}
+        <div class="dash-empty-mini">
+          <p style="margin-bottom:1rem;">No listings yet — start earning from what you own.</p>
+          <a href="{% url 'create_listing' %}" class="dash-btn dash-btn--primary"><i class="bi bi-plus-circle"></i> Create Listing</a>
+        </div>
+        {% endif %}
+      </div>
+
+      <div class="dash-panel">
+        <div class="dash-panel-head">
+          <span class="dash-panel-title"><i class="bi bi-calendar-check" style="color:#00D084;"></i> My Rentals</span>
+          <a href="{% url 'my_bookings' %}" class="dash-panel-link">View all →</a>
+        </div>
+        {% if my_bookings %}
+          {% for booking in my_bookings %}
+          <a href="{% url 'booking_detail' booking.pk %}" class="dash-row">
+            <img src="{{ booking.product.get_primary_image }}" alt=""
+                 onerror="this.src='https://placehold.co/52x44/101428/4F8EF7?text=📦'">
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:700;font-size:.875rem;color:#EEF0FF;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">{{ booking.product.title }}</div>
+              <div style="font-size:.7rem;color:rgba(238,240,255,.35);">{{ booking.start_date|date:"d M" }} → {{ booking.end_date|date:"d M Y" }}</div>
+            </div>
+            {% if booking.status == 'pending' %}<span class="dash-chip dash-chip--gold">Pending</span>
+            {% elif booking.status == 'approved' or booking.status == 'active' %}<span class="dash-chip dash-chip--blue">Active</span>
+            {% elif booking.status == 'completed' %}<span class="dash-chip dash-chip--green">Done</span>
+            {% else %}<span class="dash-chip">{{ booking.get_status_display }}</span>{% endif %}
+          </a>
+          {% endfor %}
+        {% else %}
+        <div class="dash-empty-mini">
+          <p style="margin-bottom:1rem;">No active rentals yet.</p>
+          <a href="{% url 'browse' %}" class="dash-btn dash-btn--primary"><i class="bi bi-search"></i> Browse Items</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <aside>
+      <div class="dash-panel">
+        <div class="dash-panel-head">
+          <span class="dash-panel-title"><i class="bi bi-hourglass-split" style="color:#F59E0B;"></i> Pending Requests</span>
+          <a href="{% url 'owner_bookings' %}" class="dash-panel-link">Manage →</a>
+        </div>
+        {% if pending_requests %}
+          {% for booking in pending_requests|slice:":4" %}
+          <div class="dash-row" style="cursor:default;">
+            <img src="{{ booking.renter.profile.get_photo_url }}" alt="" style="border-radius:50%;width:40px;height:40px;"
+                 onerror="this.src='https://placehold.co/40/4F8EF7/fff?text={{ booking.renter.username|first|upper }}'">
+            <div style="flex:1;min-width:0;">
+              <div style="font-weight:600;font-size:.8rem;color:#EEF0FF;">{{ booking.renter.get_full_name|default:booking.renter.username }}</div>
+              <div style="font-size:.7rem;color:rgba(238,240,255,.35);">{{ booking.product.title|truncatechars:28 }}</div>
+            </div>
+            <form method="post" action="{% url 'approve_booking' booking.pk %}" style="margin:0;">
+              {% csrf_token %}
+              <button type="submit" class="dash-btn dash-btn--primary" style="padding:.35rem .5rem;font-size:.75rem;" title="Approve"><i class="bi bi-check-lg"></i></button>
+            </form>
+            <form method="post" action="{% url 'reject_booking' booking.pk %}" style="margin:0;">
+              {% csrf_token %}
+              <button type="submit" style="width:32px;height:32px;border-radius:10px;background:rgba(255,82,114,.1);border:1px solid rgba(255,82,114,.22);color:#FF5272;cursor:pointer;" title="Reject"><i class="bi bi-x-lg"></i></button>
+            </form>
+          </div>
+          {% endfor %}
+        {% else %}
+        <div class="dash-empty-mini"><i class="bi bi-inbox" style="font-size:1.25rem;opacity:.35;"></i><br>No pending requests</div>
+        {% endif %}
+      </div>
+
+      <div class="dash-panel">
+        <div class="dash-panel-head"><span class="dash-panel-title">Quick Links</span></div>
+        <a href="{% url 'owner_bookings' %}" class="dash-ql"><i class="bi bi-calendar-check" style="color:#4F8EF7;"></i> Manage Bookings</a>
+        <a href="{% url 'inbox' %}" class="dash-ql">
+          <i class="bi bi-chat-dots" style="color:#00D084;"></i> Messages
+          {% if messages_unread > 0 %}<span class="dash-chip dash-chip--green" style="margin-left:auto;">{{ messages_unread }}</span>{% endif %}
+        </a>
+        <a href="{% url 'wishlist' %}" class="dash-ql"><i class="bi bi-heart" style="color:#FF5272;"></i> Wishlist</a>
+        <a href="{% url 'public_profile' request.user.username %}" class="dash-ql"><i class="bi bi-person" style="color:#A78BFA;"></i> My Profile</a>
+        <a href="{% url 'notifications_list' %}" class="dash-ql"><i class="bi bi-bell" style="color:#F59E0B;"></i> Notifications</a>
+      </div>
+    </aside>
+  </div>
+</div>
+{% endblock %}

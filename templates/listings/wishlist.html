@@ -1,0 +1,33 @@
+{% extends 'base.html' %}
+{% block title %}My Wishlist — Rentify{% endblock %}
+
+{% block content %}
+<div class="acct-shell acct-shell--wide">
+  <div class="acct-grid-header">
+    <div>
+      <h1 class="acct-page-title">My Wishlist</h1>
+      <p class="acct-page-sub">{{ wishlist|length }} saved item{{ wishlist|length|pluralize }}</p>
+    </div>
+    <a href="{% url 'search' %}" class="pp-msg-btn" style="width:auto;">
+      <i class="bi bi-search"></i> Browse More
+    </a>
+  </div>
+
+  {% if wishlist %}
+  <div class="acct-grid">
+    {% for item in wishlist %}
+    {% include 'listings/_product_card.html' with product=item.product wishlist_ids=wishlist_ids %}
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="acct-empty">
+    <div class="acct-empty-ico"><i class="bi bi-heart"></i></div>
+    <h4>Your wishlist is empty</h4>
+    <p>Save items you're interested in by tapping the heart on any listing.</p>
+    <a href="{% url 'search' %}" class="acct-btn-primary" style="max-width:240px;margin:0 auto;">
+      <i class="bi bi-search"></i> Explore Listings
+    </a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

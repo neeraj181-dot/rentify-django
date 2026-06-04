@@ -1,0 +1,33 @@
+<article class="hub-card">
+  <div class="hub-card-img-wrap">
+    <a href="{% url 'booking_detail' booking.pk %}">
+      <img src="{{ booking.product.get_primary_image }}" alt="{{ booking.product.title }}"
+           loading="lazy"
+           onerror="this.src='https://placehold.co/600x375/0d1020/4F8EF7?text=Rent'">
+    </a>
+    <span class="hub-card-badge hub-badge--status-{{ booking.status }}">{{ booking.get_status_display }}</span>
+  </div>
+  <div class="hub-card-body">
+    <h3 class="hub-card-title">
+      <a href="{% url 'booking_detail' booking.pk %}">{{ booking.product.title }}</a>
+    </h3>
+    <div class="hub-card-owner">
+      <img src="{{ booking.product.owner.profile.get_photo_url }}" alt=""
+           onerror="this.src='https://placehold.co/26/4F8EF7/fff?text={{ booking.product.owner.username|first|upper }}'">
+      <span>{{ booking.product.owner.get_full_name|default:booking.product.owner.username }}</span>
+    </div>
+    <div class="hub-card-dates">
+      <i class="bi bi-calendar3"></i>
+      {{ booking.start_date|date:"d M Y" }} → {{ booking.end_date|date:"d M Y" }}
+      · {{ booking.total_days }} day{{ booking.total_days|pluralize }}
+    </div>
+    <div class="hub-card-price">₹{{ booking.total_amount|floatformat:0 }}<span> total</span></div>
+    <div class="hub-card-actions">
+      <a href="{% url 'start_conversation' booking.product.owner.username %}" class="hub-act hub-act--primary"><i class="bi bi-chat-dots"></i> Message Owner</a>
+      <a href="{% url 'booking_detail' booking.pk %}" class="hub-act"><i class="bi bi-receipt"></i> View Rental</a>
+      {% if booking.status == 'approved' or booking.status == 'active' %}
+      <a href="{% url 'booking_detail' booking.pk %}" class="hub-act"><i class="bi bi-arrow-return-left"></i> Return Item</a>
+      {% endif %}
+    </div>
+  </div>
+</article>

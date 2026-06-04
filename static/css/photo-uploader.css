@@ -1,0 +1,282 @@
+/* Rentify — listing photo uploader (Airbnb/OLX-style compact grid) */
+
+.rfy-photo-uploader {
+  margin-bottom: 0;
+}
+
+/* ── Upload grid: cover left, thumbs right on desktop ── */
+.rfy-photo-grid {
+  display: grid;
+  gap: 0.65rem;
+  align-items: start;
+}
+
+.rfy-photo-item {
+  position: relative;
+  border-radius: 16px;
+  overflow: hidden;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1.5px dashed rgba(255, 255, 255, 0.12);
+  transition: border-color 0.2s, transform 0.2s, box-shadow 0.2s;
+  min-height: 0;
+}
+
+.rfy-photo-item.has-image {
+  border-style: solid;
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.rfy-photo-item img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  border-radius: 16px;
+}
+
+/* Cover preview — capped height, object-fit cover */
+.rfy-photo-item.is-cover img,
+.rfy-photo-item.is-cover .photo-cover-preview {
+  max-height: 320px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: 16px;
+}
+
+.rfy-photo-cover-badge {
+  position: absolute;
+  top: 0.55rem;
+  left: 0.55rem;
+  z-index: 3;
+  font-size: 0.62rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  padding: 0.25rem 0.6rem;
+  border-radius: 50px;
+  background: rgba(0, 208, 132, 0.2);
+  color: #00d084;
+  border: 1px solid rgba(0, 208, 132, 0.45);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: none;
+}
+.rfy-photo-item.is-cover .rfy-photo-cover-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* ── Desktop: cover + 2×2 thumbs beside it ── */
+@media (min-width: 640px) {
+  .rfy-photo-grid {
+    grid-template-columns: minmax(0, 1.45fr) repeat(2, minmax(0, 1fr));
+    grid-template-rows: repeat(2, minmax(0, 1fr));
+    gap: 0.65rem;
+    align-items: start;
+  }
+
+  .rfy-photo-item.is-cover {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    aspect-ratio: auto;
+    height: 320px;
+    max-height: 320px;
+  }
+
+  .rfy-photo-item.is-cover img,
+  .rfy-photo-item.is-cover .photo-cover-preview {
+    max-height: 320px;
+    height: 320px;
+  }
+
+  /* Thumbnail slots + empty add slots (not cover) */
+  .rfy-photo-item:not(.is-cover) {
+    aspect-ratio: 4 / 3;
+    height: auto;
+    max-height: calc((320px - 0.65rem) / 2);
+  }
+}
+
+@media (min-width: 900px) {
+  .rfy-photo-item.is-cover {
+    height: 350px;
+    max-height: 350px;
+  }
+
+  .rfy-photo-item.is-cover img,
+  .rfy-photo-item.is-cover .photo-cover-preview {
+    max-height: 350px;
+    height: 350px;
+  }
+
+  .rfy-photo-item:not(.is-cover) {
+    max-height: calc((350px - 0.65rem) / 2);
+  }
+}
+
+/* ── Mobile: cover banner + 2-col thumbs ── */
+@media (max-width: 639px) {
+  .rfy-photo-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.55rem;
+  }
+
+  .rfy-photo-item.is-cover {
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 9;
+    max-height: 200px;
+    height: auto;
+  }
+
+  .rfy-photo-item.is-cover img,
+  .rfy-photo-item.is-cover .photo-cover-preview {
+    max-height: 200px;
+    height: 100%;
+  }
+
+  .rfy-photo-item:not(.is-cover) {
+    aspect-ratio: 4 / 3;
+  }
+}
+
+.rfy-photo-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  padding: 0.65rem;
+  background: rgba(8, 10, 24, 0.55);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  opacity: 0;
+  transition: opacity 0.22s ease;
+  border-radius: 16px;
+}
+
+.rfy-photo-item.has-image:hover .rfy-photo-overlay,
+.rfy-photo-item.has-image:focus-within .rfy-photo-overlay {
+  opacity: 1;
+}
+
+@media (hover: none) {
+  .rfy-photo-item.has-image .rfy-photo-overlay {
+    opacity: 1;
+    background: rgba(8, 10, 24, 0.72);
+  }
+}
+
+.rfy-photo-act {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  min-width: 100px;
+  padding: 0.4rem 0.65rem;
+  border-radius: 10px;
+  font-size: 0.68rem;
+  font-weight: 700;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: #eef0ff;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.rfy-photo-act:hover {
+  background: rgba(0, 208, 132, 0.15);
+  border-color: rgba(0, 208, 132, 0.35);
+  color: #00d084;
+}
+
+.rfy-photo-act--danger:hover {
+  background: rgba(255, 82, 114, 0.15);
+  border-color: rgba(255, 82, 114, 0.35);
+  color: #ff5272;
+}
+
+.rfy-photo-add {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  cursor: pointer;
+  color: rgba(238, 240, 255, 0.35);
+  height: 100%;
+  min-height: 88px;
+  width: 100%;
+}
+
+.rfy-photo-add i {
+  font-size: 1.5rem;
+  transition: color 0.18s;
+}
+
+.rfy-photo-add span {
+  font-size: 0.72rem;
+  font-weight: 600;
+}
+
+.rfy-photo-item:hover .rfy-photo-add i {
+  color: #00d084;
+}
+
+.rfy-photo-hidden-inputs {
+  display: none;
+}
+
+.rfy-photo-hint {
+  font-size: 0.72rem;
+  color: rgba(238, 240, 255, 0.28);
+  margin-top: 0.75rem;
+  line-height: 1.6;
+}
+
+.rfy-photo-viewer {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.88);
+  backdrop-filter: blur(8px);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 1.5rem;
+}
+
+.rfy-photo-viewer.open {
+  display: flex;
+}
+
+.rfy-photo-viewer img {
+  max-width: min(92vw, 900px);
+  max-height: 85vh;
+  border-radius: 16px;
+  object-fit: contain;
+}
+
+.rfy-photo-viewer-close {
+  position: absolute;
+  top: 1.25rem;
+  right: 1.25rem;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+  font-size: 1.25rem;
+  cursor: pointer;
+}
+
+/* Tighter listing card padding for photos section */
+.listing-card-body:has(.rfy-photo-uploader) {
+  padding: 1.15rem 1.25rem 1.25rem;
+}

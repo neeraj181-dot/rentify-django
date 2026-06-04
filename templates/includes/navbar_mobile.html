@@ -1,0 +1,58 @@
+{% comment %}Mobile menu — matches desktop navbar mode (auth vs guest){% endcomment %}
+<div class="rfy-mobile-menu" id="mobileMenu">
+  <div style="flex:1;" onclick="closeMobileMenu()"></div>
+  <div class="rfy-mobile-inner">
+
+    {% if user.is_authenticated %}
+
+    <form action="{% url 'browse' %}" method="get" style="margin-bottom:.5rem;">
+      <div style="display:flex;gap:.5rem;background:rgba(255,255,255,.06);border:1.5px solid rgba(255,255,255,.1);border-radius:50px;padding:.45rem .45rem .45rem 1rem;align-items:center;">
+        <i class="bi bi-search" style="color:rgba(238,240,255,.3);font-size:.85rem;"></i>
+        <input type="text" name="q" placeholder="Search…" style="flex:1;background:none;border:none;outline:none;color:var(--text);font-size:.875rem;font-family:'Inter',sans-serif;">
+        <input type="hidden" name="location" value="{{ browse_location|default:'' }}" data-nav-loc>
+        <button type="submit" style="background:var(--green);color:#000;border:none;border-radius:50px;padding:.45rem 1rem;font-size:.78rem;font-weight:700;cursor:pointer;">Go</button>
+      </div>
+    </form>
+
+    <div style="margin-bottom:.75rem;padding:0 .25rem;">
+      {% include 'includes/location_dropdown.html' with loc_suffix='-mob' %}
+    </div>
+
+    <a href="{% url 'browse' %}" class="rfy-mob-link"><i class="bi bi-grid-3x3-gap" style="color:var(--green);"></i> Browse</a>
+    <a href="{% url 'inbox' %}" class="rfy-mob-link">
+      <i class="bi bi-chat-dots" style="color:var(--gold);"></i> Messages
+      {% if unread_count > 0 %}<span style="margin-left:auto;background:#FF5272;color:#fff;font-size:.65rem;font-weight:800;border-radius:50px;padding:.15rem .5rem;">{{ unread_count }}</span>{% endif %}
+    </a>
+    <a href="{% url 'notifications_list' %}" class="rfy-mob-link"><i class="bi bi-bell" style="color:var(--gold);"></i> Notifications</a>
+    <a href="{% url 'dashboard' %}" class="rfy-mob-link"><i class="bi bi-speedometer2" style="color:var(--blue);"></i> Dashboard</a>
+    <a href="{% url 'my_listings' %}" class="rfy-mob-link"><i class="bi bi-box-seam" style="color:var(--purple);"></i> My Listings</a>
+    <a href="{% url 'wishlist' %}" class="rfy-mob-link"><i class="bi bi-heart" style="color:#FF5272;"></i> Wishlist</a>
+    <a href="{% url 'create_listing' %}" class="rfy-mob-link" style="background:rgba(0,208,132,.12);color:var(--green);border:1.5px solid rgba(0,208,132,.2);border-radius:12px;margin-top:.35rem;">
+      <i class="bi bi-plus-circle"></i> List Item
+    </a>
+    <div style="border-top:1px solid rgba(255,255,255,.07);margin:.35rem 0;"></div>
+    <a href="{% url 'edit_profile' %}" class="rfy-mob-link"><i class="bi bi-gear" style="color:rgba(238,240,255,.35);"></i> Settings</a>
+    <a href="{% url 'logout' %}" class="rfy-mob-link" style="color:#FF5272;"><i class="bi bi-box-arrow-right"></i> Sign Out</a>
+
+    {% else %}
+
+    <div style="margin-bottom:.75rem;padding:0 .25rem;">
+      {% include 'includes/location_dropdown.html' with loc_suffix='-mob' %}
+    </div>
+
+    <a href="{% url 'how_it_works' %}" class="rfy-mob-link"><i class="bi bi-info-circle" style="color:var(--blue);"></i> How It Works</a>
+    <a href="{% url 'categories_page' %}" class="rfy-mob-link"><i class="bi bi-tags" style="color:var(--purple);"></i> Categories</a>
+    <a href="{% url 'browse' %}" class="rfy-mob-link"><i class="bi bi-grid-3x3-gap" style="color:var(--green);"></i> Browse</a>
+    <a href="{% url 'earn' %}" class="rfy-mob-link"><i class="bi bi-currency-rupee" style="color:var(--gold);"></i> Earn</a>
+    <div style="border-top:1px solid rgba(255,255,255,.07);margin:.5rem 0;"></div>
+    <button type="button" class="rfy-mob-link w-100 border-0 bg-transparent" data-modal="login" style="text-align:left;cursor:pointer;font-family:'Inter',sans-serif;">
+      <i class="bi bi-person" style="color:var(--blue);"></i> Sign In
+    </button>
+    <button type="button" class="rfy-mob-link w-100 border-0" data-modal="register" style="text-align:left;background:rgba(0,208,132,.1);color:var(--green);border:1.5px solid rgba(0,208,132,.2) !important;border-radius:12px;cursor:pointer;font-family:'Inter',sans-serif;">
+      <i class="bi bi-person-plus"></i> Get Started Free
+    </button>
+
+    {% endif %}
+
+  </div>
+</div>

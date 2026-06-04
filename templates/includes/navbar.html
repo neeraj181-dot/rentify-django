@@ -1,0 +1,123 @@
+{% comment %}
+  Shared Rentify navbar — one source of truth.
+  Authenticated: Browse, Messages, Notifications, List Item, Profile
+  Guest: How It Works, Categories, Browse, Earn, Sign In, Get Started
+{% endcomment %}
+
+{% if user.is_authenticated %}
+
+<!-- ═══ AUTHENTICATED NAVBAR ═══ -->
+<nav class="rfy-nav" id="mainNav">
+  <div class="rfy-nav-inner">
+
+    <a href="{% url 'home' %}" class="rfy-brand me-1">
+      <span class="b-dark">Rent</span><span style="color:var(--green);">ify</span><span class="b-dot">.</span>
+    </a>
+
+    <form class="rfy-search d-none d-md-flex" action="{% url 'browse' %}" method="get" style="max-width:380px;">
+      <i class="bi bi-search" style="color:rgba(238,240,255,.3);font-size:.85rem;flex-shrink:0;"></i>
+      <input type="text" name="q" placeholder="Search cameras, bikes, laptops…" value="{{ request.GET.q|default:'' }}" autocomplete="off">
+      {% if request.GET.category %}<input type="hidden" name="category" value="{{ request.GET.category }}">{% endif %}
+      <input type="hidden" name="location" id="navLocationField" value="{{ browse_location|default:'' }}" data-nav-loc>
+    </form>
+
+    <div class="d-none d-lg-flex">
+      {% include 'includes/location_dropdown.html' %}
+    </div>
+
+    <div class="rfy-nav-right d-none d-lg-flex">
+      <a href="{% url 'browse' %}"
+         class="rfy-navlink {% if request.resolver_match.url_name == 'browse' or request.resolver_match.url_name == 'search' or request.resolver_match.url_name == 'product_detail' or request.resolver_match.url_name == 'category_detail' %}active{% endif %}">
+        <i class="bi bi-grid-3x3-gap"></i> Browse
+      </a>
+
+      <a href="{% url 'inbox' %}"
+         class="rfy-msg-link {% if request.resolver_match.url_name == 'inbox' or request.resolver_match.url_name == 'conversation' %}active{% endif %}">
+        <i class="bi bi-chat-dots"></i>
+        Messages
+        {% if unread_count > 0 %}<span class="rfy-msg-badge">{{ unread_count }}</span>{% endif %}
+      </a>
+
+      <div style="position:relative;">
+        <button class="rfy-iconbtn" id="notifBtn" aria-label="Notifications">
+          <i class="bi bi-bell"></i>
+          {% if unread_count > 0 %}<span class="rfy-badge"></span>{% endif %}
+        </button>
+        <div class="rfy-notif-dd" id="notifDD">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:.9rem 1rem .7rem;border-bottom:1px solid rgba(255,255,255,.07);">
+            <span style="font-weight:700;font-size:.88rem;color:var(--text);">Notifications</span>
+            <a href="{% url 'mark_all_read' %}" style="font-size:.72rem;color:var(--green);">Mark all read</a>
+          </div>
+          <div style="max-height:320px;overflow-y:auto;">
+            {% for n in unread_notifications %}
+            <a href="{% url 'mark_notification_read' n.pk %}" class="rfy-notif-row {% if not n.is_read %}unread{% endif %}">
+              <div class="rfy-notif-icon"><i class="bi {{ n.get_icon }}"></i></div>
+              <div style="flex:1;overflow:hidden;">
+                <div style="font-size:.8rem;font-weight:{% if not n.is_read %}600{% else %}400{% endif %};line-height:1.4;color:var(--text);">{{ n.message|truncatechars:55 }}</div>
+                <div style="font-size:.7rem;color:var(--text3);margin-top:.15rem;">{{ n.created_at|timesince }} ago</div>
+              </div>
+            </a>
+            {% empty %}
+            <div style="text-align:center;padding:2.25rem 1rem;">
+              <i class="bi bi-check2-all" style="font-size:2rem;color:var(--green);opacity:.4;display:block;margin-bottom:.6rem;"></i>
+              <span style="font-size:.83rem;color:var(--text3);">You're all caught up!</span>
+            </div>
+            {% endfor %}
+          </div>
+          <div style="padding:.6rem 1rem;border-top:1px solid rgba(255,255,255,.07);text-align:center;">
+            <a href="{% url 'notifications_list' %}" style="font-size:.78rem;color:var(--green);">See all notifications</a>
+          </div>
+        </div>
+      </div>
+
+      <a href="{% url 'create_listing' %}" class="rfy-list-btn">
+        <i class="bi bi-plus-lg"></i> List Item
+      </a>
+
+      <div class="rfy-nav-authed-only" style="position:relative;margin-left:.15rem;">
+        <button class="rfy-profile-trigger" id="profileBtn" aria-expanded="false">
+          <img src="{{ request.user.profile.get_photo_url }}"
+               alt="{{ request.user.username }}"
+               onerror="this.src='https://placehold.co/34/4F8EF7/fff?text={{ request.user.username|first|upper }}'">
+          <span class="pt-name d-none d-xl-block">{{ request.user.first_name|default:request.user.username }}</span>
+          <i class="bi bi-chevron-down pt-caret"></i>
+        </button>
+        {% include 'includes/profile_dropdown.html' %}
+      </div>
+    </div>
+
+    <button class="rfy-burger d-lg-none" id="burgerBtn" aria-label="Menu">
+      <i class="bi bi-list"></i>
+    </button>
+
+  </div>
+</nav>
+
+{% else %}
+
+<!-- ═══ VISITOR / LANDING NAVBAR ═══ -->
+<nav class="nav-visitor{% if request.resolver_match.url_name == 'home' %}{% else %} solid{% endif %}" id="mainNav">
+  <div class="nav-visitor-inner">
+    <a href="{% url 'home' %}" class="nav-visitor-brand">
+      <span class="r">Rent</span><span class="g">ify</span><span class="dot">.</span>
+    </a>
+    <div class="nav-visitor-links" id="navVisitorLinks">
+      <a href="{% url 'how_it_works' %}" class="nav-visitor-link {% if request.resolver_match.url_name == 'how_it_works' %}active{% endif %}">How it works</a>
+      <a href="{% url 'categories_page' %}" class="nav-visitor-link {% if request.resolver_match.url_name == 'categories_page' %}active{% endif %}">Categories</a>
+      <a href="{% url 'browse' %}" class="nav-visitor-link {% if request.resolver_match.url_name == 'browse' or request.resolver_match.url_name == 'search' or request.resolver_match.url_name == 'product_detail' or request.resolver_match.url_name == 'category_detail' %}active{% endif %}">Browse</a>
+      <a href="{% url 'earn' %}" class="nav-visitor-link {% if request.resolver_match.url_name == 'earn' %}active{% endif %}">Earn</a>
+    </div>
+    <div class="nav-visitor-loc d-none d-md-flex">
+      {% include 'includes/location_dropdown.html' %}
+    </div>
+    <div class="nav-visitor-cta">
+      <button type="button" class="btn-nav btn-nav-ghost" data-modal="login">Sign in</button>
+      <button type="button" class="btn-nav btn-nav-primary" data-modal="register">Get Started</button>
+    </div>
+    <button type="button" class="nav-visitor-burger" id="burgerBtn" aria-label="Menu">
+      <i class="bi bi-list"></i>
+    </button>
+  </div>
+</nav>
+
+{% endif %}

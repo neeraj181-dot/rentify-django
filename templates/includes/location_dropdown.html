@@ -1,0 +1,30 @@
+{% comment %}Rentify location picker — pass loc_suffix='-mob' for mobile menu{% endcomment %}
+<div class="rfy-loc" id="locBtn{{ loc_suffix|default:'' }}" role="button" tabindex="0" aria-haspopup="listbox">
+  <i class="bi bi-geo-alt-fill loc-dot"></i>
+  <span class="loc-label">{% if browse_location %}{{ browse_location }}{% else %}Select city{% endif %}</span>
+  <i class="bi bi-chevron-down loc-caret"></i>
+
+  <div class="loc-dropdown" id="locDD{{ loc_suffix|default:'' }}" onclick="event.stopPropagation()">
+    <p class="loc-dd-title">Your location</p>
+    <div class="loc-search-wrap">
+      <i class="bi bi-search"></i>
+      <input type="text" class="loc-input loc-search-input" placeholder="Search cities…" autocomplete="off">
+    </div>
+    <button type="button" class="loc-use-gps">
+      <span class="loc-gps-ico">📍</span>
+      <span>Use Current Location</span>
+      <span class="loc-gps-status"></span>
+    </button>
+    <p class="loc-section-label">Popular</p>
+    <div class="loc-list loc-popular-list" aria-live="polite">
+      <div class="loc-loading">Loading…</div>
+    </div>
+    <div class="loc-search-results-wrap" style="display:none;">
+      <p class="loc-section-label">Results</p>
+      <div class="loc-list loc-search-results"></div>
+    </div>
+    <div class="loc-dd-footer">
+      <button type="button" class="loc-clear">Show all locations</button>
+    </div>
+  </div>
+</div>

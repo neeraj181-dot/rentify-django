@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}{{ profile_user.get_full_name|default:profile_user.username }} — Rentify{% endblock %}
+
+{% block content %}
+<div class="pp-cover">
+  <div class="pp-cover-grid"></div>
+</div>
+
+<div class="pp-shell">
+  <header class="pp-hero">
+    <img src="{{ profile_user.profile.get_photo_url }}" class="pp-avatar"
+         alt="{{ profile_user.username }}"
+         onerror="this.src='https://placehold.co/120/101428/00D084?text={{ profile_user.username|first|upper }}'">
+
+    <div class="pp-hero-main">
+      <h1 class="pp-name">
+        {{ profile_user.get_full_name|default:profile_user.username }}
+        {% if profile_user.profile.is_verified %}
+        <i class="bi bi-patch-check-fill" style="color:#4F8EF7;font-size:.85rem;margin-left:.25rem;" title="Verified"></i>
+        {% endif %}
+      </h1>
+      <div class="pp-meta">
+        <span class="pp-handle">@{{ profile_user.username }}</span>
+        {% if profile_user.profile.address %}
+        <span class="pp-loc"><i class="bi bi-geo-alt-fill"></i> {{ profile_user.profile.address }}</span>
+        {% endif %}
+        <span class="pp-badge {% if profile_user.profile.is_verified or profile_user.profile.total_reviews >= 3 %}pp-badge--trusted{% endif %}">
+          {% if profile_user.profile.is_verified or profile_user.profile.total_reviews >= 3 %}
+          <i class="bi bi-patch-check-fill"></i> Trusted Seller
+          {% else %}
+          <i class="bi bi-star-fill"></i> New Seller
+          {% endif %}
+        </span>
+      </div>
+    </div>
+
+    <div class="pp-stats">
+      <div class="pp-stat">
+        <div class="pp-stat-val">{{ avg_rating|floatformat:1 }}</div>
+        <div class="pp-stat-lbl">Rating</div>
+      </div>
+      <div class="pp-stat">
+        <div class="pp-stat-val">{{ review_count }}</div>
+        <div class="pp-stat-lbl">Reviews</div>
+      </div>
+      <div class="pp-stat">
+        <div class="pp-stat-val">{{ listings|length }}</div>
+        <div class="pp-stat-lbl">Listings</div>
+      </div>
+    </div>
+
+    {% if user.is_authenticated and user != profile_user %}
+    <div class="pp-actions">
+      <a href="{% url 'start_conversation' profile_user.username %}" class="pp-msg-btn">
+        <i class="bi bi-chat-text-fill"></i> Message
+      </a>
+    </div>
+    {% endif %}
+  </header>
+
+  <div class="pp-content">
+    <aside class="pp-about">
+      <div class="pp-about-title">About</div>
+      {% if profile_user.profile.bio %}
+      <p class="pp-bio">{{ profile_user.profile.bio }}</p>
+      {% else %}
+      <p class="pp-bio" style="font-style:italic;opacity:.7;">No bio yet.</p>
+      {% endif %}
+
+      {% if profile_user.profile.phone %}
+      <div class="pp-info-row">
+        <i class="bi bi-telephone-fill"></i>
+        <span>{{ profile_user.profile.phone }}</span>
+      </div>
+      {% endif %}
+      <div class="pp-info-row">
+        <i class="bi bi-calendar3"></i>
+        <span>Member since {{ profile_user.date_joined|date:"F Y" }}</span>
+      </div>
+      {% if profile_user.profile.rating > 0 %}
+      <div class="pp-info-row">
+        <i class="bi bi-star-fill" style="color:#F59E0B;"></i>
+        <span><strong style="color:#EEF0FF;">{{ profile_user.profile.rating|floatformat:1 }}</strong> from {{ profile_user.profile.total_reviews }} review{{ profile_user.profile.total_reviews|pluralize }}</span>
+      </div>
+      {% endif %}
+
+      {% if profile_user.profile.is_verified %}
+      <div class="pp-verified-bar">
+        <i class="bi bi-patch-check-fill"></i>
+        Verified — identity confirmed
+      </div>
+      {% endif %}
+    </aside>
+
+    <div>
+      <h2 class="pp-section-hd">
+        <i class="bi bi-box-seam" style="color:#00D084;"></i>
+        Active Listings
+        <span class="count">{{ listings|length }}</span>
+      </h2>
+      {% if listings %}
+      <div class="pp-listings-grid">
+        {% for listing in listings %}
+        {% include 'listings/_product_card.html' with product=listing %}
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="pp-empty">
+        <i class="bi bi-box-seam" style="font-size:2rem;display:block;margin-bottom:.5rem;opacity:.4;"></i>
+        No active listings yet.
+      </div>
+      {% endif %}
+
+      <h2 class="pp-section-hd" style="margin-top:.5rem;">
+        <i class="bi bi-star-fill" style="color:#F59E0B;"></i>
+        Reviews
+        <span class="count">{{ review_count }}</span>
+      </h2>
+      {% for review in reviews %}
+      <div class="pp-review">
+        <div style="display:flex;align-items:flex-start;gap:.85rem;">
+          <img src="{{ review.reviewer.profile.get_photo_url }}"
+               style="width:40px;height:40px;border-radius:50%;object-fit:cover;flex-shrink:0;border:2px solid rgba(255,255,255,.08);"
+               onerror="this.src='https://placehold.co/40/4F8EF7/fff?text={{ review.reviewer.username|first|upper }}'">
+          <div style="flex:1;min-width:0;">
+            <div style="display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:.4rem;">
+              <span style="font-weight:700;font-size:.875rem;color:#EEF0FF;">{{ review.reviewer.get_full_name|default:review.reviewer.username }}</span>
+              <span style="font-size:.7rem;color:rgba(238,240,255,.3);">{{ review.created_at|date:"M d, Y" }}</span>
+            </div>
+            <div style="display:flex;gap:.12rem;margin:.35rem 0 .45rem;">
+              {% for i in "12345" %}
+              <i class="bi bi-star{% if forloop.counter <= review.rating %}-fill{% endif %}"
+                 style="font-size:.72rem;color:{% if forloop.counter <= review.rating %}#F59E0B{% else %}rgba(255,255,255,.12){% endif %};"></i>
+              {% endfor %}
+            </div>
+            <p style="margin:0;font-size:.85rem;color:rgba(238,240,255,.6);line-height:1.65;">{{ review.comment }}</p>
+          </div>
+        </div>
+      </div>
+      {% empty %}
+      <div class="pp-empty">No reviews yet.</div>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

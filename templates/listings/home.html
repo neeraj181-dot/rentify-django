@@ -1,0 +1,660 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Rentify — Rent Anything. Earn From Everything.</title>
+<link rel="icon" href="{% static 'branding/favicon.ico' %}" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="{% static 'branding/favicon-32x32.png' %}">
+<link rel="apple-touch-icon" href="{% static 'branding/apple-touch-icon.png' %}">
+<meta name="theme-color" content="#00D084">
+<meta name="description" content="Rent premium products from trusted people near you or earn money from items you already own.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+<link rel="stylesheet" href="{% static 'css/landing-shared.css' %}">
+<link rel="stylesheet" href="{% static 'css/navbar-app.css' %}">
+<link rel="stylesheet" href="{% static 'css/auth-modal.css' %}">
+{% if user.is_authenticated %}
+<link rel="stylesheet" href="{% static 'css/dashboard.css' %}">
+{% endif %}
+<style>
+/* ============================================================
+   RENTIFY LANDING — Premium Cinematic Design
+   ============================================================ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;-webkit-font-smoothing:antialiased}
+body{font-family:'Inter',sans-serif;background:#050510;color:#fff;overflow-x:hidden;line-height:1.6}
+img{display:block;max-width:100%}
+a{text-decoration:none;color:inherit}
+button{cursor:pointer;font-family:inherit}
+
+/* ── TOKENS ── */
+:root{
+  --green:#00D084;--green2:#00A866;
+  --blue:#2563EB;--blue2:#60A5FA;
+  --purple:#7C3AED;--pink:#EC4899;
+  --gold:#F59E0B;
+  --glass:rgba(255,255,255,.06);
+  --glass-border:rgba(255,255,255,.12);
+  --glass-hover:rgba(255,255,255,.1);
+  --r:16px;--r-lg:24px;--r-xl:32px;--r-full:999px;
+  --ease:cubic-bezier(.16,1,.3,1);
+  --t:.22s var(--ease);
+}
+</style>
+</head>
+<body class="page-home"
+      data-server-auth="{% if user.is_authenticated %}true{% else %}false{% endif %}">
+
+{% include 'includes/navbar.html' %}
+{% include 'includes/navbar_mobile.html' %}
+
+<style>
+/* ============================================================
+   HERO
+   ============================================================ */
+.hero{
+  position:relative;min-height:100vh;display:flex;align-items:center;
+  overflow:hidden;padding:68px 2rem 0;
+}
+/* Cinematic dark background */
+.hero-bg{
+  position:absolute;inset:0;z-index:0;
+  background:#050510;
+}
+.hero-bg::before{
+  content:'';position:absolute;inset:0;
+  background:
+    radial-gradient(ellipse 70% 55% at 50% -5%, rgba(0,180,100,.22) 0%, transparent 65%),
+    radial-gradient(ellipse 40% 40% at 85% 70%, rgba(37,99,235,.18) 0%, transparent 55%),
+    radial-gradient(ellipse 50% 50% at 10% 85%, rgba(124,58,237,.14) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 60% at 60% 110%, rgba(0,208,132,.1) 0%, transparent 50%);
+}
+/* Subtle grid */
+.hero-bg::after{
+  content:'';position:absolute;inset:0;
+  background-image:
+    linear-gradient(rgba(255,255,255,.024) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.024) 1px, transparent 1px);
+  background-size:72px 72px;
+  mask-image:radial-gradient(ellipse 80% 80% at 50% 40%, black 30%, transparent 100%);
+}
+/* Glow orbs */
+.orb{position:absolute;border-radius:50%;filter:blur(80px);pointer-events:none;z-index:0}
+.orb-1{width:600px;height:600px;background:rgba(0,208,132,.12);top:-200px;left:-100px}
+.orb-2{width:500px;height:500px;background:rgba(37,99,235,.1);top:100px;right:-150px}
+.orb-3{width:400px;height:400px;background:rgba(124,58,237,.09);bottom:-100px;left:30%}
+
+.hero-inner{
+  position:relative;z-index:1;
+  max-width:1280px;margin:0 auto;width:100%;
+  display:grid;grid-template-columns:1fr 1fr;gap:5rem;align-items:center;
+  padding:6rem 0 5rem;
+}
+/* ── LEFT ── */
+.hero-left{}
+.hero-badge{
+  display:inline-flex;align-items:center;gap:.5rem;
+  background:rgba(0,208,132,.1);border:1px solid rgba(0,208,132,.25);
+  color:var(--green);padding:.4rem 1rem;border-radius:var(--r-full);
+  font-size:.75rem;font-weight:700;letter-spacing:.05em;text-transform:uppercase;
+  margin-bottom:2rem;
+}
+.hero-badge .pulse{width:7px;height:7px;border-radius:50%;background:var(--green);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,208,132,.5)}50%{box-shadow:0 0 0 6px rgba(0,208,132,0)}}
+.hero-title{
+  font-size:clamp(3rem,5.5vw,5rem);font-weight:900;line-height:1.06;
+  letter-spacing:-.04em;margin-bottom:1.6rem;color:#fff;
+}
+.hero-title .line2{display:block;color:rgba(255,255,255,.45)}
+.hero-title .accent{
+  display:block;
+  background:linear-gradient(135deg, var(--green) 0%, #00F5A0 40%, var(--blue2) 100%);
+  -webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+.hero-sub{
+  font-size:1.1rem;color:rgba(255,255,255,.55);
+  line-height:1.8;max-width:460px;margin-bottom:2.5rem;font-weight:400;
+}
+/* Search bar */
+.hero-search{
+  background:rgba(255,255,255,.07);
+  backdrop-filter:blur(20px);
+  border:1px solid rgba(255,255,255,.12);
+  border-radius:var(--r-lg);padding:6px 6px 6px 1.25rem;
+  display:flex;align-items:center;gap:.75rem;margin-bottom:1.5rem;
+  max-width:520px;transition:var(--t);
+}
+.hero-search:focus-within{border-color:rgba(0,208,132,.4);box-shadow:0 0 0 3px rgba(0,208,132,.08)}
+.hero-search input{
+  flex:1;background:none;border:none;outline:none;
+  color:#fff;font-size:.95rem;font-family:inherit;
+}
+.hero-search input::placeholder{color:rgba(255,255,255,.35)}
+.hero-search-btn{
+  background:var(--green);color:#000;font-weight:700;font-size:.875rem;
+  border:none;border-radius:12px;padding:.65rem 1.35rem;
+  display:flex;align-items:center;gap:.4rem;transition:var(--t);flex-shrink:0;
+}
+.hero-search-btn:hover{background:#00E890;transform:translateY(-1px)}
+/* Popular tags */
+.popular-tags{display:flex;align-items:center;gap:.5rem;flex-wrap:wrap;margin-bottom:2.5rem}
+.tag-label{font-size:.72rem;color:rgba(255,255,255,.35);font-weight:500;flex-shrink:0}
+.pop-tag{
+  padding:.25rem .75rem;background:rgba(255,255,255,.07);
+  border:1px solid rgba(255,255,255,.1);border-radius:var(--r-full);
+  font-size:.75rem;color:rgba(255,255,255,.6);transition:var(--t);cursor:pointer;
+}
+.pop-tag:hover{background:rgba(255,255,255,.13);color:#fff;border-color:rgba(255,255,255,.2)}
+/* CTA buttons */
+.hero-cta{display:flex;gap:.85rem;flex-wrap:wrap;margin-bottom:3rem}
+.btn-hero-primary{
+  background:var(--green);color:#000;font-weight:800;
+  padding:.85rem 2rem;border-radius:var(--r-full);border:none;
+  font-size:.95rem;display:flex;align-items:center;gap:.5rem;
+  transition:var(--t);font-family:inherit;
+}
+.btn-hero-primary:hover{background:#00E890;transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,208,132,.4);color:#000}
+.btn-hero-ghost{
+  background:rgba(255,255,255,.07);color:rgba(255,255,255,.85);font-weight:600;
+  padding:.85rem 2rem;border-radius:var(--r-full);
+  border:1px solid rgba(255,255,255,.14);
+  font-size:.95rem;display:flex;align-items:center;gap:.5rem;
+  transition:var(--t);font-family:inherit;
+}
+.btn-hero-ghost:hover{background:rgba(255,255,255,.12);color:#fff;border-color:rgba(255,255,255,.22);transform:translateY(-2px)}
+/* Stats */
+.hero-stats{display:flex;gap:2.5rem;flex-wrap:wrap}
+.hero-stat-val{font-size:1.6rem;font-weight:900;color:#fff;line-height:1;letter-spacing:-.02em}
+.hero-stat-lbl{font-size:.72rem;color:rgba(255,255,255,.4);margin-top:.2rem;font-weight:500}
+.stat-divider{width:1px;background:rgba(255,255,255,.1);align-self:stretch}
+</style>
+
+<!-- ════════════════════ HERO ════════════════════ -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
+
+  <div class="hero-inner">
+    <!-- LEFT CONTENT -->
+    <div class="hero-left">
+      <div class="hero-badge">
+        <span class="pulse"></span>
+        Sustainable &bull; Affordable &bull; Smart
+      </div>
+
+      <h1 class="hero-title">
+        Rent Anything.
+        <span class="line2">Earn From</span>
+        <span class="accent">Everything.</span>
+      </h1>
+
+      <p class="hero-sub">
+        Rent premium products from trusted people near you — or earn money from items you already own. No buying, no waste.
+      </p>
+
+      <!-- Search -->
+      <div class="hero-search">
+        <i class="bi bi-search" style="color:rgba(255,255,255,.35);font-size:.9rem;flex-shrink:0"></i>
+        <input type="text" id="heroSearch" placeholder="Search cameras, laptops, bikes..." />
+        <button class="hero-search-btn" onclick="handleSearch()">
+          <i class="bi bi-search"></i> Search
+        </button>
+      </div>
+
+      <div class="popular-tags">
+        <span class="tag-label">Popular:</span>
+        <span class="pop-tag" onclick="searchFor('Camera')">📷 Camera</span>
+        <span class="pop-tag" onclick="searchFor('Laptop')">💻 Laptop</span>
+        <span class="pop-tag" onclick="searchFor('Bike')">🚲 Bike</span>
+        <span class="pop-tag" onclick="searchFor('Projector')">📽 Projector</span>
+        <span class="pop-tag" onclick="searchFor('PS5')">🎮 PS5</span>
+      </div>
+
+      <div class="hero-cta">
+        <a href="{% url 'browse' %}" class="btn-hero-primary">
+          <i class="bi bi-grid-3x3-gap"></i> Browse Listings
+        </a>
+        <button class="btn-hero-ghost" data-modal="register">
+          <i class="bi bi-plus-circle"></i> List Your Item
+        </button>
+      </div>
+
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-val">10K+</div>
+          <div class="hero-stat-lbl">Products Available</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">5K+</div>
+          <div class="hero-stat-lbl">Verified Owners</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">500+</div>
+          <div class="hero-stat-lbl">Cities Covered</div>
+        </div>
+        <div class="stat-divider"></div>
+        <div class="hero-stat">
+          <div class="hero-stat-val">100%</div>
+          <div class="hero-stat-lbl">Safe & Secure</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT VISUAL -->
+    <div class="hero-right" id="heroRight"></div>
+  </div>
+</section>
+
+<style>
+/* ── HERO RIGHT — product mosaic ── */
+.hero-right{position:relative;height:580px}
+.mosaic{position:relative;width:100%;height:100%}
+/* Main large card */
+.mc{
+  position:absolute;border-radius:var(--r-xl);overflow:hidden;
+  background:rgba(255,255,255,.06);backdrop-filter:blur(24px);
+  border:1px solid rgba(255,255,255,.12);
+  box-shadow:0 32px 80px rgba(0,0,0,.5);
+}
+.mc-main{width:260px;height:300px;top:20px;left:30px;z-index:3;animation:floatA 6s ease-in-out infinite}
+.mc-b{width:220px;height:240px;top:60px;right:10px;z-index:2;animation:floatB 7s ease-in-out infinite}
+.mc-c{width:200px;height:200px;bottom:30px;left:90px;z-index:4;animation:floatA 8s ease-in-out infinite reverse}
+.mc-d{width:170px;height:170px;bottom:80px;right:60px;z-index:1;animation:floatB 5s ease-in-out infinite}
+@keyframes floatA{0%,100%{transform:translateY(0) rotate(.4deg)}50%{transform:translateY(-16px) rotate(-.4deg)}}
+@keyframes floatB{0%,100%{transform:translateY(0) rotate(-.3deg)}50%{transform:translateY(-10px) rotate(.3deg)}}
+.mc img{width:100%;height:68%;object-fit:cover}
+.mc-body{padding:.75rem .9rem}
+.mc-name{font-size:.82rem;font-weight:700;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mc-price{font-size:.75rem;color:var(--green);font-weight:700;margin-top:.15rem}
+.mc-loc{font-size:.68rem;color:rgba(255,255,255,.45);display:flex;align-items:center;gap:.25rem;margin-top:.1rem}
+/* Floating trust pills */
+.trust-pill{
+  position:absolute;z-index:10;
+  background:rgba(5,5,16,.8);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.14);border-radius:var(--r-full);
+  padding:.5rem 1rem;display:flex;align-items:center;gap:.5rem;
+  font-size:.75rem;font-weight:600;color:#fff;white-space:nowrap;
+  box-shadow:0 8px 24px rgba(0,0,0,.4);
+}
+.trust-pill .dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.tp-a{top:0px;right:80px;animation:floatB 5s ease-in-out infinite}
+.tp-b{bottom:10px;left:10px;animation:floatA 6s ease-in-out infinite}
+.tp-c{top:200px;right:0px;animation:floatB 7s ease-in-out infinite}
+/* ── STATS BAR ── */
+.stats-bar{
+  position:relative;z-index:10;
+  background:rgba(255,255,255,.05);
+  backdrop-filter:blur(24px);
+  border-top:1px solid rgba(255,255,255,.07);
+  border-bottom:1px solid rgba(255,255,255,.07);
+  padding:1.5rem 2rem;
+  display:flex;align-items:center;justify-content:center;
+  flex-wrap:wrap;gap:0;
+}
+.stat-item{
+  display:flex;flex-direction:column;align-items:center;
+  padding:0 3rem;border-right:1px solid rgba(255,255,255,.08);
+}
+.stat-item:last-child{border-right:none}
+.si-val{font-size:1.75rem;font-weight:900;color:#fff;letter-spacing:-.03em;line-height:1}
+.si-lbl{font-size:.72rem;color:rgba(255,255,255,.4);font-weight:500;margin-top:.25rem;text-align:center}
+.si-icon{font-size:1rem;margin-bottom:.3rem}
+.si-icon.green{color:var(--green)}.si-icon.blue{color:var(--blue2)}.si-icon.gold{color:var(--gold)}.si-icon.purple{color:#A78BFA}
+</style>
+
+<!-- Product mosaic visual -->
+<script>
+// Hero right — product cards with emoji illustrations (no external images needed)
+const heroItems = [
+  {emoji:'📷', name:'Canon EOS R5', price:'₹300/day', loc:'Mumbai', color:'#1a1a2e'},
+  {emoji:'💻', name:'MacBook Air M3', price:'₹350/day', loc:'Bangalore', color:'#0d1b2a'},
+  {emoji:'🎮', name:'PlayStation 5', price:'₹200/day', loc:'Delhi', color:'#1a0a2e'},
+  {emoji:'🚁', name:'DJI Mini 4 Pro', price:'₹400/day', loc:'Hyderabad', color:'#0a1a0a'},
+];
+document.addEventListener('DOMContentLoaded', () => {
+  const container = document.getElementById('heroRight');
+  if (!container) return;
+  container.innerHTML = `
+  <div class="mosaic">
+    ${heroItems.map((item, i) => {
+      const cls = ['mc-main','mc-b','mc-c','mc-d'][i];
+      return `<div class="mc ${cls}">
+        <div style="height:62%;background:${item.color};display:flex;align-items:center;justify-content:center;font-size:${i===0?'4rem':'3rem'};position:relative;overflow:hidden;">
+          <div style="position:absolute;inset:0;background:radial-gradient(circle at 50% 50%,rgba(255,255,255,.04),transparent 70%)"></div>
+          ${item.emoji}
+        </div>
+        <div class="mc-body">
+          <div class="mc-name">${item.name}</div>
+          <div class="mc-price">${item.price}</div>
+          <div class="mc-loc"><i class="bi bi-geo-alt" style="font-size:.6rem"></i>${item.loc}</div>
+        </div>
+      </div>`;
+    }).join('')}
+    <div class="trust-pill tp-a"><span class="dot" style="background:var(--green)"></span> Verified Owners</div>
+    <div class="trust-pill tp-b"><span class="dot" style="background:#F59E0B"></span> 10K+ Happy Renters</div>
+    <div class="trust-pill tp-c"><span class="dot" style="background:#60A5FA"></span> 100% Trusted</div>
+  </div>`;
+});
+</script>
+
+<!-- ════════════════════ STATS BAR ════════════════════ -->
+<div class="stats-bar">
+  <div class="stat-item">
+    <div class="si-icon green"><i class="bi bi-box-seam-fill"></i></div>
+    <div class="si-val">10,000+</div>
+    <div class="si-lbl">Products Available</div>
+  </div>
+  <div class="stat-item">
+    <div class="si-icon blue"><i class="bi bi-person-check-fill"></i></div>
+    <div class="si-val">5,000+</div>
+    <div class="si-lbl">Verified Users</div>
+  </div>
+  <div class="stat-item">
+    <div class="si-icon gold"><i class="bi bi-geo-alt-fill"></i></div>
+    <div class="si-val">500+</div>
+    <div class="si-lbl">Cities Covered</div>
+  </div>
+  <div class="stat-item">
+    <div class="si-icon purple"><i class="bi bi-shield-fill-check"></i></div>
+    <div class="si-val">100%</div>
+    <div class="si-lbl">Safe & Secure</div>
+  </div>
+</div>
+
+{% if featured %}
+<style>
+.featured-section{padding:5rem 2rem;background:#050510;position:relative}
+.featured-inner{max-width:1280px;margin:0 auto}
+.featured-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:1.25rem;margin-top:2.5rem}
+@media(max-width:1100px){.featured-grid{grid-template-columns:repeat(3,1fr)}}
+@media(max-width:768px){.featured-grid{grid-template-columns:repeat(2,1fr)}}
+@media(max-width:480px){.featured-grid{grid-template-columns:1fr}}
+.feat-card{
+  background:rgba(255,255,255,.04);backdrop-filter:blur(16px);
+  border:1px solid rgba(255,255,255,.08);border-radius:20px;overflow:hidden;
+  transition:border-color .22s,transform .22s,box-shadow .22s;text-decoration:none;color:inherit;
+  display:flex;flex-direction:column;
+}
+.feat-card:hover{border-color:rgba(0,208,132,.25);transform:translateY(-4px);box-shadow:0 16px 48px rgba(0,0,0,.4)}
+.feat-card img{width:100%;aspect-ratio:4/3;object-fit:cover}
+.feat-body{padding:1rem 1.1rem 1.15rem;flex:1;display:flex;flex-direction:column}
+.feat-title{font-weight:700;font-size:.9rem;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.35rem}
+.feat-meta{font-size:.72rem;color:rgba(255,255,255,.4);display:flex;align-items:center;gap:.25rem;margin-bottom:.65rem}
+.feat-row{display:flex;justify-content:space-between;align-items:center;margin-bottom:.85rem}
+.feat-price{font-size:1.05rem;font-weight:900;color:var(--green)}
+.feat-rating{font-size:.78rem;color:rgba(255,255,255,.65);display:flex;align-items:center;gap:.2rem}
+.feat-btn{
+  display:flex;align-items:center;justify-content:center;gap:.35rem;margin-top:auto;
+  background:rgba(0,208,132,.1);color:var(--green);border:1.5px solid rgba(0,208,132,.22);
+  border-radius:999px;padding:.55rem .9rem;font-size:.78rem;font-weight:700;transition:all .18s;
+}
+.feat-card:hover .feat-btn{background:var(--green);color:#000}
+</style>
+<section class="featured-section">
+  <div class="featured-inner">
+    <div style="text-align:center;max-width:640px;margin:0 auto;">
+      <div style="display:inline-flex;align-items:center;gap:.5rem;background:rgba(0,208,132,.1);border:1px solid rgba(0,208,132,.22);color:var(--green);padding:.38rem 1rem;border-radius:999px;font-size:.72rem;font-weight:700;letter-spacing:.08em;text-transform:uppercase;margin-bottom:1rem;">
+        <span style="width:6px;height:6px;border-radius:50%;background:var(--green);"></span> Featured Rentals
+      </div>
+      <h2 style="font-size:clamp(1.75rem,3vw,2.5rem);font-weight:900;color:#fff;letter-spacing:-.03em;margin-bottom:.75rem;">Popular Items Near You</h2>
+      <p style="color:rgba(255,255,255,.55);font-size:.95rem;line-height:1.7;">Browse trusted listings from verified owners — no account needed to explore.</p>
+    </div>
+    <div class="featured-grid">
+      {% for product in featured %}
+      <a href="{% url 'product_detail' product.pk %}" class="feat-card">
+        <img src="{{ product.get_primary_image }}" alt="{{ product.title }}"
+             onerror="this.src='https://placehold.co/400x300/101428/00D084?text=Rentify'">
+        <div class="feat-body">
+          <div class="feat-title">{{ product.title }}</div>
+          <div class="feat-meta"><i class="bi bi-geo-alt" style="font-size:.65rem;"></i> {{ product.get_public_location }}</div>
+          <div class="feat-row">
+            <span class="feat-price">₹{{ product.price_per_day }}<span style="font-size:.65rem;font-weight:500;color:rgba(255,255,255,.35);">/day</span></span>
+            <span class="feat-rating"><i class="bi bi-star-fill" style="color:#F59E0B;font-size:.68rem;"></i> {{ product.rating|floatformat:1 }}</span>
+          </div>
+          <span class="feat-btn">View Details <i class="bi bi-arrow-right"></i></span>
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    <div style="text-align:center;margin-top:2.5rem;">
+      <a href="{% url 'browse' %}" style="display:inline-flex;align-items:center;gap:.5rem;background:var(--green);color:#000;font-weight:800;font-size:.9rem;border-radius:999px;padding:.85rem 2.25rem;text-decoration:none;transition:transform .18s,box-shadow .18s;" onmouseover="this.style.transform='translateY(-2px)';this.style.boxShadow='0 8px 28px rgba(0,208,132,.35)'" onmouseout="this.style.transform='';this.style.boxShadow=''">
+        <i class="bi bi-grid-3x3-gap"></i> Browse All Listings
+      </a>
+    </div>
+  </div>
+</section>
+{% endif %}
+
+{% load static %}
+<!-- ═══════════════════════════════════════════════════════
+     AUTH MODAL
+═══════════════════════════════════════════════════════ -->
+<link rel="stylesheet" href="{% static 'css/auth-modal.css' %}">
+
+<div class="rfy-modal-overlay" id="rfyAuthModal" role="dialog" aria-modal="true" aria-label="Sign in or create account">
+  <div class="rfy-modal">
+
+    <!-- Header -->
+    <div class="rfy-modal-header">
+      <div class="rfy-modal-brand">Rent<span style="color:#18181B">ify</span><em>.</em></div>
+      <button class="rfy-modal-close" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+    </div>
+
+    <!-- Body -->
+    <div class="rfy-modal-body">
+
+      <!-- Tab switcher -->
+      <div class="rfy-tabs" role="tablist">
+        <button class="rfy-tab active" data-tab="login" role="tab">Sign In</button>
+        <button class="rfy-tab" data-tab="register" role="tab">Create Account</button>
+      </div>
+
+      <!-- ════ LOGIN PANEL ════ -->
+      <div class="rfy-panel active" id="rfy-panel-login">
+        <div class="rfy-form-inner">
+
+          <!-- Google -->
+          <button class="rfy-social-btn" type="button" onclick="alert('Google login coming soon!')">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+            Continue with Google
+          </button>
+
+          <div class="rfy-divider">or sign in with email</div>
+
+          <!-- Error banner -->
+          <div class="rfy-general-error" style="display:none;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:10px;padding:.75rem 1rem;font-size:.85rem;color:#991B1B;align-items:center;gap:.5rem;margin-bottom:1rem;">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span></span>
+          </div>
+
+          <form method="post" action="/accounts/login/" novalidate autocomplete="on">
+            {% csrf_token %}
+
+            <div class="rfy-field">
+              <label for="login-username">Email or Username</label>
+              <div class="rfy-input-wrap">
+                <i class="bi bi-person rfy-input-icon"></i>
+                <input id="login-username" class="auth-input" type="text" name="username"
+                       placeholder="you@example.com" autocomplete="username" required>
+              </div>
+            </div>
+
+            <div class="rfy-field">
+              <label for="login-password">Password</label>
+              <div class="rfy-input-wrap">
+                <i class="bi bi-lock rfy-input-icon"></i>
+                <input id="login-password" class="auth-input" type="password" name="password"
+                       placeholder="Your password" autocomplete="current-password" required>
+                <button type="button" class="rfy-eye-btn" aria-label="Show/hide password">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <div class="rfy-meta-row">
+              <label class="rfy-check-label">
+                <input type="checkbox" name="remember_me"> Remember me
+              </label>
+              <a href="/accounts/password-reset/" class="rfy-forgot">Forgot password?</a>
+            </div>
+
+            <button type="submit" class="rfy-submit">
+              <div class="spinner"></div>
+              <span class="btn-text"><i class="bi bi-arrow-right-circle" style="font-size:1rem;"></i> Sign In</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Success state -->
+        <div class="rfy-success-state">
+          <div class="rfy-success-icon"><i class="bi bi-check2"></i></div>
+          <h3>Welcome back!</h3>
+          <p>Signed in successfully. Taking you to your dashboard…</p>
+        </div>
+
+        <p class="rfy-modal-note">
+          Don't have an account?
+          <a href="#" data-switch-tab="register">Create one free →</a>
+        </p>
+      </div>
+
+      <!-- ════ REGISTER PANEL ════ -->
+      <div class="rfy-panel" id="rfy-panel-register">
+        <div class="rfy-form-inner">
+
+          <!-- Google -->
+          <button class="rfy-social-btn" type="button" onclick="alert('Google signup coming soon!')">
+            <svg width="18" height="18" viewBox="0 0 18 18"><path fill="#4285F4" d="M17.64 9.2c0-.637-.057-1.251-.164-1.84H9v3.481h4.844a4.14 4.14 0 01-1.796 2.716v2.259h2.908c1.702-1.567 2.684-3.875 2.684-6.615z"/><path fill="#34A853" d="M9 18c2.43 0 4.467-.806 5.956-2.18l-2.908-2.259c-.806.54-1.837.86-3.048.86-2.344 0-4.328-1.584-5.036-3.711H.957v2.332A8.997 8.997 0 009 18z"/><path fill="#FBBC05" d="M3.964 10.71A5.41 5.41 0 013.682 9c0-.593.102-1.17.282-1.71V4.958H.957A8.996 8.996 0 000 9c0 1.452.348 2.827.957 4.042l3.007-2.332z"/><path fill="#EA4335" d="M9 3.58c1.321 0 2.508.454 3.44 1.345l2.582-2.58C13.463.891 11.426 0 9 0A8.997 8.997 0 00.957 4.958L3.964 6.29C4.672 4.163 6.656 3.58 9 3.58z"/></svg>
+            Continue with Google
+          </button>
+
+          <div class="rfy-divider">or create with email</div>
+
+          <!-- Error banner -->
+          <div class="rfy-general-error" style="display:none;background:#FEF2F2;border:1px solid #FCA5A5;border-radius:10px;padding:.75rem 1rem;font-size:.85rem;color:#991B1B;align-items:center;gap:.5rem;margin-bottom:1rem;">
+            <i class="bi bi-exclamation-triangle-fill"></i>
+            <span></span>
+          </div>
+
+          <form method="post" action="/accounts/register/" novalidate autocomplete="off">
+            {% csrf_token %}
+
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:.75rem;">
+              <div class="rfy-field">
+                <label for="reg-fname">First Name</label>
+                <input id="reg-fname" class="auth-input" type="text" name="first_name" placeholder="Alex" required>
+              </div>
+              <div class="rfy-field">
+                <label for="reg-lname">Last Name</label>
+                <input id="reg-lname" class="auth-input" type="text" name="last_name" placeholder="Kumar" required>
+              </div>
+            </div>
+
+            <div class="rfy-field">
+              <label for="reg-username">Username</label>
+              <div class="rfy-input-wrap">
+                <i class="bi bi-at rfy-input-icon"></i>
+                <input id="reg-username" class="auth-input" type="text" name="username"
+                       placeholder="alexkumar" autocomplete="username" required>
+              </div>
+            </div>
+
+            <div class="rfy-field">
+              <label for="reg-email">Email Address</label>
+              <div class="rfy-input-wrap">
+                <i class="bi bi-envelope rfy-input-icon"></i>
+                <input id="reg-email" class="auth-input" type="email" name="email"
+                       placeholder="alex@example.com" autocomplete="email" required>
+              </div>
+            </div>
+
+            <div class="rfy-field">
+              <label for="reg-phone">Phone Number <span style="color:#A1A1AA;font-weight:400">(optional)</span></label>
+              <div class="rfy-input-wrap">
+                <i class="bi bi-phone rfy-input-icon"></i>
+                <input id="reg-phone" class="auth-input" type="tel" name="phone" placeholder="+91 98765 43210">
+              </div>
+            </div>
+
+            <div class="rfy-field">
+              <label for="reg-pwd1">Password</label>
+              <div class="rfy-input-wrap">
+                <i class="bi bi-lock rfy-input-icon"></i>
+                <input id="reg-pwd1" class="auth-input" type="password" name="password1"
+                       placeholder="Create a strong password" autocomplete="new-password"
+                       data-strength required>
+                <button type="button" class="rfy-eye-btn" aria-label="Show/hide">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+              <div class="pwd-strength-bar"><div class="pwd-strength-fill"></div></div>
+              <div class="pwd-strength-label"></div>
+            </div>
+
+            <div class="rfy-field">
+              <label for="reg-pwd2">Confirm Password</label>
+              <div class="rfy-input-wrap">
+                <i class="bi bi-lock-fill rfy-input-icon"></i>
+                <input id="reg-pwd2" class="auth-input" type="password" name="password2"
+                       placeholder="Repeat your password" autocomplete="new-password" required>
+                <button type="button" class="rfy-eye-btn" aria-label="Show/hide">
+                  <i class="bi bi-eye"></i>
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" class="rfy-submit" style="background:#16A34A;">
+              <div class="spinner"></div>
+              <span class="btn-text"><i class="bi bi-person-plus" style="font-size:1rem;"></i> Create Account</span>
+            </button>
+          </form>
+        </div>
+
+        <!-- Success state -->
+        <div class="rfy-success-state">
+          <div class="rfy-success-icon"><i class="bi bi-check2"></i></div>
+          <h3>Account created!</h3>
+          <p>Welcome to Rentify. Setting up your dashboard…</p>
+        </div>
+
+        <p class="rfy-modal-note">
+          Already have an account? <a href="#" data-switch-tab="login">Sign in →</a><br>
+          By creating an account you agree to our
+          <a href="/terms/" target="_blank">Terms</a> &amp;
+          <a href="/privacy/" target="_blank">Privacy Policy</a>.
+        </p>
+      </div>
+
+    </div><!-- /body -->
+  </div><!-- /modal -->
+</div><!-- /overlay -->
+
+<script src="{% static 'js/auth-session.js' %}"></script>
+<script src="{% static 'js/location-picker.js' %}"></script>
+<script src="{% static 'js/auth-modal.js' %}"></script>
+<script src="{% static 'js/navbar.js' %}"></script>
+<script>
+function handleSearch() {
+  const q = document.getElementById('heroSearch')?.value.trim();
+  if (q) window.location.href = `/browse/?q=${encodeURIComponent(q)}`;
+  else window.location.href = '/browse/';
+}
+function searchFor(term) {
+  window.location.href = `/browse/?q=${encodeURIComponent(term)}`;
+}
+document.getElementById('heroSearch')?.addEventListener('keydown', e => {
+  if (e.key === 'Enter') handleSearch();
+});
+</script>
+</body>
+</html>

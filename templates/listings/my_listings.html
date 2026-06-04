@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}My Listings — Rentify{% endblock %}
+{% block body_class %}page-my-listings{% endblock %}
+
+{% block content %}
+<div class="dash-app">
+
+  <div class="hub-hero" style="display:flex;justify-content:space-between;align-items:flex-end;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <div class="hub-eyebrow">Owner Hub</div>
+      <h1 class="hub-title">My Listings</h1>
+      <p class="hub-sub">{{ listings|length }} listing{{ listings|length|pluralize }} · Manage your inventory</p>
+    </div>
+    <a href="{% url 'create_listing' %}" class="dash-btn dash-btn--primary"><i class="bi bi-plus-lg"></i> Create Listing</a>
+  </div>
+
+  {% if listings %}
+  <div class="hub-stats">
+    <div class="dash-stat" style="cursor:default;">
+      <div class="dash-stat-icon dash-stat-icon--green"><i class="bi bi-box-seam-fill"></i></div>
+      <div><div class="dash-stat-val">{{ listings|length }}</div><div class="dash-stat-lbl">Total</div></div>
+    </div>
+    <div class="dash-stat" style="cursor:default;">
+      <div class="dash-stat-icon dash-stat-icon--blue"><i class="bi bi-check-circle-fill"></i></div>
+      <div><div class="dash-stat-val">{{ active_count }}</div><div class="dash-stat-lbl">Active</div></div>
+    </div>
+    <div class="dash-stat" style="cursor:default;">
+      <div class="dash-stat-icon dash-stat-icon--gold"><i class="bi bi-eye-fill"></i></div>
+      <div><div class="dash-stat-val">{{ total_views }}</div><div class="dash-stat-lbl">Views</div></div>
+    </div>
+    <div class="dash-stat" style="cursor:default;">
+      <div class="dash-stat-icon dash-stat-icon--purple"><i class="bi bi-currency-rupee"></i></div>
+      <div><div class="dash-stat-val">₹{{ request.user.profile.total_earnings|floatformat:0 }}</div><div class="dash-stat-lbl">Earnings</div></div>
+    </div>
+  </div>
+
+  <div class="hub-card-grid">
+    {% for listing in listings %}
+    {% include 'listings/_owner_listing_card.html' with listing=listing %}
+    {% endfor %}
+  </div>
+
+  {% else %}
+  <div class="hub-empty">
+    <div class="hub-empty-icon"><i class="bi bi-box-seam"></i></div>
+    <h3>No Listings Yet</h3>
+    <p>Start earning by listing your first item.</p>
+    <a href="{% url 'create_listing' %}" class="dash-btn dash-btn--primary"><i class="bi bi-plus-lg"></i> Create Listing</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% block title %}Notifications — Rentify{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:720px;">
+  <div class="d-flex justify-content-between align-items-center mb-5 flex-wrap gap-3">
+    <div>
+      <h2 style="font-weight:800;margin-bottom:.2rem;">Notifications</h2>
+      <p class="text-muted mb-0" style="font-size:.875rem;">{{ notifications|length }} notification{{ notifications|length|pluralize }}</p>
+    </div>
+    <a href="{% url 'mark_all_read' %}" class="btn btn-outline-secondary btn-sm rounded-pill px-3">
+      <i class="bi bi-check2-all me-1"></i>Mark All Read
+    </a>
+  </div>
+
+  {% if notifications %}
+  <div class="card border-0 shadow-sm" style="border-radius:var(--radius);overflow:hidden;">
+    {% for n in notifications %}
+    <a href="{% url 'mark_notification_read' n.pk %}" class="notif-row {% if not n.is_read %}unread{% endif %}">
+      <div style="width:42px;height:42px;border-radius:50%;background:var(--primary-light);color:var(--primary);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.95rem;">
+        <i class="bi {{ n.get_icon }}"></i>
+      </div>
+      <div class="flex-grow-1">
+        <div style="font-size:.875rem;font-weight:{% if not n.is_read %}600{% else %}400{% endif %};line-height:1.5;">{{ n.message }}</div>
+        <div style="font-size:.72rem;color:var(--text-muted);margin-top:.2rem;">{{ n.created_at|timesince }} ago</div>
+      </div>
+      {% if not n.is_read %}<div class="notif-dot flex-shrink-0"></div>{% endif %}
+    </a>
+    {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state">
+    <div class="empty-icon"><i class="bi bi-bell-slash"></i></div>
+    <h4>All caught up!</h4>
+    <p>You have no notifications right now.</p>
+    <a href="{% url 'home' %}" class="btn btn-primary px-5 rounded-pill">Go to Home</a>
+  </div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,50 @@
+{% extends 'base.html' %}
+{% block title %}Write a Review — Rentify{% endblock %}
+{% block content %}
+<div class="container py-5" style="max-width:600px;">
+  <div class="card border-0 shadow-sm" style="border-radius:20px;">
+    <div class="card-body p-4 p-md-5">
+
+      <!-- Product preview -->
+      <div class="d-flex gap-3 align-items-center mb-4 p-3 rounded-3" style="background:var(--bg);">
+        <img src="{{ product.get_primary_image }}" style="width:60px;height:52px;border-radius:8px;object-fit:cover;">
+        <div>
+          <div style="font-weight:700;font-size:.9rem;">{{ product.title }}</div>
+          <div style="font-size:.75rem;color:var(--text-muted);">Rented {{ booking.start_date|date:"d M Y" }} – {{ booking.end_date|date:"d M Y" }}</div>
+        </div>
+      </div>
+
+      <h4 style="font-weight:800;margin-bottom:.4rem;">How was your experience?</h4>
+      <p class="text-muted mb-4" style="font-size:.875rem;">Your honest review helps the community make better decisions.</p>
+
+      <form method="post" novalidate>
+        {% csrf_token %}
+        <!-- Star rating widget -->
+        <div class="mb-4">
+          <label class="form-label">Rating</label>
+          <div class="star-rating-widget d-flex gap-2">
+            {% for i in "12345" %}
+            <button type="button" class="star-btn btn btn-link p-0" data-value="{{ forloop.counter }}" aria-label="{{ forloop.counter }} stars">
+              <i class="bi bi-star" style="font-size:2rem;color:#D1D5DB;transition:.15s;"></i>
+            </button>
+            {% endfor %}
+          </div>
+          <!-- Hidden input carrying actual value -->
+          <input type="hidden" name="rating" id="rating-value" value="">
+          {% if form.rating.errors %}<div class="text-danger mt-1" style="font-size:.8rem;">Please select a star rating.</div>{% endif %}
+        </div>
+
+        <div class="mb-4">
+          <label class="form-label">Your Review</label>
+          {{ form.comment }}
+          {% if form.comment.errors %}<div class="text-danger mt-1" style="font-size:.8rem;">{{ form.comment.errors.0 }}</div>{% endif %}
+        </div>
+
+        <button type="submit" class="btn btn-primary w-100 btn-lg rounded-pill">
+          <i class="bi bi-star-fill me-2"></i>Submit Review
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

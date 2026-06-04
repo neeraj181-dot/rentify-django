@@ -1,0 +1,95 @@
+{% extends 'base.html' %}{% load static %}
+{% block title %}{{ category_name }} for Rent — Rentify{% endblock %}
+{% block content %}
+<div class="mk">
+  <!-- hero banner -->
+  <div style="background:linear-gradient(135deg,var(--bg2),var(--surf));border-bottom:1px solid var(--border);padding:3rem 0 2.5rem;">
+    <div class="mk-wrap">
+      <div style="display:flex;align-items:center;gap:1.5rem;flex-wrap:wrap;">
+        <div style="width:72px;height:72px;border-radius:var(--r-lg);background:var(--gdim);border:1px solid var(--gborder);display:flex;align-items:center;justify-content:center;font-size:2.2rem;flex-shrink:0;">
+          <i class="bi {{ category_icon }}" style="color:var(--green);"></i>
+        </div>
+        <div>
+          <div class="sec-label">Category</div>
+          <h1 class="t-h1" style="margin:.2rem 0;">{{ category_name }}</h1>
+          <p style="font-size:.875rem;color:var(--text3);margin:0;">{{ total_count }} listing{{ total_count|pluralize }} available to rent</p>
+        </div>
+        <a href="{% url 'create_listing' %}" class="btn btn-primary" style="margin-left:auto;">
+          <i class="bi bi-plus-lg"></i> List a {{ category_name }}
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <div class="mk-wrap" style="padding-top:2.5rem;padding-bottom:4rem;">
+    <div style="display:grid;grid-template-columns:240px 1fr;gap:2rem;align-items:start;">
+
+      <!-- sidebar -->
+      <div class="filter-sidebar d-none d-lg-block">
+        <form method="get">
+          <div class="filter-group">
+            <div class="filter-title">Price per Day (₹)</div>
+            <div class="price-row">
+              <input type="number" name="min_price" class="mk-input" placeholder="Min" value="{{ request.GET.min_price }}">
+              <input type="number" name="max_price" class="mk-input" placeholder="Max" value="{{ request.GET.max_price }}">
+            </div>
+          </div>
+          <div class="filter-group">
+            <div class="filter-title">Location</div>
+            <input type="text" name="location" class="mk-input" placeholder="City or area" value="{{ request.GET.location }}">
+          </div>
+          <div class="filter-group">
+            <div class="filter-title">Sort By</div>
+            <select name="sort" class="mk-select">
+              <option value="newest">Newest</option>
+              <option value="price_low" {% if request.GET.sort == 'price_low' %}selected{% endif %}>Price ↑</option>
+              <option value="price_high" {% if request.GET.sort == 'price_high' %}selected{% endif %}>Price ↓</option>
+              <option value="rating" {% if request.GET.sort == 'rating' %}selected{% endif %}>Top Rated</option>
+            </select>
+          </div>
+          <button type="submit" class="btn btn-primary" style="width:100%;">Apply</button>
+          <a href="{% url 'category_detail' category_slug %}" class="btn btn-ghost" style="width:100%;margin-top:.5rem;text-align:center;">Reset</a>
+        </form>
+      </div>
+
+      <!-- grid -->
+      <div>
+        {% if products %}
+        <div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:1.25rem;">
+          {% for product in products %}
+          <div class="reveal d{{ forloop.counter|add:'0'|slice:'-1' }}">
+            {% include 'listings/_product_card.html' with product=product %}
+          </div>
+          {% endfor %}
+        </div>
+
+        {% if products.has_other_pages %}
+        <div class="mk-pages">
+          {% if products.has_previous %}<a class="pg-btn" href="?page={{ products.previous_page_number }}"><i class="bi bi-chevron-left"></i></a>{% endif %}
+          {% for n in products.paginator.page_range %}
+            {% if products.number == n %}<span class="pg-btn active">{{ n }}</span>
+            {% elif n > products.number|add:"-3" and n < products.number|add:"3" %}<a class="pg-btn" href="?page={{ n }}">{{ n }}</a>{% endif %}
+          {% endfor %}
+          {% if products.has_next %}<a class="pg-btn" href="?page={{ products.next_page_number }}"><i class="bi bi-chevron-right"></i></a>{% endif %}
+        </div>
+        {% endif %}
+
+        {% else %}
+        <div class="empty-state">
+          <i class="bi bi-inbox es-icon"></i>
+          <h3>No {{ category_name }} listings yet</h3>
+          <p>Be the first to list a {{ category_name|lower }} and start earning!</p>
+          <a href="{% url 'create_listing' %}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> List Yours</a>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+{% block extra_js %}
+<script>
+const io=new IntersectionObserver(es=>es.forEach((e,i)=>{if(e.isIntersecting){e.target.style.transitionDelay=(i%6*.07)+'s';e.target.classList.add('in');io.unobserve(e.target);}}),{threshold:.07});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+</script>
+{% endblock %}
+{% endblock %}

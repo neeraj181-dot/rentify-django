@@ -1,0 +1,274 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Booking #{{ booking.pk }} — Rentify{% endblock %}
+
+{% block extra_css %}
+<style>
+.bd-wrap { max-width: 960px; margin: 0 auto; padding: 2rem 1.25rem 5rem; }
+.bd-status-bar {
+  display: flex; justify-content: space-between; align-items: center;
+  flex-wrap: wrap; gap: 1rem; margin-bottom: 1.75rem;
+}
+.bd-id { font-size: 1.25rem; font-weight: 900; color: #EEF0FF; margin: 0 0 .2rem; }
+.bd-meta { font-size: .75rem; color: rgba(238,240,255,.35); }
+.status-chip {
+  display: inline-flex; align-items: center; gap: .35rem;
+  padding: .4rem 1rem; border-radius: 50px; font-size: .82rem; font-weight: 700;
+}
+.sc-pending   { background: rgba(245,158,11,.12); color: #F59E0B; border: 1px solid rgba(245,158,11,.25); }
+.sc-approved  { background: rgba(79,142,247,.12); color: #4F8EF7; border: 1px solid rgba(79,142,247,.25); }
+.sc-completed { background: rgba(0,208,132,.12); color: #00D084; border: 1px solid rgba(0,208,132,.25); }
+.sc-cancelled,.sc-rejected { background: rgba(255,82,114,.1); color: #FF5272; border: 1px solid rgba(255,82,114,.2); }
+.sc-active    { background: rgba(167,139,250,.12); color: #A78BFA; border: 1px solid rgba(167,139,250,.25); }
+
+.bd-grid { display: grid; grid-template-columns: 1fr 320px; gap: 1.5rem; align-items: start; }
+@media (max-width: 768px) { .bd-grid { grid-template-columns: 1fr; } }
+
+.bd-card {
+  background: #101428; border: 1px solid rgba(255,255,255,.08);
+  border-radius: 16px; overflow: hidden; margin-bottom: 1rem;
+}
+.bd-card-head {
+  padding: .9rem 1.25rem;
+  border-bottom: 1px solid rgba(255,255,255,.07);
+  font-size: .68rem; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .1em; color: rgba(238,240,255,.35);
+  display: flex; align-items: center; gap: .5rem;
+}
+.bd-card-body { padding: 1.25rem; }
+
+/* Product row */
+.prod-row {
+  display: flex; align-items: center; gap: 1rem;
+  padding: 1rem 1.25rem; text-decoration: none; color: #EEF0FF;
+  transition: background .15s;
+}
+.prod-row:hover { background: rgba(255,255,255,.03); }
+.prod-row img { width: 72px; height: 60px; border-radius: 10px; object-fit: cover; flex-shrink: 0; border: 1px solid rgba(255,255,255,.08); }
+.prod-title { font-weight: 700; font-size: .9rem; color: #EEF0FF; }
+.prod-loc { font-size: .74rem; color: rgba(238,240,255,.4); margin-top: .15rem; display: flex; align-items: center; gap: .3rem; }
+
+/* Dates */
+.date-grid { display: grid; grid-template-columns: 1fr 1px 1fr 1px 1fr; gap: 0; }
+.date-cell { padding: 1rem 1.25rem; }
+.date-div { background: rgba(255,255,255,.07); align-self: stretch; }
+.date-lbl { font-size: .65rem; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: rgba(238,240,255,.3); margin-bottom: .3rem; }
+.date-val { font-size: 1rem; font-weight: 800; color: #EEF0FF; }
+.date-val.green { color: #00D084; }
+@media (max-width: 500px) {
+  .date-grid { grid-template-columns: 1fr; }
+  .date-div { display: none; }
+}
+
+/* Notes */
+.note-block {
+  padding: 1rem 1.25rem;
+  font-size: .875rem; color: rgba(238,240,255,.6);
+  font-style: italic; line-height: 1.65;
+  border-left: 3px solid rgba(0,208,132,.3);
+  margin: 0;
+}
+
+/* Action buttons */
+.bd-actions { display: flex; gap: .65rem; flex-wrap: wrap; padding: 1rem 1.25rem; border-top: 1px solid rgba(255,255,255,.07); }
+.bd-btn {
+  display: inline-flex; align-items: center; gap: .4rem;
+  padding: .6rem 1.3rem; border-radius: 50px; font-size: .82rem;
+  font-weight: 700; border: none; cursor: pointer;
+  font-family: 'Inter', sans-serif; transition: all .18s; text-decoration: none;
+}
+.bd-btn-primary { background: #00D084; color: #000; }
+.bd-btn-primary:hover { background: #00F59A; transform: translateY(-1px); color: #000; }
+.bd-btn-blue { background: rgba(79,142,247,.12); color: #4F8EF7; border: 1px solid rgba(79,142,247,.25); }
+.bd-btn-blue:hover { background: rgba(79,142,247,.2); color: #4F8EF7; }
+.bd-btn-danger { background: rgba(255,82,114,.1); color: #FF5272; border: 1px solid rgba(255,82,114,.22); }
+.bd-btn-danger:hover { background: rgba(255,82,114,.18); color: #FF5272; }
+.bd-btn-outline { background: rgba(255,255,255,.05); color: rgba(238,240,255,.65); border: 1.5px solid rgba(255,255,255,.1); }
+.bd-btn-outline:hover { background: rgba(255,255,255,.09); color: #EEF0FF; }
+.bd-btn-gold { background: rgba(245,158,11,.1); color: #F59E0B; border: 1px solid rgba(245,158,11,.25); }
+.bd-btn-gold:hover { background: rgba(245,158,11,.18); color: #F59E0B; }
+
+/* Price card */
+.price-card { background: #101428; border: 1px solid rgba(255,255,255,.08); border-radius: 16px; overflow: hidden; position: sticky; top: 80px; }
+.price-row { display: flex; justify-content: space-between; align-items: center; padding: .65rem 1.25rem; border-bottom: 1px solid rgba(255,255,255,.05); font-size: .85rem; }
+.price-row:last-child { border-bottom: none; }
+.price-row .pl { color: rgba(238,240,255,.5); }
+.price-row .pv { font-weight: 600; color: #EEF0FF; }
+.price-total { display: flex; justify-content: space-between; align-items: center; padding: 1rem 1.25rem; background: rgba(0,208,132,.05); border-top: 1px solid rgba(0,208,132,.15); }
+.pt-lbl { font-weight: 800; font-size: .9rem; color: #EEF0FF; }
+.pt-val { font-size: 1.35rem; font-weight: 900; color: #00D084; }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="bd-wrap">
+
+  <!-- Status bar -->
+  <div class="bd-status-bar">
+    <div>
+      <div class="bd-id">Booking #{{ booking.pk }}</div>
+      <div class="bd-meta">
+        <i class="bi bi-clock me-1"></i>Requested {{ booking.created_at|date:"M d, Y" }} at {{ booking.created_at|time:"H:i" }}
+      </div>
+    </div>
+    <span class="status-chip sc-{{ booking.status }}">
+      <i class="bi {{ booking.get_status_icon }}"></i>
+      {{ booking.get_status_display }}
+    </span>
+  </div>
+
+  <div class="bd-grid">
+    <!-- LEFT -->
+    <div>
+
+      <!-- Product -->
+      <div class="bd-card">
+        <div class="bd-card-head"><i class="bi bi-box-seam" style="color:#4F8EF7;"></i> Item Being Rented</div>
+        <a href="{% url 'product_detail' booking.product.pk %}" class="prod-row">
+          <img src="{{ booking.product.get_primary_image }}" alt="{{ booking.product.title }}"
+               onerror="this.src='https://placehold.co/72x60/101428/4F8EF7?text=📦'">
+          <div>
+            <div class="prod-title">{{ booking.product.title }}</div>
+            <div class="prod-loc"><i class="bi bi-geo-alt" style="font-size:.65rem;"></i>{{ booking.product.get_public_location }}</div>
+          </div>
+          <i class="bi bi-chevron-right" style="margin-left:auto;color:rgba(238,240,255,.2);font-size:.8rem;"></i>
+        </a>
+      </div>
+
+      <!-- Dates -->
+      <div class="bd-card">
+        <div class="bd-card-head"><i class="bi bi-calendar3" style="color:#00D084;"></i> Rental Period</div>
+        <div class="date-grid">
+          <div class="date-cell">
+            <div class="date-lbl">Check-in</div>
+            <div class="date-val">{{ booking.start_date|date:"d M Y" }}</div>
+          </div>
+          <div class="date-div"></div>
+          <div class="date-cell">
+            <div class="date-lbl">Return</div>
+            <div class="date-val">{{ booking.end_date|date:"d M Y" }}</div>
+          </div>
+          <div class="date-div"></div>
+          <div class="date-cell">
+            <div class="date-lbl">Duration</div>
+            <div class="date-val green">{{ booking.total_days }} day{{ booking.total_days|pluralize }}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Notes -->
+      {% if booking.renter_note or booking.owner_note %}
+      <div class="bd-card">
+        <div class="bd-card-head"><i class="bi bi-chat-quote" style="color:#A78BFA;"></i> Notes</div>
+        {% if booking.renter_note %}
+        <div style="padding:.75rem 1.25rem 0;">
+          <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(238,240,255,.3);margin-bottom:.4rem;">From Renter</div>
+          <p class="note-block">"{{ booking.renter_note }}"</p>
+        </div>
+        {% endif %}
+        {% if booking.owner_note %}
+        <div style="padding:.75rem 1.25rem 0;">
+          <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.09em;color:rgba(238,240,255,.3);margin-bottom:.4rem;">From Owner</div>
+          <p class="note-block" style="border-color:rgba(79,142,247,.35);">"{{ booking.owner_note }}"</p>
+        </div>
+        {% endif %}
+        <div style="padding:.75rem;"></div>
+      </div>
+      {% endif %}
+
+      <!-- Actions -->
+      <div class="bd-card">
+        <div class="bd-card-head"><i class="bi bi-lightning-charge-fill" style="color:#F59E0B;"></i> Actions</div>
+        <div class="bd-actions">
+          {% if request.user == booking.renter %}
+            {% if booking.status == 'completed' and not booking.review %}
+            <a href="{% url 'create_review' booking.pk %}" class="bd-btn bd-btn-gold">
+              <i class="bi bi-star-fill"></i> Write Review
+            </a>
+            {% endif %}
+            {% if booking.status == 'pending' or booking.status == 'approved' %}
+            <form method="post" action="{% url 'cancel_booking' booking.pk %}" style="margin:0;">
+              {% csrf_token %}
+              <button type="submit" class="bd-btn bd-btn-danger" onclick="return confirm('Cancel this booking?')">
+                <i class="bi bi-x-circle"></i> Cancel Booking
+              </button>
+            </form>
+            {% endif %}
+          {% endif %}
+
+          {% if request.user == booking.product.owner %}
+            {% if booking.status == 'pending' %}
+            <form method="post" action="{% url 'approve_booking' booking.pk %}" style="margin:0;">
+              {% csrf_token %}
+              <button class="bd-btn bd-btn-primary"><i class="bi bi-check-circle-fill"></i> Approve</button>
+            </form>
+            <form method="post" action="{% url 'reject_booking' booking.pk %}" style="margin:0;">
+              {% csrf_token %}
+              <button class="bd-btn bd-btn-danger"><i class="bi bi-x-circle-fill"></i> Reject</button>
+            </form>
+            {% elif booking.status == 'approved' %}
+            <form method="post" action="{% url 'mark_returned' booking.pk %}" style="margin:0;">
+              {% csrf_token %}
+              <button class="bd-btn bd-btn-primary"><i class="bi bi-box-arrow-in-down"></i> Mark Returned</button>
+            </form>
+            {% endif %}
+          {% endif %}
+
+          <a href="{% url 'start_conversation' booking.product.owner.username %}" class="bd-btn bd-btn-outline ms-auto">
+            <i class="bi bi-chat-text"></i> Message
+          </a>
+        </div>
+      </div>
+    </div>
+
+    <!-- RIGHT — Price card -->
+    <div>
+      <div class="price-card">
+        <div class="bd-card-head" style="padding:.9rem 1.25rem;border-bottom:1px solid rgba(255,255,255,.07);">
+          <i class="bi bi-receipt" style="color:#00D084;"></i> Price Summary
+        </div>
+        <div class="price-row">
+          <span class="pl">₹{{ booking.price_per_day }}/day × {{ booking.total_days }} day{{ booking.total_days|pluralize }}</span>
+          <span class="pv">₹{{ booking.rental_cost|floatformat:0 }}</span>
+        </div>
+        <div class="price-row">
+          <span class="pl">Security deposit</span>
+          <span class="pv">₹{{ booking.security_deposit|floatformat:0 }}</span>
+        </div>
+        <div class="price-total">
+          <span class="pt-lbl">Total Paid</span>
+          <span class="pt-val">₹{{ booking.total_amount|floatformat:0 }}</span>
+        </div>
+        <div style="padding:.85rem 1.25rem;font-size:.72rem;color:rgba(238,240,255,.3);line-height:1.6;border-top:1px solid rgba(255,255,255,.05);">
+          <i class="bi bi-shield-fill-check" style="color:#00D084;margin-right:.3rem;"></i>
+          Deposit is refunded after safe return is confirmed by the owner.
+        </div>
+      </div>
+
+      <!-- Owner info -->
+      <div style="background:#101428;border:1px solid rgba(255,255,255,.08);border-radius:16px;padding:1.1rem 1.25rem;margin-top:1rem;">
+        <div style="font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:rgba(238,240,255,.3);margin-bottom:.85rem;">Owner</div>
+        <div style="display:flex;align-items:center;gap:.75rem;">
+          <img src="{{ booking.product.owner.profile.get_photo_url }}"
+               style="width:42px;height:42px;border-radius:50%;object-fit:cover;border:2px solid rgba(0,208,132,.25);flex-shrink:0;"
+               onerror="this.src='https://placehold.co/42/4F8EF7/fff?text={{ booking.product.owner.username|first|upper }}'">
+          <div>
+            <a href="{% url 'public_profile' booking.product.owner.username %}"
+               style="font-weight:700;font-size:.875rem;color:#EEF0FF;text-decoration:none;">
+              {{ booking.product.owner.get_full_name|default:booking.product.owner.username }}
+              {% if booking.product.owner.profile.is_verified %}
+              <i class="bi bi-patch-check-fill" style="color:#4F8EF7;font-size:.75rem;margin-left:.2rem;"></i>
+              {% endif %}
+            </a>
+            <div style="font-size:.7rem;color:rgba(238,240,255,.35);margin-top:.1rem;">
+              <i class="bi bi-star-fill" style="color:#F59E0B;font-size:.6rem;"></i>
+              {{ booking.product.owner.profile.rating|floatformat:1 }} · Member since {{ booking.product.owner.date_joined|date:"M Y" }}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+{% endblock %}

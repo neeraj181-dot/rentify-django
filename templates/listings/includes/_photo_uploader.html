@@ -1,0 +1,23 @@
+<div class="rfy-photo-uploader"
+     data-mode="{{ uploader_mode|default:'create' }}"
+     {% if product %}data-product-id="{{ product.pk }}"{% endif %}>
+  {% if uploader_mode == 'edit' and product %}
+  <script type="application/json" class="rfy-photo-existing-json">[
+{% for img in product.images.all %}{"id":{{ img.pk }},"url":"{{ img.image.url|escapejs }}","isCover":{% if img.is_primary %}true{% else %}false{% endif %}}{% if not forloop.last %},{% endif %}
+{% endfor %}
+]</script>
+  {% endif %}
+  <div class="rfy-photo-grid"></div>
+  <div class="rfy-photo-hidden-inputs"></div>
+  <input type="file" class="rfy-photo-picker" accept="image/*" multiple hidden aria-hidden="true">
+
+  <p class="rfy-photo-hint">
+    <i class="bi bi-info-circle me-1"></i>
+    Up to 5 photos · First upload is cover · Hover for actions
+  </p>
+</div>
+
+<div class="rfy-photo-viewer" id="rfyPhotoViewer" role="dialog" aria-modal="true" aria-label="Photo preview">
+  <button type="button" class="rfy-photo-viewer-close" aria-label="Close"><i class="bi bi-x-lg"></i></button>
+  <img src="" alt="Preview">
+</div>

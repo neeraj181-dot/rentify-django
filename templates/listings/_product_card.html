@@ -1,0 +1,102 @@
+{% load static %}
+<div style="background:#101428;border:1px solid rgba(255,255,255,.08);border-radius:16px;overflow:hidden;display:flex;flex-direction:column;transition:border-color .2s,transform .25s,box-shadow .25s;height:100%;"
+     onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 16px 48px rgba(0,0,0,.6),0 0 0 1px rgba(0,208,132,.12)';this.style.borderColor='rgba(0,208,132,.25)'"
+     onmouseout="this.style.transform='';this.style.boxShadow='';this.style.borderColor='rgba(255,255,255,.08)'">
+
+  <!-- Image -->
+  <div style="position:relative;overflow:hidden;aspect-ratio:4/3;">
+    <a href="{% url 'product_detail' product.pk %}" style="display:block;height:100%;">
+      <img src="{{ product.get_primary_image }}"
+           alt="{{ product.title }}"
+           loading="lazy"
+           style="width:100%;height:100%;object-fit:cover;display:block;transition:transform .45s ease;"
+           onmouseover="this.style.transform='scale(1.05)'"
+           onmouseout="this.style.transform='scale(1)'"
+           onerror="this.src='https://placehold.co/400x300/0d1020/00D084?text=No+Photo'">
+    </a>
+
+    <!-- Status ribbon -->
+    {% if not product.is_available %}
+    <span style="position:absolute;top:.65rem;left:.65rem;background:rgba(255,255,255,.07);color:rgba(238,240,255,.5);border:1px solid rgba(255,255,255,.1);border-radius:50px;font-size:.62rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:.2rem .65rem;">
+      Unavailable
+    </span>
+    {% elif product.rating >= 4.5 and product.total_reviews >= 3 %}
+    <span style="position:absolute;top:.65rem;left:.65rem;background:linear-gradient(90deg,#F59E0B,#EF4444);color:#fff;border-radius:50px;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.05em;padding:.22rem .65rem;">
+      ⭐ Top Rated
+    </span>
+    {% else %}
+    <span style="position:absolute;top:.65rem;left:.65rem;background:rgba(0,208,132,.12);color:#00D084;border:1px solid rgba(0,208,132,.22);border-radius:50px;font-size:.62rem;font-weight:700;padding:.22rem .65rem;">
+      <i class="bi bi-circle-fill" style="font-size:.3rem;vertical-align:middle;margin-right:.25rem;"></i>Available
+    </span>
+    {% endif %}
+
+    <!-- Wishlist button -->
+    {% if request.user.is_authenticated %}
+    <button data-pid="{{ product.pk }}"
+            onclick="event.preventDefault();event.stopPropagation();wlToggle(this)"
+            class="{% if product.pk in wishlist_ids %}on{% endif %}"
+            aria-label="Save to wishlist"
+            style="position:absolute;top:.65rem;right:.65rem;width:34px;height:34px;border-radius:50%;background:rgba(9,12,26,.75);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center;cursor:pointer;transition:all .18s;font-size:.85rem;color:{% if product.pk in wishlist_ids %}#FF5272{% else %}rgba(238,240,255,.55){% endif %};">
+      <i class="bi {% if product.pk in wishlist_ids %}bi-heart-fill{% else %}bi-heart{% endif %}"></i>
+    </button>
+    {% endif %}
+  </div>
+
+  <!-- Card body -->
+  <div style="padding:.95rem 1rem 1rem;display:flex;flex-direction:column;flex:1;">
+
+    <!-- Title -->
+    <a href="{% url 'product_detail' product.pk %}"
+       style="font-weight:700;font-size:.9rem;color:#EEF0FF;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:.3rem;text-decoration:none;"
+       onmouseover="this.style.color='#00D084'"
+       onmouseout="this.style.color='#EEF0FF'">
+      {{ product.title }}
+    </a>
+
+    <!-- Location -->
+    <div style="font-size:.73rem;color:rgba(238,240,255,.35);display:flex;align-items:center;gap:.25rem;margin-bottom:.65rem;">
+      <i class="bi bi-geo-alt" style="font-size:.65rem;"></i>
+      {{ product.get_public_location }}
+    </div>
+
+    <!-- Price + Rating -->
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:.65rem;">
+      <div>
+        <span style="font-size:1.05rem;font-weight:900;color:#00D084;">₹{{ product.price_per_day }}</span>
+        <span style="font-size:.65rem;color:rgba(238,240,255,.35);">/day</span>
+      </div>
+      <div style="display:flex;align-items:center;gap:.25rem;">
+        <i class="bi bi-star-fill" style="color:#F59E0B;font-size:.68rem;"></i>
+        <span style="font-size:.8rem;font-weight:700;color:rgba(238,240,255,.75);">{{ product.rating|floatformat:1 }}</span>
+        <span style="font-size:.72rem;color:rgba(238,240,255,.32);">({{ product.total_reviews }})</span>
+      </div>
+    </div>
+
+    <!-- Owner row -->
+    <div style="display:flex;align-items:center;gap:.5rem;padding-top:.6rem;border-top:1px solid rgba(255,255,255,.06);margin-bottom:.85rem;">
+      <img src="{{ product.owner.profile.get_photo_url }}"
+           style="width:20px;height:20px;border-radius:50%;object-fit:cover;flex-shrink:0;"
+           onerror="this.src='https://placehold.co/20/4F8EF7/fff?text={{ product.owner.username|first|upper }}'">
+      <span style="font-size:.72rem;color:rgba(238,240,255,.38);overflow:hidden;white-space:nowrap;text-overflow:ellipsis;">
+        {{ product.owner.get_full_name|default:product.owner.username }}
+      </span>
+      {% if product.owner.profile.is_verified %}
+      <i class="bi bi-patch-check-fill" style="color:#4F8EF7;font-size:.7rem;margin-left:auto;flex-shrink:0;" title="Verified Owner"></i>
+      {% endif %}
+    </div>
+
+    <!-- View Details button -->
+    <a href="{% url 'product_detail' product.pk %}"
+       style="display:flex;align-items:center;justify-content:center;gap:.4rem;
+              background:rgba(0,208,132,.1);color:#00D084;
+              border:1.5px solid rgba(0,208,132,.22);
+              border-radius:50px;padding:.55rem .9rem;
+              font-size:.8rem;font-weight:700;text-decoration:none;
+              transition:all .18s;margin-top:auto;"
+       onmouseover="this.style.background='#00D084';this.style.color='#000'"
+       onmouseout="this.style.background='rgba(0,208,132,.1)';this.style.color='#00D084'">
+      View Details <i class="bi bi-arrow-right" style="font-size:.75rem;"></i>
+    </a>
+
+  </div>
+</div>

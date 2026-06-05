@@ -7,6 +7,9 @@
            onerror="this.src='https://placehold.co/72/101428/00D084?text={{ request.user.username|first|upper }}'">
       <div class="rfy-dd-identity">
         <div class="rfy-dd-name">{{ request.user.get_full_name|default:request.user.username }}</div>
+        {% if request.user.profile.is_premium %}
+        <div class="rfy-dd-premium"><i class="bi bi-patch-check-fill"></i> Premium Member</div>
+        {% endif %}
         {% if request.user.profile.address %}
         <div class="rfy-dd-loc"><i class="bi bi-geo-alt-fill"></i> {{ request.user.profile.address|truncatechars:28 }}</div>
         {% endif %}

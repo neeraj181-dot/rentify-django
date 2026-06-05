@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Premium — Rentify{% endblock %}
+{% block body_class %}page-premium{% endblock %}
+
+{% block content %}
+<section style="padding: 4rem 1.5rem; max-width: 1120px; margin: 0 auto;">
+  <div style="display:grid;grid-template-columns:1.2fr .8fr;gap:2rem;align-items:start;">
+    <div>
+      <div class="premium-hero-pill">
+        <i class="bi bi-stars"></i> Premium
+      </div>
+      <h1 class="premium-hero-title">Unlock Rentify Premium for smarter rentals.</h1>
+      <p class="premium-hero-copy">
+        Upgrade to premium access and get unlimited messaging, owner contact details, premium seller visibility, and priority benefits across the marketplace.
+      </p>
+
+      <div class="premium-feature-grid">
+        <div class="premium-feature-card">
+          <div class="premium-feature-title"><i class="bi bi-patch-check-fill"></i> Unlimited Messaging</div>
+          <p>Chat without daily caps and connect with more owners.</p>
+        </div>
+        <div class="premium-feature-card">
+          <div class="premium-feature-title"><i class="bi bi-patch-check-fill"></i> View Owner Phone Number</div>
+          <p>See verified owner phone numbers on eligible listings.</p>
+        </div>
+        <div class="premium-feature-card">
+          <div class="premium-feature-title"><i class="bi bi-patch-check-fill"></i> View Owner Address</div>
+          <p>Access extra listing details for trusted booking decisions.</p>
+        </div>
+        <div class="premium-feature-card">
+          <div class="premium-feature-title"><i class="bi bi-patch-check-fill"></i> Premium Badge</div>
+          <p>Show off the premium mark and stand out as a trusted member.</p>
+        </div>
+      </div>
+
+      {% if is_premium %}
+      <div class="premium-status-chip">
+        <i class="bi bi-patch-check-fill"></i>
+        You are already a Premium member.
+      </div>
+      {% else %}
+      <a href="{% url 'premium_dashboard' %}" class="rfy-premium-btn premium-hero-cta">Upgrade Now</a>
+      {% endif %}
+    </div>
+
+    <div class="premium-card-panel">
+      <div>
+        <p class="premium-plan-tag">Limited Launch Offer</p>
+        <h2 class="premium-card-title">₹1 Premium Access</h2>
+        <p class="premium-card-subtitle">Temporary testing price for access to all Rentify Premium benefits.</p>
+      </div>
+      <p class="premium-card-description">Upgrade once and unlock unlimited messaging, direct owner contact details, priority placement, and a premium profile badge across Rentify.</p>
+      <div class="premium-benefit-list">
+        <div class="premium-benefit-row">
+          <i class="bi bi-patch-check-fill"></i>
+          Unlimited messaging access
+        </div>
+        <div class="premium-benefit-row">
+          <i class="bi bi-patch-check-fill"></i>
+          Contact owner phone number and address
+        </div>
+        <div class="premium-benefit-row">
+          <i class="bi bi-patch-check-fill"></i>
+          Premium profile badge and listing priority
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+{% endblock %}

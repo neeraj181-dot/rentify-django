@@ -2,13 +2,15 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
-from accounts.views import health_check
+from accounts.views import health_check, premium_view, premium_dashboard_view
 
 urlpatterns = [
     path('admin/', admin.site.urls),
 
     path('api/health', health_check, name='health_check'),
     path('api/health/', health_check, name='health_check_slash'),
+    path('premium/', premium_view, name='premium'),
+    path('premium/dashboard/', premium_dashboard_view, name='premium_dashboard'),
 
     path('', include('listings.urls')),
 

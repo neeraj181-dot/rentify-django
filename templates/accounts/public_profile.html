@@ -19,10 +19,13 @@
         {% if profile_user.profile.is_verified %}
         <i class="bi bi-patch-check-fill" style="color:#4F8EF7;font-size:.85rem;margin-left:.25rem;" title="Verified"></i>
         {% endif %}
+        {% if profile_user.profile.is_premium %}
+        <span class="pp-premium-badge"><i class="bi bi-patch-check-fill"></i> Premium</span>
+        {% endif %}
       </h1>
       <div class="pp-meta">
         <span class="pp-handle">@{{ profile_user.username }}</span>
-        {% if profile_user.profile.address %}
+        {% if profile_user.profile.address and can_view_contact %}
         <span class="pp-loc"><i class="bi bi-geo-alt-fill"></i> {{ profile_user.profile.address }}</span>
         {% endif %}
         <span class="pp-badge {% if profile_user.profile.is_verified or profile_user.profile.total_reviews >= 3 %}pp-badge--trusted{% endif %}">
@@ -68,7 +71,7 @@
       <p class="pp-bio" style="font-style:italic;opacity:.7;">No bio yet.</p>
       {% endif %}
 
-      {% if profile_user.profile.phone %}
+      {% if profile_user.profile.phone and can_view_contact %}
       <div class="pp-info-row">
         <i class="bi bi-telephone-fill"></i>
         <span>{{ profile_user.profile.phone }}</span>
@@ -82,6 +85,13 @@
       <div class="pp-info-row">
         <i class="bi bi-star-fill" style="color:#F59E0B;"></i>
         <span><strong style="color:#EEF0FF;">{{ profile_user.profile.rating|floatformat:1 }}</strong> from {{ profile_user.profile.total_reviews }} review{{ profile_user.profile.total_reviews|pluralize }}</span>
+      </div>
+      {% endif %}
+
+      {% if not can_view_contact and (profile_user.profile.phone or profile_user.profile.address) and user.is_authenticated and user != profile_user %}
+      <div class="pp-premium-prompt">
+        <i class="bi bi-lock-fill"></i>
+        Upgrade to Premium to view contact details.
       </div>
       {% endif %}
 

@@ -98,12 +98,17 @@ body.page-home .nav-visitor:not(.solid) {
 /* Responsive display helpers (used by app navbar) */
 .d-none { display: none !important; }
 .d-xl-block { display: none !important; }
+.d-xl-inline-block { display: none !important; }
 @media (min-width: 768px) {
   .d-md-flex { display: flex !important; }
 }
 @media (min-width: 992px) {
   .d-lg-flex { display: flex !important; }
+  .d-lg-inline-flex { display: inline-flex !important; }
   .d-lg-none { display: none !important; }
+}
+@media (min-width: 1200px) {
+  .d-xl-inline-block { display: inline-block !important; }
 }
 @media (min-width: 1200px) {
   .d-xl-block { display: block !important; }

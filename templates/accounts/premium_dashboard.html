@@ -1,0 +1,137 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %}Premium Dashboard — Rentify{% endblock %}
+{% block body_class %}page-premium-dashboard{% endblock %}
+
+{% block content %}
+<section class="premium-dashboard-shell">
+  <div class="premium-dashboard-grid">
+
+    <main class="premium-dashboard-main">
+      <div class="premium-dashboard-header">
+        <span class="premium-plan-tag">Limited Launch Offer</span>
+        <h1 class="premium-dashboard-title">₹1 Premium Access</h1>
+        <p class="premium-dashboard-intro">Activate premium and unlock all Rentify benefits for a single testing price.</p>
+      </div>
+
+      {% if is_premium %}
+      <div class="premium-status-banner premium-status-active">
+        <div class="premium-status-banner-content">
+          <i class="bi bi-patch-check-fill"></i>
+          <div>
+            <span class="premium-status-banner-label">Premium Active</span>
+            <p class="premium-status-banner-desc">You have access to all Rentify Premium benefits.</p>
+          </div>
+        </div>
+      </div>
+      {% else %}
+      <div class="premium-status-banner premium-status-inactive">
+        <div class="premium-status-banner-content">
+          <i class="bi bi-exclamation-circle"></i>
+          <div>
+            <span class="premium-status-banner-label">Premium Not Active</span>
+            <p class="premium-status-banner-desc">Upgrade to unlock unlimited messaging and owner contact details.</p>
+          </div>
+        </div>
+      </div>
+      {% endif %}
+
+      <div class="premium-usage-stats-card">
+        <h3 class="premium-usage-stats-title">Your Usage</h3>
+        <div class="premium-usage-stats-grid">
+          <div class="premium-usage-stat-item">
+            <div class="premium-usage-stat-label">Messages Used</div>
+            <div class="premium-usage-stat-value">{{ messages_used }}</div>
+          </div>
+          <div class="premium-usage-stat-item">
+            <div class="premium-usage-stat-label">Limit</div>
+            <div class="premium-usage-stat-value">{% if current_plan == 'Premium' %}<span style="color:#F59E0B;">∞</span>{% else %}5{% endif %}</div>
+          </div>
+          <div class="premium-usage-stat-item">
+            <div class="premium-usage-stat-label">Current Plan</div>
+            <div class="premium-usage-stat-value premium-plan-badge">{{ current_plan }}</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="premium-benefits-comparison">
+        <h3 class="premium-benefits-comparison-title">Plan Comparison</h3>
+        <div class="premium-comparison-grid">
+          <div class="premium-comparison-col">
+            <div class="premium-comparison-header">Free</div>
+            <ul class="premium-comparison-list">
+              <li class="included"><i class="bi bi-patch-check-fill"></i> 5 Messages</li>
+              <li class="excluded"><i class="bi bi-x-circle"></i> Phone Number Access</li>
+              <li class="excluded"><i class="bi bi-x-circle"></i> Address Access</li>
+              <li class="excluded"><i class="bi bi-x-circle"></i> Premium Badge</li>
+            </ul>
+          </div>
+          <div class="premium-comparison-col premium-comparison-col-highlighted">
+            <div class="premium-comparison-header">Premium</div>
+            <ul class="premium-comparison-list">
+              <li class="included"><i class="bi bi-patch-check-fill"></i> Unlimited Messages</li>
+              <li class="included"><i class="bi bi-patch-check-fill"></i> Phone Number Access</li>
+              <li class="included"><i class="bi bi-patch-check-fill"></i> Address Access</li>
+              <li class="included"><i class="bi bi-patch-check-fill"></i> Premium Badge</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+
+      <div class="premium-dashboard-payment-card">
+        <div class="premium-dashboard-payment-head">
+          <h3>Payment</h3>
+          <p>Activate premium access with a one-time ₹1 payment. This button will be connected to Cashfree payment processing.</p>
+        </div>
+        <button type="button" class="rfy-premium-btn premium-dashboard-paybtn" id="premiumActivateBtn" {% if is_premium %}disabled{% endif %}>Pay ₹1 and Activate Premium</button>
+        <div class="premium-dashboard-message-area" id="premiumMessageArea" style="display:none;">
+          <strong id="premiumMessageTitle"></strong>
+          <p id="premiumMessageText"></p>
+        </div>
+      </div>
+    </main>
+
+    <aside class="premium-dashboard-aside">
+      <div class="premium-dashboard-aside-card">
+        <p class="premium-plan-tag">Why go premium?</p>
+        <h2>Premium gives you better renter access.</h2>
+        <p>Rentify Premium helps you move faster with unlimited chat, owner contact details, and a visible profile status that owners trust.</p>
+        <div class="premium-dashboard-feature-block">
+          <div><i class="bi bi-patch-check-fill"></i> Priority owner access</div>
+          <div><i class="bi bi-patch-check-fill"></i> Better rental visibility</div>
+          <div><i class="bi bi-patch-check-fill"></i> More reliable booking flow</div>
+        </div>
+      </div>
+    </aside>
+
+  </div>
+</section>
+
+<script>
+  const premiumActivateBtn = document.getElementById('premiumActivateBtn');
+  const premiumMessageArea = document.getElementById('premiumMessageArea');
+  const premiumMessageTitle = document.getElementById('premiumMessageTitle');
+  const premiumMessageText = document.getElementById('premiumMessageText');
+
+  if (premiumActivateBtn) {
+    premiumActivateBtn.addEventListener('click', function() {
+      if (this.disabled) return;
+      
+      this.disabled = true;
+      const originalText = this.textContent;
+      this.textContent = 'Processing...';
+      this.classList.add('loading');
+      
+      setTimeout(() => {
+        this.classList.remove('loading');
+        this.textContent = originalText;
+        this.disabled = false;
+        
+        premiumMessageArea.style.display = 'block';
+        premiumMessageTitle.textContent = 'Payment Integration Pending';
+        premiumMessageText.textContent = 'Cashfree payment integration will be connected soon. For now, this is a placeholder button.';
+      }, 2000);
+    });
+  }
+</script>
+{% endblock %}

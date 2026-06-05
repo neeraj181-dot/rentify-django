@@ -30,6 +30,15 @@
     <a href="{% url 'create_listing' %}" class="rfy-mob-link" style="background:rgba(0,208,132,.12);color:var(--green);border:1.5px solid rgba(0,208,132,.2);border-radius:12px;margin-top:.35rem;">
       <i class="bi bi-plus-circle"></i> List Item
     </a>
+    {% if not request.user.profile.is_premium %}
+    <a href="{% url 'premium' %}" class="rfy-mob-link premium-link" style="margin-top:.35rem;">
+      <i class="bi bi-patch-check-fill"></i> Premium
+    </a>
+    {% else %}
+    <span class="rfy-mob-link premium-status" style="margin-top:.35rem;">
+      <i class="bi bi-patch-check-fill"></i> Premium
+    </span>
+    {% endif %}
     <div style="border-top:1px solid rgba(255,255,255,.07);margin:.35rem 0;"></div>
     <a href="{% url 'edit_profile' %}" class="rfy-mob-link"><i class="bi bi-gear" style="color:rgba(238,240,255,.35);"></i> Settings</a>
     <a href="{% url 'logout' %}" class="rfy-mob-link" style="color:#FF5272;"><i class="bi bi-box-arrow-right"></i> Sign Out</a>

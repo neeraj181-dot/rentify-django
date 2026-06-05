@@ -11,6 +11,8 @@ class UserProfile(models.Model):
     bio = models.TextField(blank=True, max_length=500)
     profile_photo = models.ImageField(upload_to='profiles/', blank=True, null=True)
     is_verified = models.BooleanField(default=False)
+    is_premium = models.BooleanField(default=False)
+    messages_sent_count = models.PositiveIntegerField(default=0)
     rating = models.DecimalField(max_digits=3, decimal_places=2, default=0.00)
     total_reviews = models.IntegerField(default=0)
     total_earnings = models.DecimalField(max_digits=10, decimal_places=2, default=0.00)
@@ -20,6 +22,16 @@ class UserProfile(models.Model):
 
     def __str__(self):
         return f"{self.user.username}'s Profile"
+
+    def can_send_message(self):
+        return self.is_premium or self.messages_sent_count < 5
+
+    def remaining_messages(self):
+        return None if self.is_premium else max(0, 5 - self.messages_sent_count)
+
+    def increment_messages_sent(self):
+        self.messages_sent_count = self.messages_sent_count + 1
+        self.save(update_fields=['messages_sent_count'])
 
     def get_photo_url(self):
         if self.profile_photo:

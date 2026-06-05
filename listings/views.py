@@ -234,6 +234,13 @@ def product_detail_view(request, pk):
             review__isnull=True,
         ).order_by('-created_at').first()
         user_booked = review_booking is not None
+        can_view_owner_contact = is_owner or request.user.profile.is_premium
+    else:
+        is_owner = False
+        in_wishlist = False
+        review_booking = None
+        user_booked = False
+        can_view_owner_contact = False
 
     context = {
         'product': product,
@@ -245,6 +252,7 @@ def product_detail_view(request, pk):
         'review_booking': review_booking,
         'is_owner': is_owner,
         'show_private_address': is_owner or user_booked,
+        'can_view_owner_contact': can_view_owner_contact,
         'rating_range': range(1, 6),
     }
     return render(request, 'listings/product_detail.html', context)

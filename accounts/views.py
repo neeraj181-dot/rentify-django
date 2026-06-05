@@ -216,6 +216,9 @@ def public_profile_view(request, username):
     listings     = Product.objects.filter(owner=profile_user, is_available=True)
     reviews      = Review.objects.filter(reviewee=profile_user).select_related('reviewer').order_by('-created_at')
     avg_rating   = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
+    can_view_contact = False
+    if request.user.is_authenticated:
+        can_view_contact = request.user == profile_user or request.user.profile.is_premium
 
     return render(request, 'accounts/public_profile.html', {
         'profile_user': profile_user,
@@ -223,6 +226,7 @@ def public_profile_view(request, username):
         'reviews':      reviews,
         'avg_rating':   avg_rating,
         'review_count': reviews.count(),
+        'can_view_contact': can_view_contact,
     })
 
 
@@ -267,6 +271,40 @@ def toggle_dark_mode(request):
     profile.dark_mode = not profile.dark_mode
     profile.save(update_fields=['dark_mode'])
     return redirect(request.META.get('HTTP_REFERER', '/'))
+
+
+def premium_view(request):
+    is_premium = False
+    if request.user.is_authenticated:
+        is_premium = getattr(request.user, 'profile', None) and request.user.profile.is_premium
+
+    return render(request, 'accounts/premium.html', {
+        'is_premium': is_premium,
+    })
+
+
+def premium_dashboard_view(request):
+    profile = None
+    is_premium = False
+    messages_used = 0
+    messages_limit = 0
+    messages_remaining = 0
+    
+    if request.user.is_authenticated:
+        profile = getattr(request.user, 'profile', None)
+        is_premium = bool(profile and profile.is_premium)
+        messages_used = profile.messages_sent_count if profile else 0
+        messages_limit = float('inf') if is_premium else 5
+        messages_remaining = max(0, int(messages_limit) - messages_used) if not is_premium else float('inf')
+
+    return render(request, 'accounts/premium_dashboard.html', {
+        'is_premium': is_premium,
+        'premium_status_label': 'Premium Active' if is_premium else 'Premium Not Active',
+        'messages_used': messages_used,
+        'messages_limit': messages_limit if messages_limit != float('inf') else 'Unlimited',
+        'messages_remaining': messages_remaining if messages_remaining != float('inf') else 'Unlimited',
+        'current_plan': 'Premium' if is_premium else 'Free',
+    })
 
 
 # ── AJAX: check username / email availability ─────────────────────────────────

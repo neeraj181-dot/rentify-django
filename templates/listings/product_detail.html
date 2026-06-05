@@ -228,10 +228,13 @@
                  onerror="this.src='https://placehold.co/52/4F8EF7/fff?text={{ product.owner.username|first|upper }}'">
           </a>
           <div>
-            <a href="{% url 'public_profile' product.owner.username %}" style="font-weight:700;font-size:.9rem;color:var(--text);display:flex;align-items:center;gap:.4rem;">
+            <a href="{% url 'public_profile' product.owner.username %}" style="font-weight:700;font-size:.9rem;color:var(--text);display:flex;align-items:center;gap:.4rem;flex-wrap:wrap;">
               {{ product.owner.get_full_name|default:product.owner.username }}
               {% if product.owner.profile.is_verified %}
               <i class="bi bi-patch-check-fill" style="color:var(--blue);font-size:.8rem;"></i>
+              {% endif %}
+              {% if product.owner.profile.is_premium %}
+              <span class="premium-pill" style="font-size:.65rem;"><i class="bi bi-patch-check-fill"></i> Premium</span>
               {% endif %}
             </a>
             <div style="font-size:.75rem;color:var(--text3);margin-top:.2rem;">
@@ -241,6 +244,32 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <div class="gcard" style="padding:1.25rem; margin-top:.9rem;">
+        <div style="font-size:.68rem;font-weight:700;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:1rem;">Contact Owner</div>
+        {% if can_view_owner_contact %}
+          {% if product.owner.profile.phone %}
+          <div style="display:flex;align-items:center;gap:.6rem;padding:.85rem 0;border-bottom:1px solid rgba(255,255,255,.06);color:var(--text);">
+            <i class="bi bi-telephone-fill" style="color:var(--green);"></i>
+            <span>{{ product.owner.profile.phone }}</span>
+          </div>
+          {% endif %}
+          {% if product.owner.profile.address %}
+          <div style="display:flex;align-items:center;gap:.6rem;padding:.85rem 0;color:var(--text);">
+            <i class="bi bi-geo-alt-fill" style="color:var(--blue);"></i>
+            <span>{{ product.owner.profile.address }}</span>
+          </div>
+          {% endif %}
+          {% if not product.owner.profile.phone and not product.owner.profile.address %}
+          <div style="color:var(--text3);">Contact details are not available for this owner.</div>
+          {% endif %}
+        {% else %}
+          <div style="padding:.85rem 0;color:var(--text2);line-height:1.7;">
+            <i class="bi bi-lock-fill" style="color:#F59E0B;margin-right:.5rem;"></i>
+            Upgrade to Premium to view contact details.
+          </div>
+        {% endif %}
       </div>
 
       <!-- Safety note -->

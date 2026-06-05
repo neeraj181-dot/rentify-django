@@ -42,11 +42,30 @@ def conversation_view(request, conv_id):
     if request.method == 'POST':
         content = request.POST.get('content', '').strip()
         if content:
+            profile = request.user.profile
+            if not profile.can_send_message():
+                error_payload = {
+                    'error': 'message_limit',
+                    'title': 'Upgrade to Rentify Premium',
+                    'description': 'You have reached your free messaging limit.',
+                    'benefits': [
+                        'Unlimited Messaging',
+                        'View Owner Phone Number',
+                        'View Owner Address',
+                        'Premium Badge',
+                    ],
+                }
+                if request.headers.get('X-Requested-With') == 'XMLHttpRequest':
+                    return JsonResponse(error_payload, status=403)
+                messages.warning(request, 'You have reached your free messaging limit. Upgrade to premium to continue chatting.')
+                return redirect('conversation', conv_id=conv_id)
+
             msg = Message.objects.create(
                 conversation=conversation,
                 sender=request.user,
                 content=content
             )
+            profile.increment_messages_sent()
             conversation.save()  # update updated_at
             other = conversation.get_other_participant(request.user)
             create_notification(

@@ -308,6 +308,23 @@
       </button>
     </form>
 
+    <div class="premium-modal-backdrop" id="premiumModalBackdrop"></div>
+    <div class="premium-modal" id="premiumModal" role="dialog" aria-modal="true" aria-labelledby="premiumModalTitle">
+      <button type="button" class="premium-modal-close" id="premiumModalClose" aria-label="Close">&times;</button>
+      <h2 id="premiumModalTitle">Upgrade to Rentify Premium</h2>
+      <p>You have reached your free messaging limit.</p>
+      <ul>
+        <li>Unlimited Messaging</li>
+        <li>View Owner Phone Number</li>
+        <li>View Owner Address</li>
+        <li>Premium Badge</li>
+      </ul>
+      <div class="premium-actions">
+        <a href="{% url 'dashboard' %}" class="btn btn-primary btn-upgrade">Upgrade Now</a>
+        <button type="button" class="btn btn-ghost btn-later" id="premiumModalCancel">Maybe Later</button>
+      </div>
+    </div>
+
   </div><!-- /chat-area -->
 </div><!-- /msg-shell -->
 {% endblock %}
@@ -364,6 +381,25 @@
     lastId = Math.max(lastId, msg.id);
   }
 
+  const premiumModal = document.getElementById('premiumModal');
+  const premiumBackdrop = document.getElementById('premiumModalBackdrop');
+  const premiumClose = document.getElementById('premiumModalClose');
+  const premiumCancel = document.getElementById('premiumModalCancel');
+
+  function closePremiumModal() {
+    premiumModal?.classList.remove('open');
+    premiumBackdrop?.classList.remove('open');
+  }
+
+  function showPremiumModal() {
+    premiumModal?.classList.add('open');
+    premiumBackdrop?.classList.add('open');
+  }
+
+  premiumBackdrop?.addEventListener('click', closePremiumModal);
+  premiumClose?.addEventListener('click', closePremiumModal);
+  premiumCancel?.addEventListener('click', closePremiumModal);
+
   /* ── Send message via AJAX ── */
   window.submitMsg = async function () {
     const content = input?.value.trim();
@@ -391,6 +427,11 @@
           scrollBottom();
         }
       } else {
+        const payload = await res.json().catch(() => ({}));
+        if (payload.error === 'message_limit') {
+          showPremiumModal();
+          return;
+        }
         /* server returned an error — fall back to full page POST */
         form.submit();
       }

@@ -7,6 +7,14 @@ TEXTAREA = 'rfy-field-input rfy-field-textarea'
 
 
 class ProductForm(forms.ModelForm):
+    state = forms.ChoiceField(
+        choices=(),
+        widget=forms.Select(attrs={
+            'class': f'{FIELD} rfy-field-select',
+            'id': 'id_state',
+        })
+    )
+
     class Meta:
         model = Product
         fields = [
@@ -26,7 +34,6 @@ class ProductForm(forms.ModelForm):
                 'rows': 5,
                 'placeholder': "Describe your product — condition, features, what's included...",
             }),
-            'state': forms.Select(attrs={'class': f'{FIELD} rfy-field-select', 'id': 'id_state'}),
             'city': forms.TextInput(attrs={
                 'class': FIELD,
                 'id': 'id_city',

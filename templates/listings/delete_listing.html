@@ -1,22 +1,230 @@
 {% extends 'base.html' %}
 {% block title %}Delete Listing — Rentify{% endblock %}
+{% block extra_css %}
+<style>
+  .delete-listing-modal-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 12000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem;
+    background: rgba(6, 10, 21, 0.88);
+    backdrop-filter: blur(22px);
+    overflow-y: auto;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity .28s ease;
+  }
+  .delete-listing-modal-overlay.open {
+    opacity: 1;
+    pointer-events: all;
+  }
+  .delete-listing-modal {
+    width: min(100%, 540px);
+    background: rgba(12, 16, 28, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 24px;
+    box-shadow: 0 32px 90px rgba(0, 0, 0, 0.35);
+    overflow: hidden;
+    transform: translateY(20px) scale(.96);
+    opacity: 0;
+    transition: transform .3s cubic-bezier(.22,1,.36,1), opacity .3s ease;
+  }
+  .delete-listing-modal.open {
+    transform: translateY(0) scale(1);
+    opacity: 1;
+  }
+  .delete-listing-modal-inner {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    text-align: center;
+    padding: 2rem 2rem 2.25rem;
+  }
+  .delete-listing-icon {
+    width: 84px;
+    height: 84px;
+    margin-bottom: 1.5rem;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(255, 77, 91, 0.12);
+    border: 1px solid rgba(255, 77, 91, 0.2);
+    color: #FF4D5B;
+    font-size: 2.2rem;
+  }
+  .delete-listing-title {
+    margin-bottom: 0.85rem;
+    font-size: clamp(1.6rem, 2.5vw, 2rem);
+    font-weight: 800;
+    color: #F8FAFC;
+  }
+  .delete-listing-copy {
+    max-width: 420px;
+    margin: 0 auto 2rem;
+    color: rgba(238, 241, 255, 0.8);
+    line-height: 1.8;
+    font-size: .97rem;
+  }
+  .delete-listing-actions {
+    width: 100%;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.9rem;
+  }
+  .delete-listing-actions button,
+  .delete-listing-actions a {
+    min-height: 52px;
+    padding: 0 1rem;
+    border-radius: 14px;
+    font-weight: 700;
+    font-size: .95rem;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform .2s ease, box-shadow .2s ease, background .2s ease, border-color .2s ease;
+    border: 1px solid transparent;
+    width: 100%;
+  }
+  .delete-listing-actions button {
+    background: #FF4D5B;
+    color: #FFF;
+    border-color: rgba(255, 77, 91, 0.35);
+    box-shadow: 0 18px 40px rgba(255, 77, 91, 0.18);
+  }
+  .delete-listing-actions button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 22px 48px rgba(255, 77, 91, 0.24);
+  }
+  .delete-listing-actions button:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+  }
+  .delete-listing-actions .cancel-button {
+    background: rgba(255, 255, 255, 0.06);
+    color: #E5E7EB;
+    border-color: rgba(226, 232, 240, 0.12);
+  }
+  .delete-listing-actions .cancel-button:hover {
+    background: rgba(255, 255, 255, 0.11);
+  }
+  .delete-listing-close {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    width: 42px;
+    height: 42px;
+    border-radius: 50%;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(15, 19, 33, 0.86);
+    color: rgba(241, 245, 249, 0.85);
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+    transition: background .2s ease, transform .2s ease;
+  }
+  .delete-listing-close:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-1px);
+  }
+  @media (max-width: 640px) {
+    .delete-listing-modal {
+      width: 100%;
+      border-radius: 20px;
+    }
+    .delete-listing-modal-inner {
+      padding: 1.5rem 1.25rem 1.5rem;
+    }
+    .delete-listing-actions {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>
+{% endblock %}
+
 {% block content %}
-<div class="mk-page py-5 d-flex align-items-center" style="min-height:75vh;">
-  <div class="container-xl" style="max-width:520px;">
-    <div class="gcard text-center p-5">
-      <div style="width:64px; height:64px; background:rgba(255,92,92,.1); border:1px solid rgba(255,92,92,.25); border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.75rem; margin:0 auto 1.5rem; color:var(--red);">
+<div class="delete-listing-modal-overlay open" id="deleteListingModal" role="dialog" aria-modal="true" aria-labelledby="delete-listing-title">
+  <div class="delete-listing-modal open" tabindex="-1">
+    <button type="button" class="delete-listing-close" aria-label="Close delete confirmation" id="deleteListingClose">
+      <i class="bi bi-x-lg"></i>
+    </button>
+    <div class="delete-listing-modal-inner">
+      <div class="delete-listing-icon">
         <i class="bi bi-trash3-fill"></i>
       </div>
-      <h4 style="font-weight:800; margin-bottom:.5rem; color:var(--text);">Delete Listing?</h4>
-      <p style="font-size:.9rem; color:var(--text-2); margin-bottom:1.75rem;">
-        You're about to permanently delete <strong>{{ product.title }}</strong>. This action cannot be undone.
+      <h1 class="delete-listing-title" id="delete-listing-title">Delete Listing?</h1>
+      <p class="delete-listing-copy">
+        You are about to permanently delete <strong>{{ product.title }}</strong>. This action cannot be undone.
       </p>
-      <form method="post" style="display:flex; flex-direction:column; gap:.75rem;">
+      <form method="post" class="delete-listing-actions">
         {% csrf_token %}
-        <button type="submit" class="mk-btn mk-btn-danger mk-btn-lg" style="width:100%;">Yes, Delete Listing</button>
-        <a href="{% url 'product_detail' product.pk %}" class="mk-btn mk-btn-outline" style="text-align:center;">Cancel</a>
+        <button type="submit">Delete Listing</button>
+        <a href="{% url 'product_detail' product.pk %}" class="cancel-button">Cancel</a>
       </form>
     </div>
   </div>
 </div>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+  (function () {
+    const overlay = document.getElementById('deleteListingModal');
+    const closeButton = document.getElementById('deleteListingClose');
+    const focusableSelectors = 'button, a[href], input, textarea, select, [tabindex]:not([tabindex="-1"])';
+    const modal = overlay.querySelector('.delete-listing-modal');
+    const focusable = Array.from(modal.querySelectorAll(focusableSelectors));
+    const firstFocusable = focusable[0];
+    const lastFocusable = focusable[focusable.length - 1];
+
+    if (firstFocusable) {
+      firstFocusable.focus();
+    }
+
+    function closeModal() {
+      window.location.href = '{% url "product_detail" product.pk %}';
+    }
+
+    overlay.addEventListener('click', function (event) {
+      if (event.target === overlay) {
+        closeModal();
+      }
+    });
+
+    closeButton.addEventListener('click', closeModal);
+
+    const form = modal.querySelector('form');
+    const submitButton = form ? form.querySelector('button[type="submit"]') : null;
+    if (form && submitButton) {
+      form.addEventListener('submit', function () {
+        submitButton.disabled = true;
+        submitButton.textContent = 'Deleting...';
+      });
+    }
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        event.preventDefault();
+        closeModal();
+      }
+      if (event.key === 'Tab') {
+        if (!firstFocusable || !lastFocusable) return;
+        if (event.shiftKey) {
+          if (document.activeElement === firstFocusable) {
+            event.preventDefault();
+            lastFocusable.focus();
+          }
+        } else {
+          if (document.activeElement === lastFocusable) {
+            event.preventDefault();
+            firstFocusable.focus();
+          }
+        }
+      }
+    });
+  })();
+</script>
 {% endblock %}

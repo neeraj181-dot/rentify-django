@@ -74,8 +74,8 @@
             Reviews
             <span style="font-size:.85rem;font-weight:500;color:var(--text3);margin-left:.4rem;">({{ reviews|length }})</span>
           </h3>
-          {% if user_booked %}
-          <a href="{% url 'create_review' reviews.0.booking.pk %}" class="btn btn-outline btn-sm">Write Review</a>
+          {% if review_booking %}
+          <a href="{% url 'create_review' review_booking.pk %}" class="btn btn-outline btn-sm">Write Review</a>
           {% endif %}
         </div>
 

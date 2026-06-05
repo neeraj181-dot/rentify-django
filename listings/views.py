@@ -220,14 +220,20 @@ def product_detail_view(request, pk):
 
     in_wishlist = False
     user_booked = False
+    review_booking = None
     is_owner = False
     if request.user.is_authenticated:
         is_owner = product.owner_id == request.user.id
         in_wishlist = Wishlist.objects.filter(user=request.user, product=product).exists()
         from bookings.models import Booking
-        user_booked = Booking.objects.filter(
-            renter=request.user, product=product, status__in=['approved', 'completed']
-        ).exists()
+        # Only allow review creation for completed bookings that have not yet been reviewed.
+        review_booking = Booking.objects.filter(
+            renter=request.user,
+            product=product,
+            status='completed',
+            review__isnull=True,
+        ).order_by('-created_at').first()
+        user_booked = review_booking is not None
 
     context = {
         'product': product,
@@ -236,6 +242,7 @@ def product_detail_view(request, pk):
         'similar': similar,
         'in_wishlist': in_wishlist,
         'user_booked': user_booked,
+        'review_booking': review_booking,
         'is_owner': is_owner,
         'show_private_address': is_owner or user_booked,
         'rating_range': range(1, 6),

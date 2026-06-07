@@ -34,14 +34,19 @@
         </div>
       </div>
 
-      {% if is_premium %}
-      <div class="premium-status-chip">
-        <i class="bi bi-patch-check-fill"></i>
-        You are already a Premium member.
-      </div>
-      {% else %}
-      <a href="{% url 'premium_dashboard' %}" class="rfy-premium-btn premium-hero-cta">Upgrade Now</a>
-      {% endif %}
+     {% if is_premium %}
+<div class="premium-status-chip">
+  <i class="bi bi-patch-check-fill"></i>
+  You are already a Premium member.
+</div>
+{% else %}
+<a href="https://payments-test.cashfree.com/links?code=zagp4cfugmqg_AAAAAACpUz4"
+   target="_blank"
+   rel="noopener noreferrer"
+   class="rfy-premium-btn premium-hero-cta">
+   Upgrade Now
+</a>
+{% endif %}
     </div>
 
     <div class="premium-card-panel">

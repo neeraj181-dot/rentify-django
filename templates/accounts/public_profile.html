@@ -19,7 +19,7 @@
         {% if profile_user.profile.is_verified %}
         <i class="bi bi-patch-check-fill" style="color:#4F8EF7;font-size:.85rem;margin-left:.25rem;" title="Verified"></i>
         {% endif %}
-        {% if profile_user.profile.is_premium %}
+        {% if profile_user_is_premium %}
         <span class="pp-premium-badge"><i class="bi bi-patch-check-fill"></i> Premium</span>
         {% endif %}
       </h1>

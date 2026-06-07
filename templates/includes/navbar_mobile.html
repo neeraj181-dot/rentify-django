@@ -30,7 +30,7 @@
     <a href="{% url 'create_listing' %}" class="rfy-mob-link" style="background:rgba(0,208,132,.12);color:var(--green);border:1.5px solid rgba(0,208,132,.2);border-radius:12px;margin-top:.35rem;">
       <i class="bi bi-plus-circle"></i> List Item
     </a>
-    {% if not request.user.profile.is_premium %}
+    {% if not user_is_premium %}
     <a href="{% url 'premium' %}" class="rfy-mob-link premium-link" style="margin-top:.35rem;">
       <i class="bi bi-patch-check-fill"></i> Premium
     </a>

@@ -233,7 +233,7 @@
               {% if product.owner.profile.is_verified %}
               <i class="bi bi-patch-check-fill" style="color:var(--blue);font-size:.8rem;"></i>
               {% endif %}
-              {% if product.owner.profile.is_premium %}
+              {% if owner_is_premium %}
               <span class="premium-pill" style="font-size:.65rem;"><i class="bi bi-patch-check-fill"></i> Premium</span>
               {% endif %}
             </a>

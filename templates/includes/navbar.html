@@ -70,7 +70,7 @@
         </div>
       </div>
 
-      {% if not request.user.profile.is_premium %}
+      {% if not user_is_premium %}
       <a href="{% url 'premium' %}" class="premium-btn d-none d-lg-inline-flex" role="button" aria-label="Upgrade to Premium">
         Premium
       </a>
@@ -88,7 +88,7 @@
                alt="{{ request.user.username }}"
                onerror="this.src='https://placehold.co/34/4F8EF7/fff?text={{ request.user.username|first|upper }}'">
           <span class="pt-name d-none d-xl-block">{{ request.user.first_name|default:request.user.username }}</span>
-          {% if request.user.profile.is_premium %}
+          {% if user_is_premium %}
           <span class="premium-pill d-none d-xl-inline-block"><i class="bi bi-patch-check-fill"></i> Premium</span>
           {% endif %}
           <i class="bi bi-chevron-down pt-caret"></i>

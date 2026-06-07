@@ -24,10 +24,12 @@ class UserProfile(models.Model):
         return f"{self.user.username}'s Profile"
 
     def can_send_message(self):
-        return self.is_premium or self.messages_sent_count < 5
+        from subscriptions.utils import is_premium
+        return is_premium(self.user) or self.messages_sent_count < 5
 
     def remaining_messages(self):
-        return None if self.is_premium else max(0, 5 - self.messages_sent_count)
+        from subscriptions.utils import is_premium
+        return None if is_premium(self.user) else max(0, 5 - self.messages_sent_count)
 
     def increment_messages_sent(self):
         self.messages_sent_count = self.messages_sent_count + 1

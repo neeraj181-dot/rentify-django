@@ -10,6 +10,7 @@ from django.core.paginator import Paginator
 from .models import Product, ProductImage, Wishlist, CATEGORY_CHOICES, CATEGORY_ICONS
 from .forms import ProductForm, ProductImageForm, SearchForm
 from reviews.models import Review
+from subscriptions.utils import is_premium
 from .location_utils import (
     resolve_browse_location,
     set_browse_location_session,
@@ -234,13 +235,15 @@ def product_detail_view(request, pk):
             review__isnull=True,
         ).order_by('-created_at').first()
         user_booked = review_booking is not None
-        can_view_owner_contact = is_owner or request.user.profile.is_premium
+        can_view_owner_contact = is_owner or is_premium(request.user)
     else:
         is_owner = False
         in_wishlist = False
         review_booking = None
         user_booked = False
         can_view_owner_contact = False
+
+    owner_is_premium = is_premium(product.owner)
 
     context = {
         'product': product,
@@ -253,6 +256,7 @@ def product_detail_view(request, pk):
         'is_owner': is_owner,
         'show_private_address': is_owner or user_booked,
         'can_view_owner_contact': can_view_owner_contact,
+        'owner_is_premium': owner_is_premium,
         'rating_range': range(1, 6),
     }
     return render(request, 'listings/product_detail.html', context)

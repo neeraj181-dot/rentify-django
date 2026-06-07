@@ -9,6 +9,7 @@ from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db.models import Avg
 from django.conf import settings
 from subscriptions.models import UserSubscription
+from subscriptions.utils import is_premium
 import json
 import logging
 import jwt
@@ -214,15 +215,17 @@ def dashboard_view(request):
 # ── Public Profile ────────────────────────────────────────────────────────────
 def public_profile_view(request, username):
     profile_user = get_object_or_404(User, username=username)
+    profile_user_is_premium = is_premium(profile_user)
     listings     = Product.objects.filter(owner=profile_user, is_available=True)
     reviews      = Review.objects.filter(reviewee=profile_user).select_related('reviewer').order_by('-created_at')
     avg_rating   = reviews.aggregate(avg=Avg('rating'))['avg'] or 0
     can_view_contact = False
     if request.user.is_authenticated:
-        can_view_contact = request.user == profile_user or request.user.profile.is_premium
+        can_view_contact = request.user == profile_user or is_premium(request.user)
 
     return render(request, 'accounts/public_profile.html', {
         'profile_user': profile_user,
+        'profile_user_is_premium': profile_user_is_premium,
         'listings':     listings,
         'reviews':      reviews,
         'avg_rating':   avg_rating,

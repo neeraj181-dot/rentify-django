@@ -274,30 +274,59 @@ def toggle_dark_mode(request):
     return redirect(request.META.get('HTTP_REFERER', '/'))
 
 
+@login_required
 def premium_view(request):
+    """Display premium page or premium member status."""
+    from django.utils import timezone
+    
     is_premium = False
 
     if request.user.is_authenticated:
+        now = timezone.now()
         is_premium = UserSubscription.objects.filter(
             user=request.user,
-            status='active'
+            status='active',
+            expires_at__gt=now
         ).exists()
+        logger.info(f"[premium_view] User: {request.user.username}, is_premium: {is_premium}")
 
     return render(request, 'accounts/premium.html', {
         'is_premium': is_premium,
     })
 
+@login_required
 def premium_dashboard_view(request):
+    """Premium dashboard — show subscription status and usage limits."""
+    from django.utils import timezone
+    
     profile = None
     is_premium = False
     messages_used = 0
     messages_limit = 0
     messages_remaining = 0
+    active_subscription = None
     
     if request.user.is_authenticated:
         profile = getattr(request.user, 'profile', None)
-        is_premium = bool(profile and profile.is_premium)
         messages_used = profile.messages_sent_count if profile else 0
+        
+        now = timezone.now()
+        # Check for active UserSubscription with expiry check
+        active_subscription = UserSubscription.objects.filter(
+            user=request.user,
+            status='active',
+            expires_at__gt=now
+        ).first()
+        
+        is_premium = active_subscription is not None
+        
+        # Log debug info
+        logger.info(
+            f"[premium_dashboard_view] User: {request.user.username}, "
+            f"Active subscription: {active_subscription is not None}, "
+            f"is_premium: {is_premium}"
+        )
+        
         messages_limit = float('inf') if is_premium else 5
         messages_remaining = max(0, int(messages_limit) - messages_used) if not is_premium else float('inf')
 

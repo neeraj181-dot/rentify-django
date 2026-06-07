@@ -88,12 +88,14 @@
       </div>
       {% endif %}
 
-     {% if not can_view_contact and profile_user.profile.phone or profile_user.profile.address and user.is_authenticated and user != profile_user %}
-      <div class="pp-premium-prompt">
+     {% if not can_view_contact and user.is_authenticated and user != profile_user %}
+    {% if profile_user.profile.phone or profile_user.profile.address %}
+    <div class="pp-premium-prompt">
         <i class="bi bi-lock-fill"></i>
         Upgrade to Premium to view contact details.
-      </div>
-      {% endif %}
+    </div>
+    {% endif %}
+{% endif %}
 
       {% if profile_user.profile.is_verified %}
       <div class="pp-verified-bar">

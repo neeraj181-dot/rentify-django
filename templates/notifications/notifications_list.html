@@ -1,73 +1,125 @@
 {% extends 'base.html' %}
 {% block title %}Notifications — Rentify{% endblock %}
-{% block content %}
 {% block extra_css %}
 <style>
-/* Notifications page — premium dark UI overrides */
+/* Notifications page — premium dark theme */
 body { background-image: none; background: #070B1A; }
-.notifications-page { max-width: 1000px; margin: 0 auto; }
-.notifications-hero { display:flex; align-items:center; gap:1rem; justify-content:space-between; flex-wrap:wrap; margin-bottom:1.25rem; }
-.notifications-title { font-weight:800; font-size:1.6rem; color:#FFFFFF; margin:0; }
-.notif-count { display:inline-block; background:rgba(255,255,255,.06); color:#FFFFFF; padding:.25rem .6rem; border-radius:999px; font-size:.85rem; margin-left:.5rem; font-weight:700; }
-.btn-mark { background:#00D084; color:#070B1A; border:none; padding:.5rem .9rem; border-radius:999px; font-weight:700; box-shadow:0 6px 18px rgba(0,208,132,.12); }
-.btn-mark:hover{ transform:translateY(-2px); }
-.notification-card { border-radius:16px; border:1px solid rgba(255,255,255,.03); background: rgba(255,255,255,0.02); padding:12px; }
-.notification-list { display:flex; flex-direction:column; gap:.6rem; }
-.notifications-page .notif-row { display:flex; align-items:center; gap:1rem; padding:.85rem; border-bottom:none; border-radius:12px; text-decoration:none; color:#FFFFFF; transition:transform .18s ease, box-shadow .18s ease; }
-.notifications-page .notif-row:hover{ transform:translateY(-6px); box-shadow:0 18px 40px rgba(2,6,23,.6);} 
-.notifications-page .notif-icon{ width:48px;height:48px;border-radius:12px;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.03); color:#FFFFFF; flex-shrink:0; }
-.notifications-page .notif-body{ flex:1; display:flex; flex-direction:column; }
-.notifications-page .notif-title{ font-size:.95rem; font-weight:600; color:#FFFFFF; }
-.notifications-page .notif-meta{ font-size:.78rem; color:#9CA3AF; margin-top:.25rem; }
-.notifications-page .notif-time{ margin-left:auto; font-size:.78rem; color:#9CA3AF; flex-shrink:0; }
-.notifications-page .notif-dot{ width:8px;height:8px;border-radius:50%;background:#00D084; flex-shrink:0; margin-left:12px; }
-.notifications-page .notif-row.unread{ border-left:4px solid #00D084; background: rgba(0,208,132,.03); }
-.empty-state{ text-align:center; padding:4rem 2rem; color:#9CA3AF; }
-.empty-state .es-icon{ font-size:4.5rem; color:#9CA3AF; opacity:.7; margin-bottom:1rem }
-@media (max-width:768px){
-  .notifications-page{ padding:0 1rem; }
-  .notifications-hero{ align-items:flex-start; }
-  .notifications-page .notif-time{ margin-left:0; margin-top:.5rem; }
-  .notifications-page .notif-row{ flex-direction:column; align-items:flex-start; }
-}
+.notifications-shell { max-width: 1120px; margin: 0 auto; padding: 4.5rem 1rem 3rem; }
+.notifications-panel { background: rgba(8,11,26,.9); border: 1px solid rgba(255,255,255,.06); border-radius: 28px; box-shadow: 0 24px 80px rgba(0,0,0,.5); overflow: hidden; backdrop-filter: blur(18px); }
+.notifications-top { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; padding: 2rem 2.25rem 1.5rem; }
+.notifications-title-block { display: flex; align-items: center; gap: 1rem; }
+.notifications-badge-icon { width: 54px; height: 54px; display:flex; align-items:center; justify-content:center; border-radius:18px; background: rgba(255,255,255,.05); color: #fff; box-shadow: inset 0 0 0 1px rgba(255,255,255,.04); }
+.notifications-title-block h1 { margin: 0; font-size: clamp(2rem, 2.8vw, 2.6rem); letter-spacing: -.03em; color: #FFFFFF; }
+.notifications-subtitle { margin-top: .35rem; color: rgba(255,255,255,.65); font-size: .95rem; max-width: 42rem; line-height: 1.75; }
+.notifications-header-meta { display: flex; align-items: center; gap: .9rem; flex-wrap: wrap; justify-content: flex-end; }
+.unread-pill { display: inline-flex; align-items: center; gap: .45rem; padding: .65rem 1rem; border-radius: 999px; background: rgba(0,208,132,.08); color: #D8FFF0; font-weight: 700; font-size: .82rem; }
+.unread-pill span { color: #E9FFF9; }
+.btn-mark { display: inline-flex; align-items: center; justify-content: center; gap: .5rem; padding: .8rem 1.2rem; border-radius: 999px; background: #00D084; color: #070B1A; font-weight: 700; font-size: .9rem; border: none; box-shadow: 0 16px 34px rgba(0,208,132,.16); transition: transform .2s ease, box-shadow .2s ease; text-decoration: none; }
+.btn-mark:hover { transform: translateY(-2px); box-shadow: 0 22px 44px rgba(0,208,132,.22); }
+.notifications-tabs { display: flex; flex-wrap: wrap; gap: .7rem; padding: 1rem 2.25rem 1.75rem; border-bottom: 1px solid rgba(255,255,255,.06); background: rgba(255,255,255,.015); }
+.notifications-tab { display: inline-flex; align-items: center; justify-content: center; padding: .75rem 1.2rem; border-radius: 999px; font-weight: 700; font-size: .88rem; color: rgba(255,255,255,.75); background: rgba(255,255,255,.02); border: 1px solid transparent; cursor: pointer; transition: all .22s ease; }
+.notifications-tab.active { color: #fff; background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.12); box-shadow: 0 10px 28px rgba(0,0,0,.18); }
+.notifications-tab:hover { transform: translateY(-1px); background: rgba(255,255,255,.06); }
+.notification-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; padding: 1.5rem 2.25rem 2.25rem; }
+.notif-card { display: flex; flex-direction: column; min-height: 190px; padding: 1.35rem 1.5rem; gap: .85rem; border-radius: 24px; background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.05); box-shadow: inset 0 0 0 1px rgba(255,255,255,.01), 0 18px 44px rgba(0,0,0,.24); text-decoration: none; color: #FFFFFF; transition: transform .22s ease, border-color .22s ease, box-shadow .22s ease, background .22s ease; }
+.notif-card:hover { transform: translateY(-6px); border-color: rgba(0,216,132,.3); box-shadow: 0 20px 50px rgba(0,0,0,.35), 0 0 0 1px rgba(255,255,255,.06); background: rgba(255,255,255,.06); }
+.notif-card.unread { border-left: 4px solid #00D084; background: rgba(0,208,132,.05); }
+.notif-card-top { display: flex; align-items: flex-start; gap: 1rem; }
+.notif-card-icon { width: 52px; height: 52px; flex-shrink: 0; border-radius: 18px; display: grid; place-items: center; background: rgba(255,255,255,.05); color: #fff; font-size: 1.4rem; }
+.notif-card-content { display: flex; flex-direction: column; gap: .6rem; }
+.notif-card-title { font-size: 1rem; font-weight: 700; letter-spacing: -.01em; color: #FFFFFF; }
+.notif-card-label { padding: .32rem .65rem; border-radius: 999px; font-size: .72rem; font-weight: 700; color: #D8FFF0; background: rgba(0,208,132,.12); align-self: flex-start; }
+.notif-card-body { color: rgba(255,255,255,.72); font-size: .92rem; line-height: 1.7; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; }
+.notif-card-footer { display: flex; flex-wrap: wrap; align-items: center; gap: .75rem; justify-content: space-between; color: rgba(255,255,255,.55); font-size: .82rem; }
+.notif-card-dot { width: 10px; height: 10px; border-radius: 999px; background: #00D084; }
+.empty-state { text-align: center; padding: 5rem 2rem; color: rgba(255,255,255,.72); }
+.empty-state .es-icon { font-size: 5rem; color: rgba(255,255,255,.22); margin-bottom: 1rem; }
+.empty-state h3 { color: #fff; font-size: 1.55rem; margin-bottom: .75rem; }
+.empty-state p { max-width: 34rem; margin: 0 auto 1.5rem; color: rgba(255,255,255,.62); line-height: 1.8; }
+.empty-state .empty-cta { display: inline-flex; align-items: center; justify-content: center; padding: .9rem 1.6rem; border-radius: 999px; background: #00D084; color: #070B1A; font-weight: 700; text-decoration: none; box-shadow: 0 16px 34px rgba(0,208,132,.16); }
+@media (max-width: 1024px) { .notification-grid { grid-template-columns: 1fr; } }
+@media (max-width: 768px) { .notifications-shell { padding: 3rem .85rem 2rem; } .notifications-top { flex-direction: column; align-items: stretch; } .notifications-header-meta { justify-content: space-between; width: 100%; } .notifications-tabs { padding: 1rem .75rem 1.25rem; } .notification-grid { padding: 1rem .75rem 1.5rem; } }
+@media (max-width: 560px) { .notifications-top { padding: 1.35rem 1rem 1rem; } .notifications-panel { border-radius: 22px; } .notif-card { border-radius: 20px; padding: 1.15rem; } }
 </style>
 {% endblock %}
 
-<div class="container notifications-page py-5">
-  <div class="notifications-hero">
-    <div style="display:flex;align-items:center;gap:.5rem;">
-      <h1 class="notifications-title">Notifications</h1>
-      <span class="notif-count">{{ notifications|length }}</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:.75rem;">
-      <a href="{% url 'mark_all_read' %}" class="btn-mark">
-        <i class="bi bi-check2-all" style="margin-right:.45rem; font-weight:700;"></i>Mark All Read
-      </a>
-    </div>
-  </div>
-
-  {% if notifications %}
-  <div class="notification-card">
-    <div class="notification-list">
-    {% for n in notifications %}
-    <a href="{% url 'mark_notification_read' n.pk %}" class="notif-row {% if not n.is_read %}unread{% endif %}" role="listitem">
-      <div class="notif-icon"><i class="bi {{ n.get_icon }}"></i></div>
-      <div class="notif-body">
-        <div class="notif-title">{{ n.message }}</div>
+{% block content %}
+<div class="notifications-shell">
+  <section class="notifications-panel" aria-label="Notifications overview">
+    <div class="notifications-top">
+      <div class="notifications-title-block">
+        <div class="notifications-badge-icon"><i class="bi bi-bell-fill"></i></div>
+        <div>
+          <h1>Notifications</h1>
+          <p class="notifications-subtitle">Stay informed about bookings, messages, payments, and system updates with a premium notifications inbox.</p>
+        </div>
       </div>
-      <div class="notif-time">{{ n.created_at|timesince }} ago</div>
-      {% if not n.is_read %}<div class="notif-dot" aria-hidden="true"></div>{% endif %}
-    </a>
-    {% endfor %}
+      <div class="notifications-header-meta">
+        <div class="unread-pill"><span>{{ unread_count }}</span> unread</div>
+        <a href="{% url 'mark_all_read' %}" class="btn-mark"><i class="bi bi-check2-all"></i> Mark All as Read</a>
+      </div>
     </div>
-  </div>
-  {% else %}
-  <div class="empty-state">
-    <div class="es-icon"><i class="bi bi-bell-slash"></i></div>
-    <h3>All caught up!</h3>
-    <p>You have no notifications right now.</p>
-    <a href="{% url 'home' %}" class="btn btn-primary px-5 rounded-pill">Go to Home</a>
-  </div>
-  {% endif %}
+
+    <div class="notifications-tabs" role="tablist" aria-label="Notification categories">
+      <button type="button" class="notifications-tab active" data-filter="all" role="tab" aria-selected="true">All</button>
+      <button type="button" class="notifications-tab" data-filter="messages" role="tab" aria-selected="false">Messages</button>
+      <button type="button" class="notifications-tab" data-filter="bookings" role="tab" aria-selected="false">Bookings</button>
+      <button type="button" class="notifications-tab" data-filter="payments" role="tab" aria-selected="false">Payments</button>
+      <button type="button" class="notifications-tab" data-filter="system" role="tab" aria-selected="false">System</button>
+    </div>
+
+    {% if notifications %}
+    <div class="notification-grid" id="notificationGrid">
+      {% for n in notifications %}
+      <a href="{% url 'mark_notification_read' n.pk %}" class="notif-card {% if not n.is_read %}unread{% endif %}"
+         data-category="{% if n.notification_type == 'new_message' %}messages{% elif n.notification_type == 'booking_request' or n.notification_type == 'booking_approved' or n.notification_type == 'booking_rejected' %}bookings{% elif n.notification_type == 'product_returned' %}payments{% else %}system{% endif %}"
+         role="listitem">
+        <div class="notif-card-top">
+          <div class="notif-card-icon"><i class="bi {{ n.get_icon }}"></i></div>
+          <div class="notif-card-content">
+            <div class="notif-card-title">{{ n.get_notification_type_display }}</div>
+            <div class="notif-card-label">{{ n.is_read|yesno:"Read,Unread" }}</div>
+          </div>
+        </div>
+        <div class="notif-card-body">{{ n.message }}</div>
+        <div class="notif-card-footer">
+          <span>{{ n.created_at|timesince }} ago</span>
+          {% if not n.is_read %}<span class="notif-card-dot" aria-hidden="true"></span>{% endif %}
+        </div>
+      </a>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <div class="es-icon"><i class="bi bi-bell"></i></div>
+      <h3>No notifications yet</h3>
+      <p>Your Rentify inbox is quiet for now. Once activity occurs, notifications will appear here with helpful updates about bookings, messages and payments.</p>
+      <a href="{% url 'home' %}" class="empty-cta">Go to Home</a>
+    </div>
+    {% endif %}
+  </section>
 </div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+  const tabs = document.querySelectorAll('.notifications-tab');
+  const cards = document.querySelectorAll('.notif-card');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(btn => {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      });
+      tab.classList.add('active');
+      tab.setAttribute('aria-selected', 'true');
+      const filter = tab.dataset.filter;
+      cards.forEach(card => {
+        const category = card.dataset.category;
+        const isVisible = filter === 'all' || category === filter;
+        card.style.display = isVisible ? 'flex' : 'none';
+      });
+    });
+  });
+});
+</script>
 {% endblock %}

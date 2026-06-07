@@ -9,10 +9,12 @@ def notifications_list_view(request):
     notifications = Notification.objects.filter(
         recipient=request.user
     ).order_by('-created_at')
+    unread_count = notifications.filter(is_read=False).count()
     # Mark all as read when viewing the list
     Notification.objects.filter(recipient=request.user, is_read=False).update(is_read=True)
     return render(request, 'notifications/notifications_list.html', {
         'notifications': notifications,
+        'unread_count': unread_count,
     })
 
 

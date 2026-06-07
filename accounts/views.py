@@ -8,6 +8,7 @@ from django.views.decorators.http import require_POST, require_GET
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.db.models import Avg
 from django.conf import settings
+from subscriptions.models import UserSubscription
 import json
 import logging
 import jwt
@@ -275,13 +276,16 @@ def toggle_dark_mode(request):
 
 def premium_view(request):
     is_premium = False
+
     if request.user.is_authenticated:
-        is_premium = getattr(request.user, 'profile', None) and request.user.profile.is_premium
+        is_premium = UserSubscription.objects.filter(
+            user=request.user,
+            status='active'
+        ).exists()
 
     return render(request, 'accounts/premium.html', {
         'is_premium': is_premium,
     })
-
 
 def premium_dashboard_view(request):
     profile = None

@@ -71,8 +71,8 @@
       </div>
 
       {% if not request.user.profile.is_premium %}
-      <a href="{% url 'premium' %}" class="rfy-premium-btn d-none d-lg-inline-flex">
-        <span>Premium</span>
+      <a href="{% url 'premium' %}" class="premium-btn d-none d-lg-inline-flex" role="button" aria-label="Upgrade to Premium">
+        Premium
       </a>
       {% else %}
       <span class="rfy-premium-status d-none d-lg-inline-flex"><i class="bi bi-patch-check-fill"></i> Premium</span>

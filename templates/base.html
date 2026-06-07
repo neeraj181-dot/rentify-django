@@ -230,20 +230,31 @@ button { cursor: pointer; font-family: inherit; }
 }
 .rfy-list-btn:hover { background: var(--green2); transform: translateY(-1px); box-shadow: 0 6px 20px rgba(0,208,132,.3); color: #000; }
 
-.rfy-premium-btn {
-  display: inline-flex; align-items: center; justify-content: center;
-  padding: .45rem 1rem; border-radius: 999px;
-  background: linear-gradient(135deg, #F7C56D, #F59E0B 65%, #FEE4A2);
-  color: #000; font-size: .8rem; font-weight: 800;
-  border: 1px solid rgba(245,158,11,.25);
-  box-shadow: 0 0 18px rgba(245,158,11,.18), 0 12px 30px rgba(245,158,11,.08);
-  text-decoration: none; transition: transform .18s ease, box-shadow .18s ease, opacity .18s ease;
+.premium-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 22px;
+  border-radius: 999px;
+  background: linear-gradient(135deg, #FBBF24, #F59E0B);
+  color: #111827 !important;
+  font-weight: 700;
+  text-decoration: none;
+  box-shadow: 0 4px 20px rgba(245,158,11,.35);
+  transition: all .3s ease;
   margin-left: .35rem;
 }
-.rfy-premium-btn:hover {
-  transform: translateY(-1px);
-  box-shadow: 0 0 22px rgba(245,158,11,.24), 0 16px 38px rgba(245,158,11,.12);
-  opacity: .96;
+.premium-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(245,158,11,.5);
+}
+nav#mainNav .premium-btn {
+  background: linear-gradient(135deg, #FBBF24, #F59E0B) !important;
+  color: #111827 !important;
+}
+nav#mainNav .premium-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 25px rgba(245,158,11,.5) !important;
 }
 .rfy-premium-status {
   display: inline-flex; align-items: center; gap: .35rem;
@@ -253,13 +264,14 @@ button { cursor: pointer; font-family: inherit; }
   margin-left: .35rem;
 }
 .rfy-mob-link.premium-link {
-  color: #000 !important; font-weight: 800;
-  background: linear-gradient(135deg, #F7C56D, #F5A825 85%);
-  border: 1px solid rgba(245,158,11,.2);
-  box-shadow: 0 0 18px rgba(245,158,11,.12);
+  color: #070B1A !important; font-weight: 800;
+  background: linear-gradient(90deg, #FBBF24 0%, #F59E0B 100%);
+  border: 1px solid rgba(245,158,11,.18);
+  box-shadow: 0 8px 28px rgba(251,191,36,.12);
 }
 .rfy-mob-link.premium-link:hover {
-  background: linear-gradient(135deg, #F8CE82, #F7A829 85%);
+  transform: translateY(-2px);
+  box-shadow: 0 14px 44px rgba(251,191,36,.18);
 }
 .rfy-mob-link.premium-status {
   color: #F59E0B !important;
